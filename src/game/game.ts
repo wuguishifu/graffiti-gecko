@@ -107,6 +107,7 @@ export class Game {
     }
     this.camera.update();
     this.player.update();
+    this.checkPlayerNearSprayCan();
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     this.render();
     requestAnimationFrame(() => this.run());
@@ -115,6 +116,26 @@ export class Game {
   public render() {
     this.level.render(this.gl, this.programInfo, this.camera);
     this.player.render(this.gl, this.programInfo, this.camera);
+  }
+
+  private lastSprayCanCheckValue = false;
+  private checkPlayerNearSprayCan() {
+    const sprayCans = this.level.getSprayCans();
+    const playerPos = this.player.position;
+    const detectionRadius = 1.5; // Distance within which player can interact with spray can
+
+    const isNearSprayCan = sprayCans.some(sprayCan => {
+      const distance = Math.sqrt(
+        Math.pow(playerPos.x - sprayCan.position.x, 2) +
+        Math.pow(playerPos.y - sprayCan.position.y, 2)
+      );
+      return distance <= detectionRadius;
+    });
+
+    if (isNearSprayCan !== this.lastSprayCanCheckValue) {
+      store.dispatch(gameActions.setNearSprayCan(isNearSprayCan));
+      this.lastSprayCanCheckValue = isNearSprayCan;
+    }
   }
 
   public destroy() {

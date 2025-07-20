@@ -4,7 +4,7 @@ import { SprayArea, type SprayAreaRef } from '../spray/spray-area';
 import { GameProvider } from '../state/game-context';
 import { GamePauser } from '../state/game-pauser';
 import { gameActions } from '../state/gameSlice';
-import { useAppDispatch } from '../state/useAppState';
+import { useAppDispatch, useAppSelector } from '../state/useAppState';
 
 export function GamePage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -12,6 +12,7 @@ export function GamePage() {
 
   const dispatch = useAppDispatch();
   const dispatchRef = useRef(dispatch);
+  const nearSprayCan = useAppSelector((state) => state.game.nearSprayCan);
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -46,12 +47,14 @@ export function GamePage() {
         </div>
         <div className='absolute top-0 left-0 w-full h-full px-20 py-16'>
           <div className='relative w-full h-full'>
-            <div
-              className='absolute bottom-0 right-0 bg-white/50 w-40 h-20 rounded-xl flex items-center justify-center hover:opacity-80 cursor-pointer'
-              onClick={onOpenSprayArea}
-            >
-              <img src="/assets/icons/can.png" />
-            </div>
+            {nearSprayCan && (
+              <div
+                className='absolute bottom-0 right-0 bg-white/50 w-40 h-20 rounded-xl flex items-center justify-center hover:opacity-80 cursor-pointer'
+                onClick={onOpenSprayArea}
+              >
+                <img src="/assets/icons/can.png" />
+              </div>
+            )}
           </div>
         </div>
         <SprayArea ref={sprayAreaRef} />

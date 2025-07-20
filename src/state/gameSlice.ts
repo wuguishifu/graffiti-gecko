@@ -3,11 +3,13 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 type GameSliceState = {
   score: number;
   sprayAreaVisible: boolean;
+  nearSprayCan: boolean;
 };
 
 const initialState: GameSliceState = {
   score: 0,
   sprayAreaVisible: false,
+  nearSprayCan: false,
 }
 
 export const gameSlice = createSlice({
@@ -19,6 +21,9 @@ export const gameSlice = createSlice({
     },
     setSprayAreaVisible: (state, action: PayloadAction<boolean>) => {
       state.sprayAreaVisible = action.payload;
+    },
+    setNearSprayCan: (state, action: PayloadAction<boolean>) => {
+      state.nearSprayCan = action.payload;
     },
     reset: () => initialState,
   },
