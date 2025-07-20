@@ -1,14 +1,12 @@
 import { Camera } from './graphics/camera';
-import renderObject from './graphics/renderer';
 import { buildProgramInfo, initShaderProgram } from './graphics/shader-source';
 import { TextureManager } from './graphics/texture-manager';
 import type { ProgramInfo } from './graphics/types';
-import { Vector3 } from './math';
 import { Player } from './player/player';
 
 import fsSource from './shaders/fragment.glsl?raw';
 import vsSource from './shaders/vertex.glsl?raw';
-import { Tile } from './tiles/tile';
+import { Level } from './world/level';
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -17,7 +15,7 @@ export class Game {
   private shaderProgram: WebGLProgram;
   private programInfo: ProgramInfo;
   private player: Player;
-  private tiles: Tile[] = [];
+  private level: Level;
 
   private boundKeyDown: (event: KeyboardEvent) => void;
   private boundKeyUp: (event: KeyboardEvent) => void;
@@ -61,6 +59,8 @@ export class Game {
       program: this.shaderProgram,
     };
 
+    this.level = new Level(this.gl);
+
     this.boundKeyDown = this.onKeyDown.bind(this);
     this.boundKeyUp = this.onKeyUp.bind(this);
     document.addEventListener('keydown', this.boundKeyDown);
@@ -68,29 +68,6 @@ export class Game {
 
     this.player = new Player(this.gl);
     this.camera = new Camera(this.canvas.clientWidth / this.canvas.clientHeight, this.player);
-    this.tiles.push(
-      new Tile({
-        position: new Vector3(0, 0, 0),
-        rotation: new Vector3(0, 0, 0),
-        scale: new Vector3(1, 1, 1),
-        variant: 'grass',
-        gl: this.gl
-      }),
-      new Tile({
-        position: new Vector3(1, 0, 0),
-        rotation: new Vector3(0, 0, 0),
-        scale: new Vector3(1, 1, 1),
-        variant: 'stone',
-        gl: this.gl
-      }),
-      new Tile({
-        position: new Vector3(-1, 0, 0),
-        rotation: new Vector3(0, 0, 0),
-        scale: new Vector3(1, 1, 1),
-        variant: 'building',
-        gl: this.gl
-      }),
-    );
 
     this.setup().then(() => this.run());
   }
@@ -112,20 +89,7 @@ export class Game {
   }
 
   public render() {
-    this.tiles.forEach(tile => {
-      renderObject({
-        gl: this.gl,
-        info: this.programInfo,
-        object: {
-          mesh: tile.mesh(this.gl),
-          model: tile.model,
-          texture: tile.texture,
-          useTexture: tile.isTextureReady,
-        },
-        camera: this.camera,
-      });
-    });
-
+    this.level.render(this.gl, this.programInfo, this.camera);
     this.player.render(this.gl, this.programInfo, this.camera);
   }
 

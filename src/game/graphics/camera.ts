@@ -17,7 +17,7 @@ export class Camera {
 
   constructor(aspect: number, player: Player) {
     this.up = new Vector3(0, 0, 1);
-    this.position = new Vector3(player.position.x, player.position.y + 20, player.position.z);
+    this.position = new Vector3(player.position.x, player.position.y, player.position.z);
     this.aspect = aspect;
     this.player = player;
   }
