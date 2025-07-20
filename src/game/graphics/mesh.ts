@@ -62,10 +62,10 @@ export class Vertex {
 }
 
 const squareVertices = [
-  new Vertex(new Vector3(-0.5, 0, -0.5), new Vector3(0, 1, 0), [0, 0]),
-  new Vertex(new Vector3(0.5, 0, -0.5), new Vector3(0, 1, 0), [1, 0]),
-  new Vertex(new Vector3(0.5, 0, 0.5), new Vector3(0, 1, 0), [1, 1]),
-  new Vertex(new Vector3(-0.5, 0, 0.5), new Vector3(0, 1, 0), [0, 1])
+  new Vertex(new Vector3(-0.5, -0.5, 0), new Vector3(0, 0, 1), [0, 0]),
+  new Vertex(new Vector3(0.5, -0.5, 0), new Vector3(0, 0, 1), [1, 0]),
+  new Vertex(new Vector3(0.5, 0.5, 0), new Vector3(0, 0, 1), [1, 1]),
+  new Vertex(new Vector3(-0.5, 0.5, 0), new Vector3(0, 0, 1), [0, 1])
 ];
 
 const squareIndices = [

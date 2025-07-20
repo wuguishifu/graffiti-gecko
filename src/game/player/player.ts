@@ -48,8 +48,8 @@ export class Player extends RenderObject {
     if (this.keysDown.has('d')) vx += ax;
 
     if (ax === 0 && vy === 0) return;
-    this.position.add(new Vector3(vx, 0, vy));
-    this.rotation.y = Math.atan2(vx, vy);
+    this.position.add(new Vector3(vx, vy, 0));
+    this.rotation.z = -Math.atan2(vx, vy);
   }
 
   private keysDown: Set<string> = new Set();

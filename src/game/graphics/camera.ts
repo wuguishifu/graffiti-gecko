@@ -16,8 +16,8 @@ export class Camera {
   private zFar: number = 100.0;
 
   constructor(aspect: number, player: Player) {
-    this.up = new Vector3(0, 0, 1);
-    this.position = new Vector3(player.position.x, player.position.y, player.position.z);
+    this.up = new Vector3(0, 1, 0);
+    this.position = new Vector3(player.position.x, player.position.y, player.position.z + ZOOM);
     this.aspect = aspect;
     this.player = player;
   }
@@ -25,8 +25,8 @@ export class Camera {
   update() {
     this.position = new Vector3(
       this.player.position.x,
-      this.player.position.y - ZOOM,
-      this.player.position.z
+      this.player.position.y,
+      this.player.position.z + ZOOM
     );
   }
 
