@@ -19,12 +19,15 @@ type RenderProps = {
       scale: Vector3
     }
     texture?: Texture;
+    secondaryTexture?: Texture;
     useTexture?: boolean;
+    blendFactor?: number;
+    tilePosition?: [number, number];
   }
   camera: Camera;
 }
 
-export default function renderObject({ gl, object: { mesh, model, texture, useTexture = false }, camera, info }: RenderProps) {
+export default function renderObject({ gl, object: { mesh, model, texture, secondaryTexture, useTexture = false, blendFactor = 0, tilePosition = [0, 0] }, camera, info }: RenderProps) {
   const modelMatrix = mat4.create();
   mat4.translate(modelMatrix, modelMatrix, model.position.toReadonlyVec3());
   mat4.rotateX(modelMatrix, modelMatrix, model.rotation.x);
@@ -49,10 +52,22 @@ export default function renderObject({ gl, object: { mesh, model, texture, useTe
   gl.enableVertexAttribArray(info.attributes['aTextureCoord']);
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-  if (texture && useTexture) {
-    texture.bind(0);
-    gl.uniform1i(info.uniforms['uTexture'], 0);
-    gl.uniform1i(info.uniforms['useTexture'], 1);
+  if (useTexture) {
+    if (texture && secondaryTexture && blendFactor > 0) {
+      // Procedural blending with two textures
+      texture.bind(0);
+      secondaryTexture.bind(1);
+      gl.uniform1i(info.uniforms['uTexture'], 0);
+      gl.uniform1i(info.uniforms['uTexture2'], 1);
+      gl.uniform1f(info.uniforms['blendFactor'], blendFactor);
+      gl.uniform2f(info.uniforms['tilePosition'], tilePosition[0], tilePosition[1]);
+      gl.uniform1i(info.uniforms['useTexture'], 1);
+    } else if (texture) {
+      // Single texture
+      texture.bind(0);
+      gl.uniform1i(info.uniforms['uTexture'], 0);
+      gl.uniform1i(info.uniforms['useTexture'], 1);
+    }
   } else {
     gl.uniform1i(info.uniforms['useTexture'], 0);
   }
