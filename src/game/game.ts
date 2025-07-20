@@ -163,9 +163,18 @@ export class Game {
     });
 
     if (nearbyCop) {
-      console.log('Player captured by cop!');
-      // You could add game over logic here
-      // For now, just log the capture
+      // Check if player takes damage
+      if (this.player.takeDamage()) {
+        console.log(`Player took damage! Lives remaining: ${this.player.getLives()}`);
+
+        // Update game state
+        store.dispatch(gameActions.setLives(this.player.getLives()));
+
+        // Make all cops flee
+        cops.forEach(cop => {
+          cop.startFleeing();
+        });
+      }
     }
   }
 

@@ -29,6 +29,10 @@ export class Cop extends RenderObject {
   private pathUpdateTimer: number = 0;
   private pathUpdateInterval: number = 60; // Update path every 60 frames (1 second at 60fps)
   private otherCops: Cop[] = [];
+  private isFleeing: boolean = false;
+  private fleeTimer: number = 0;
+  private fleeDuration: number = 60; // 1 second at 60fps
+  private fleeTarget: { x: number; y: number } | null = null;
 
   constructor(gl: WebGLRenderingContext, level: Level, player: Player, id: number, x: number, y: number) {
     super(
@@ -45,7 +49,14 @@ export class Cop extends RenderObject {
   }
 
   public setOtherCops(cops: Cop[]) {
-    this.otherCops = cops.filter(cop => cop.id !== this.id);
+    this.otherCops = cops;
+  }
+
+  public startFleeing() {
+    this.isFleeing = true;
+    this.fleeTimer = 0;
+    this.path = []; // Clear current path
+    this.findFleeTarget();
   }
 
   public render(gl: WebGLRenderingContext, programInfo: ProgramInfo, camera: Camera) {
@@ -63,6 +74,11 @@ export class Cop extends RenderObject {
   }
 
   public update() {
+    if (this.isFleeing) {
+      this.updateFleeing();
+      return;
+    }
+
     const distanceToPlayer = this.getDistanceToPlayer();
 
     if (distanceToPlayer <= this.chaseRadius) {
@@ -78,6 +94,163 @@ export class Cop extends RenderObject {
     } else {
       // Clear path when player is out of range
       this.path = [];
+    }
+  }
+
+  private updateFleeing() {
+    this.fleeTimer++;
+
+    if (this.fleeTimer >= this.fleeDuration) {
+      this.isFleeing = false;
+      this.fleeTarget = null;
+      this.path = [];
+      return;
+    }
+
+    // Update flee target periodically
+    if (this.fleeTimer % 30 === 0) { // Every 0.5 seconds
+      this.findFleeTarget();
+    }
+
+    if (this.fleeTarget) {
+      this.moveTowardsFleeTarget();
+    }
+  }
+
+  private findFleeTarget() {
+    const playerX = Math.round(this.player.position.x);
+    const playerY = Math.round(this.player.position.y);
+    const currentX = Math.round(this.position.x);
+    const currentY = Math.round(this.position.y);
+
+    // Calculate direction away from player
+    const dx = currentX - playerX;
+    const dy = currentY - playerY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance === 0) {
+      // If cop is on top of player, pick a random direction
+      const angle = Math.random() * Math.PI * 2;
+      const fleeDistance = 10;
+      this.fleeTarget = {
+        x: currentX + Math.cos(angle) * fleeDistance,
+        y: currentY + Math.sin(angle) * fleeDistance
+      };
+    } else {
+      // Move away from player
+      const fleeDistance = 15;
+      this.fleeTarget = {
+        x: currentX + (dx / distance) * fleeDistance,
+        y: currentY + (dy / distance) * fleeDistance
+      };
+    }
+
+    // Ensure flee target is within level bounds and walkable
+    this.fleeTarget.x = Math.max(0, Math.min(this.level.getWidth() - 1, this.fleeTarget.x));
+    this.fleeTarget.y = Math.max(0, Math.min(this.level.getHeight() - 1, this.fleeTarget.y));
+
+    // Find nearest walkable tile if target is not walkable
+    if (!this.level.isWalkable(Math.round(this.fleeTarget.x), Math.round(this.fleeTarget.y))) {
+      const nearestWalkable = this.findNearestWalkable(this.fleeTarget.x, this.fleeTarget.y);
+      if (nearestWalkable) {
+        this.fleeTarget = nearestWalkable;
+      }
+    }
+  }
+
+  private findNearestWalkable(targetX: number, targetY: number): { x: number; y: number } | null {
+    const maxSearchRadius = 10;
+
+    for (let radius = 1; radius <= maxSearchRadius; radius++) {
+      for (let dx = -radius; dx <= radius; dx++) {
+        for (let dy = -radius; dy <= radius; dy++) {
+          if (Math.abs(dx) === radius || Math.abs(dy) === radius) {
+            const x = Math.round(targetX + dx);
+            const y = Math.round(targetY + dy);
+
+            if (x >= 0 && x < this.level.getWidth() && y >= 0 && y < this.level.getHeight()) {
+              if (this.level.isWalkable(x, y)) {
+                return { x, y };
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
+  private moveTowardsFleeTarget() {
+    if (!this.fleeTarget) return;
+
+    const dx = this.fleeTarget.x - this.position.x;
+    const dy = this.fleeTarget.y - this.position.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance < 0.5) {
+      // Reached flee target, find new one
+      this.findFleeTarget();
+      return;
+    }
+
+    // Move towards flee target
+    const vx = (dx / distance) * this.speed * 1.5; // Flee faster
+    const vy = (dy / distance) * this.speed * 1.5;
+
+    // Apply collision avoidance with other cops
+    const avoidance = this.calculateAvoidance();
+    const finalVx = vx + avoidance.x;
+    const finalVy = vy + avoidance.y;
+
+    // Calculate new position
+    const newPosition = new Vector3(
+      this.position.x + finalVx,
+      this.position.y + finalVy,
+      this.position.z
+    );
+
+    // Check if new position is walkable
+    const newX = Math.round(newPosition.x);
+    const newY = Math.round(newPosition.y);
+
+    if (this.level.isWalkable(newX, newY)) {
+      this.position.x = newPosition.x;
+      this.position.y = newPosition.y;
+      this.position.z = newPosition.z;
+      this.rotation.z = -Math.atan2(finalVx, finalVy);
+    } else {
+      // Try moving only on X axis
+      const xOnlyPosition = new Vector3(
+        this.position.x + finalVx,
+        this.position.y,
+        this.position.z
+      );
+      const xOnlyX = Math.round(xOnlyPosition.x);
+      const xOnlyY = Math.round(xOnlyPosition.y);
+
+      if (this.level.isWalkable(xOnlyX, xOnlyY)) {
+        this.position.x = xOnlyPosition.x;
+        this.position.y = xOnlyPosition.y;
+        this.position.z = xOnlyPosition.z;
+        this.rotation.z = -Math.atan2(finalVx, 0);
+      } else {
+        // Try moving only on Y axis
+        const yOnlyPosition = new Vector3(
+          this.position.x,
+          this.position.y + finalVy,
+          this.position.z
+        );
+        const yOnlyX = Math.round(yOnlyPosition.x);
+        const yOnlyY = Math.round(yOnlyPosition.y);
+
+        if (this.level.isWalkable(yOnlyX, yOnlyY)) {
+          this.position.x = yOnlyPosition.x;
+          this.position.y = yOnlyPosition.y;
+          this.position.z = yOnlyPosition.z;
+          this.rotation.z = -Math.atan2(0, finalVy);
+        }
+      }
     }
   }
 

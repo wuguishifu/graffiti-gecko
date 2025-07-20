@@ -1,12 +1,12 @@
 import { gameActions } from '../../state/gameSlice';
 import { store } from '../../state/store';
-import { SprayCan } from '../entities/spray-can';
 import { Cop } from '../entities/cop';
+import { SprayCan } from '../entities/spray-can';
 import type { Camera } from '../graphics/camera';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
-import { Tile } from '../tiles/tile';
 import type { Player } from '../player/player';
+import { Tile } from '../tiles/tile';
 
 type TileType = 'grass' | 'stone' | 'building';
 
@@ -484,7 +484,7 @@ export class Level {
 
     // Set other cops reference for collision avoidance
     this.cops.forEach(cop => {
-      cop.setOtherCops(this.cops);
+      cop.setOtherCops(this.cops.filter(c => c !== cop));
     });
 
     console.log(`Spawned ${this.cops.length} cops at stone locations`);
@@ -498,5 +498,13 @@ export class Level {
 
   public getCops(): Cop[] {
     return this.cops;
+  }
+
+  public getWidth(): number {
+    return this.width;
+  }
+
+  public getHeight(): number {
+    return this.height;
   }
 }

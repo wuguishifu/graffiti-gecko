@@ -6,6 +6,7 @@ type GameSliceState = {
   nearSprayCan: boolean;
   sprayCans: Record<number, boolean>;
   activeSprayCanId?: number;
+  lives: number;
 };
 
 const initialState: GameSliceState = {
@@ -13,6 +14,7 @@ const initialState: GameSliceState = {
   sprayAreaVisible: false,
   nearSprayCan: false,
   sprayCans: {},
+  lives: 3,
 }
 
 export const gameSlice = createSlice({
@@ -47,6 +49,9 @@ export const gameSlice = createSlice({
       if (state.activeSprayCanId !== undefined) {
         state.sprayCans[state.activeSprayCanId] = true;
       }
+    },
+    setLives: (state, action: PayloadAction<number>) => {
+      state.lives = action.payload;
     },
     reset: () => initialState,
   },
