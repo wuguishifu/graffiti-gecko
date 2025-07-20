@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router';
 import { Game } from '../game/game';
 import { SprayArea, type SprayAreaRef } from '../spray/spray-area';
 import { GameProvider } from '../state/game-context';
@@ -14,6 +15,9 @@ export function GamePage() {
   const dispatch = useAppDispatch();
   const dispatchRef = useRef(dispatch);
   const nearSprayCan = useAppSelector((state) => state.game.nearSprayCan);
+  const gameOverFlag = useAppSelector((state) => state.game.gameOverFlag);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (canvasRef.current) {
@@ -31,6 +35,12 @@ export function GamePage() {
   }, []);
 
   const sprayAreaRef = useRef<SprayAreaRef>(null);
+
+  useEffect(() => {
+    if (gameOverFlag) {
+      navigate('/game-over');
+    }
+  }, [gameOverFlag]);
 
   return (
     <GameProvider gameInstance={gameInstance}>

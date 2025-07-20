@@ -142,7 +142,6 @@ export class Player extends RenderObject {
     this.invincibilityTimer = 0;
     this.flashTimer = 0;
 
-    console.log(`Player took damage! Lives remaining: ${this.lives}`);
     return true; // Damage was taken
   }
 

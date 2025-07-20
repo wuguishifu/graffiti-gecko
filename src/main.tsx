@@ -6,6 +6,7 @@ import { Provider as ReduxProvider } from 'react-redux';
 import { BrowserRouter, Route, Routes } from 'react-router';
 
 import { GamePage } from './app/game';
+import { GameOver } from './app/game-over';
 import { MainMenu } from './app/menu';
 import { store } from './state/store';
 
@@ -16,6 +17,7 @@ createRoot(document.getElementById('root')!).render(
         <Routes>
           <Route path="/" element={<MainMenu />} />
           <Route path="/game" element={<GamePage />} />
+          <Route path="/game-over" element={<GameOver />} />
         </Routes>
       </BrowserRouter>
     </ReduxProvider>

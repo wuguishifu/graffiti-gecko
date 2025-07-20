@@ -7,6 +7,7 @@ type GameSliceState = {
   sprayCans: Record<number, boolean>;
   activeSprayCanId?: number;
   lives: number;
+  gameOverFlag?: boolean;
 };
 
 const initialState: GameSliceState = {
@@ -52,6 +53,9 @@ export const gameSlice = createSlice({
     },
     setLives: (state, action: PayloadAction<number>) => {
       state.lives = action.payload;
+    },
+    setGameOverFlag: (state, action: PayloadAction<boolean>) => {
+      state.gameOverFlag = action.payload;
     },
     reset: () => initialState,
   },

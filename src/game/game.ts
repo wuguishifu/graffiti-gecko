@@ -155,7 +155,6 @@ export class Game {
 
   private checkPlayerNearCops() {
     const cops = this.level.getCops();
-    const playerPos = this.player.position;
     const captureRadius = 1.0; // Distance within which cops can capture player
 
     const nearbyCop = cops.find(cop => {
@@ -166,6 +165,10 @@ export class Game {
       // Check if player takes damage
       if (this.player.takeDamage()) {
         console.log(`Player took damage! Lives remaining: ${this.player.getLives()}`);
+
+        if (this.player.getLives() === 0) {
+          store.dispatch(gameActions.setGameOverFlag(true));
+        }
 
         // Update game state
         store.dispatch(gameActions.setLives(this.player.getLives()));
