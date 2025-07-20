@@ -272,16 +272,49 @@ export class Level {
       for (let x = 0; x < this.width; x++) {
         const cell = this.grid[y][x];
         if (cell.finalTile) {
+          // Get neighbor variants for blending
+          const neighbors = this.getNeighborVariants(x, y);
+
           this.tiles[y][x] = new Tile({
             position: new Vector3(x, y, 0),
             rotation: new Vector3(0, 0, 0),
             scale: new Vector3(1, 1, 1),
             variant: cell.finalTile,
-            gl: this.gl
+            gl: this.gl,
+            neighbors
           });
         }
       }
     }
+  }
+
+  private getNeighborVariants(x: number, y: number): {
+    north?: TileType;
+    south?: TileType;
+    east?: TileType;
+    west?: TileType;
+  } {
+    const neighbors: {
+      north?: TileType;
+      south?: TileType;
+      east?: TileType;
+      west?: TileType;
+    } = {};
+
+    if (y > 0 && this.grid[y - 1][x].finalTile) {
+      neighbors.north = this.grid[y - 1][x].finalTile;
+    }
+    if (y < this.height - 1 && this.grid[y + 1][x].finalTile) {
+      neighbors.south = this.grid[y + 1][x].finalTile;
+    }
+    if (x > 0 && this.grid[y][x - 1].finalTile) {
+      neighbors.west = this.grid[y][x - 1].finalTile;
+    }
+    if (x < this.width - 1 && this.grid[y][x + 1].finalTile) {
+      neighbors.east = this.grid[y][x + 1].finalTile;
+    }
+
+    return neighbors;
   }
 
   public getTiles(): Tile[][] {
@@ -299,12 +332,34 @@ export class Level {
           variant = 'grass';
         }
 
+        // Create neighbor information for fallback level
+        const neighbors: {
+          north?: TileType;
+          south?: TileType;
+          east?: TileType;
+          west?: TileType;
+        } = {};
+
+        if (y > 0) {
+          neighbors.north = x > 0 && x < this.width - 1 && y - 1 > 0 && y - 1 < this.height - 1 ? 'grass' : 'stone';
+        }
+        if (y < this.height - 1) {
+          neighbors.south = x > 0 && x < this.width - 1 && y + 1 > 0 && y + 1 < this.height - 1 ? 'grass' : 'stone';
+        }
+        if (x > 0) {
+          neighbors.west = x - 1 > 0 && x - 1 < this.width - 1 && y > 0 && y < this.height - 1 ? 'grass' : 'stone';
+        }
+        if (x < this.width - 1) {
+          neighbors.east = x + 1 > 0 && x + 1 < this.width - 1 && y > 0 && y < this.height - 1 ? 'grass' : 'stone';
+        }
+
         this.tiles[y][x] = new Tile({
           position: new Vector3(x, y, 0),
           rotation: new Vector3(0, 0, 0),
           scale: new Vector3(1, 1, 1),
           variant,
-          gl: this.gl
+          gl: this.gl,
+          neighbors
         });
       }
     }
@@ -319,7 +374,8 @@ export class Level {
           object: {
             mesh: tile.mesh(gl),
             model: tile.model,
-            texture: tile.texture,
+            texture: tile.primaryTexture,
+            blendTextures: tile.blendTextures,
             useTexture: tile.isTextureReady,
           },
           camera,

@@ -19,12 +19,13 @@ type RenderProps = {
       scale: Vector3
     }
     texture?: Texture;
+    blendTextures?: { texture: Texture; weight: number }[];
     useTexture?: boolean;
   }
   camera: Camera;
 }
 
-export default function renderObject({ gl, object: { mesh, model, texture, useTexture = false }, camera, info }: RenderProps) {
+export default function renderObject({ gl, object: { mesh, model, texture, blendTextures, useTexture = false }, camera, info }: RenderProps) {
   const modelMatrix = mat4.create();
   mat4.translate(modelMatrix, modelMatrix, model.position.toReadonlyVec3());
   mat4.rotateX(modelMatrix, modelMatrix, model.rotation.x);
@@ -49,10 +50,63 @@ export default function renderObject({ gl, object: { mesh, model, texture, useTe
   gl.enableVertexAttribArray(info.attributes['aTextureCoord']);
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-  if (texture && useTexture) {
-    texture.bind(0);
-    gl.uniform1i(info.uniforms['uTexture'], 0);
-    gl.uniform1i(info.uniforms['useTexture'], 1);
+  if (useTexture) {
+    if (blendTextures && blendTextures.length > 1) {
+      // Multi-texture blending
+      blendTextures.forEach((blend, index) => {
+        const textureUnit = index;
+        blend.texture.bind(textureUnit);
+
+        const uniformName = index === 0 ? 'uTexture' : `uTexture${index + 1}`;
+        const weightName = `blendWeight${index + 1}`;
+
+        if (info.uniforms[uniformName]) {
+          gl.uniform1i(info.uniforms[uniformName], textureUnit);
+        }
+        if (info.uniforms[weightName]) {
+          gl.uniform1f(info.uniforms[weightName], blend.weight);
+        }
+      });
+
+      // Set remaining texture units to use the first texture to avoid undefined sampling
+      for (let i = blendTextures.length; i < 4; i++) {
+        const uniformName = i === 0 ? 'uTexture' : `uTexture${i + 1}`;
+        const weightName = `blendWeight${i + 1}`;
+
+        if (info.uniforms[uniformName]) {
+          gl.uniform1i(info.uniforms[uniformName], 0);
+        }
+        if (info.uniforms[weightName]) {
+          gl.uniform1f(info.uniforms[weightName], 0.0);
+        }
+      }
+
+      gl.uniform1i(info.uniforms['useTexture'], 1);
+    } else if (texture) {
+      // Single texture
+      texture.bind(0);
+      gl.uniform1i(info.uniforms['uTexture'], 0);
+
+      // Set other texture units to use the same texture with zero weight
+      for (let i = 1; i < 4; i++) {
+        const uniformName = `uTexture${i + 1}`;
+        const weightName = `blendWeight${i + 1}`;
+
+        if (info.uniforms[uniformName]) {
+          gl.uniform1i(info.uniforms[uniformName], 0);
+        }
+        if (info.uniforms[weightName]) {
+          gl.uniform1f(info.uniforms[weightName], 0.0);
+        }
+      }
+
+      // Set primary texture weight to 1.0
+      if (info.uniforms['blendWeight1']) {
+        gl.uniform1f(info.uniforms['blendWeight1'], 1.0);
+      }
+
+      gl.uniform1i(info.uniforms['useTexture'], 1);
+    }
   } else {
     gl.uniform1i(info.uniforms['useTexture'], 0);
   }
