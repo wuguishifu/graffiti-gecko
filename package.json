@@ -8,11 +8,14 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "start": "node server.js",
+    "serve": "npm run build && npm start"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
     "@tailwindcss/vite": "^4.1.11",
+    "express": "^4.18.2",
     "gl-matrix": "^3.4.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
