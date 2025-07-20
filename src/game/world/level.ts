@@ -21,11 +21,11 @@ export class Level {
   private height = 20;
   private grid: Cell[][] = [];
 
-  // Define adjacency rules
+  // Define adjacency rules - more flexible to avoid contradictions
   private rules: Record<TileType, TileType[]> = {
-    grass: ['stone'],
-    stone: ['grass', 'building'],
-    building: ['stone']
+    grass: ['stone', 'grass'], // Grass can be next to grass or stone
+    stone: ['grass', 'building', 'stone'], // Stone can be next to anything
+    building: ['stone', 'building'] // Building can be next to stone or building
   };
 
   constructor(gl: WebGLRenderingContext) {
@@ -39,11 +39,14 @@ export class Level {
 
     while (retries < maxRetries) {
       try {
+        console.log(`Attempt ${retries + 1} to generate level...`);
         this.initializeGrid();
         this.collapseWaveFunction();
         this.createTiles();
-        return; // Success, exit the retry loop
-      } catch {
+        console.log('Level generated successfully!');
+        return;
+      } catch (error) {
+        console.log(`Attempt ${retries + 1} failed:`, error);
         retries++;
         if (retries >= maxRetries) {
           console.warn('Failed to generate level after', maxRetries, 'attempts, using fallback');
@@ -92,6 +95,10 @@ export class Level {
         const cell = this.grid[y][x];
         if (!cell.collapsed) {
           const entropy = cell.possibleTiles.size;
+          if (entropy === 0) {
+            console.log(`Found cell (${x}, ${y}) with 0 entropy - this shouldn't happen!`);
+            throw new Error(`Cell (${x}, ${y}) has no possible tiles`);
+          }
           if (entropy < minEntropy) {
             minEntropy = entropy;
             candidates = [cell];
@@ -105,12 +112,19 @@ export class Level {
     if (candidates.length === 0) return null;
 
     // Randomly select from cells with lowest entropy
-    return candidates[Math.floor(Math.random() * candidates.length)];
+    const selectedCell = candidates[Math.floor(Math.random() * candidates.length)];
+    console.log(`Selected cell (${selectedCell.x}, ${selectedCell.y}) with entropy ${selectedCell.possibleTiles.size}`);
+    return selectedCell;
   }
 
   private collapseCell(cell: Cell) {
     const possibleTiles = Array.from(cell.possibleTiles);
+    if (possibleTiles.length === 0) {
+      throw new Error(`Cannot collapse cell (${cell.x}, ${cell.y}) - no possible tiles`);
+    }
+
     const selectedTile = possibleTiles[Math.floor(Math.random() * possibleTiles.length)];
+    console.log(`Collapsing cell (${cell.x}, ${cell.y}) to ${selectedTile} from options: ${possibleTiles}`);
 
     cell.collapsed = true;
     cell.finalTile = selectedTile;
@@ -123,20 +137,28 @@ export class Level {
 
     while (queue.length > 0) {
       const cell = queue.shift()!;
+
+      if (cell !== collapsedCell) {
+        console.log(`Skipping cell (${cell.x}, ${cell.y}) in queue - not the original collapsed cell`);
+        continue;
+      }
+
+      if (!cell.finalTile) {
+        throw new Error(`Cell (${cell.x}, ${cell.y}) is collapsed but has no finalTile`);
+      }
+
       const neighbors = this.getNeighbors(cell);
 
       for (const neighbor of neighbors) {
         if (neighbor.collapsed) continue;
 
         const originalSize = neighbor.possibleTiles.size;
-        this.updateNeighborConstraints(neighbor, cell.finalTile!);
+        this.updateNeighborConstraints(neighbor, cell.finalTile);
 
         if (neighbor.possibleTiles.size < originalSize) {
           if (neighbor.possibleTiles.size === 0) {
-            // Contradiction - throw error to trigger retry
-            throw new Error('Contradiction detected in wave function collapse');
+            throw new Error(`Contradiction detected at (${neighbor.x}, ${neighbor.y})`);
           }
-          queue.push(neighbor);
         }
       }
     }
@@ -145,10 +167,10 @@ export class Level {
   private getNeighbors(cell: Cell): Cell[] {
     const neighbors: Cell[] = [];
     const directions = [
-      { dx: -1, dy: 0 }, // left
-      { dx: 1, dy: 0 },  // right
-      { dx: 0, dy: -1 }, // up
-      { dx: 0, dy: 1 }   // down
+      { dx: -1, dy: 0 },
+      { dx: 1, dy: 0 },
+      { dx: 0, dy: -1 },
+      { dx: 0, dy: 1 }
     ];
 
     for (const { dx, dy } of directions) {
@@ -200,14 +222,12 @@ export class Level {
   }
 
   private generateFallbackLevel() {
-    // Create a simple fallback level with stone borders and grass in the middle
     this.tiles = [];
     for (let y = 0; y < this.height; y++) {
       this.tiles[y] = [];
       for (let x = 0; x < this.width; x++) {
         let variant: TileType = 'stone';
 
-        // Create stone borders
         if (x > 0 && x < this.width - 1 && y > 0 && y < this.height - 1) {
           variant = 'grass';
         }

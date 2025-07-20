@@ -2,7 +2,7 @@ import { mat4 } from 'gl-matrix';
 import { Vector3 } from '../math';
 import { Player } from '../player/player';
 
-const ZOOM = 10;
+const DISTANCE = 20;
 
 export class Camera {
   private player: Player;
@@ -17,7 +17,7 @@ export class Camera {
 
   constructor(aspect: number, player: Player) {
     this.up = new Vector3(0, 1, 0);
-    this.position = new Vector3(player.position.x, player.position.y, player.position.z + ZOOM);
+    this.position = new Vector3(player.position.x, player.position.y, player.position.z + DISTANCE);
     this.aspect = aspect;
     this.player = player;
   }
@@ -26,7 +26,7 @@ export class Camera {
     this.position = new Vector3(
       this.player.position.x,
       this.player.position.y,
-      this.player.position.z + ZOOM
+      this.player.position.z + DISTANCE
     );
   }
 
