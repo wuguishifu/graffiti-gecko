@@ -179,10 +179,10 @@ export function SprayArea() {
     ctx.fillStyle = '#FF0000';
     ctx.globalAlpha = 0.7;
 
-    for (let i = 0; i < 5; i++) {
-      const sprayX = x + (Math.random() - 0.5) * 20;
-      const sprayY = y + (Math.random() - 0.5) * 20;
-      const size = Math.random() * 4 + 2;
+    for (let i = 0; i < 8; i++) {
+      const sprayX = x + (Math.random() - 0.5) * 40;
+      const sprayY = y + (Math.random() - 0.5) * 40;
+      const size = Math.random() * 8 + 4;
 
       ctx.beginPath();
       ctx.arc(sprayX, sprayY, size, 0, Math.PI * 2);
