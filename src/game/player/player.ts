@@ -5,12 +5,14 @@ import renderObject from '../graphics/renderer';
 import { TextureManager } from '../graphics/texture-manager';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
+import type { Level } from '../world/level';
 
 export class Player extends RenderObject {
   private mesh: Mesh;
   private textureManager: TextureManager;
+  private level: Level;
 
-  constructor(gl: WebGLRenderingContext) {
+  constructor(gl: WebGLRenderingContext, level: Level) {
     super(
       new Vector3(0, 0, 0),
       new Vector3(0, 0, 0),
@@ -19,6 +21,7 @@ export class Player extends RenderObject {
 
     this.mesh = squareMesh(gl);
     this.textureManager = TextureManager.getInstance(gl);
+    this.level = level;
   }
 
   public render(gl: WebGLRenderingContext, programInfo: ProgramInfo, camera: Camera) {
@@ -47,9 +50,57 @@ export class Player extends RenderObject {
     if (this.keysDown.has('a')) vx -= ax;
     if (this.keysDown.has('d')) vx += ax;
 
-    if (ax === 0 && vy === 0) return;
-    this.position.add(new Vector3(vx, vy, 0));
-    this.rotation.z = -Math.atan2(vx, vy);
+    if (vx === 0 && vy === 0) return;
+
+    // Calculate new position
+    const newPosition = new Vector3(
+      this.position.x + vx,
+      this.position.y + vy,
+      this.position.z
+    );
+
+    // Check if new position is walkable
+    const newX = Math.round(newPosition.x);
+    const newY = Math.round(newPosition.y);
+
+    if (this.level.isWalkable(newX, newY)) {
+      this.position.x = newPosition.x;
+      this.position.y = newPosition.y;
+      this.position.z = newPosition.z;
+      this.rotation.z = -Math.atan2(vx, vy);
+    } else {
+      // Try moving only on X axis
+      const xOnlyPosition = new Vector3(
+        this.position.x + vx,
+        this.position.y,
+        this.position.z
+      );
+      const xOnlyX = Math.round(xOnlyPosition.x);
+      const xOnlyY = Math.round(xOnlyPosition.y);
+
+      if (this.level.isWalkable(xOnlyX, xOnlyY)) {
+        this.position.x = xOnlyPosition.x;
+        this.position.y = xOnlyPosition.y;
+        this.position.z = xOnlyPosition.z;
+        this.rotation.z = -Math.atan2(vx, 0);
+      } else {
+        // Try moving only on Y axis
+        const yOnlyPosition = new Vector3(
+          this.position.x,
+          this.position.y + vy,
+          this.position.z
+        );
+        const yOnlyX = Math.round(yOnlyPosition.x);
+        const yOnlyY = Math.round(yOnlyPosition.y);
+
+        if (this.level.isWalkable(yOnlyX, yOnlyY)) {
+          this.position.x = yOnlyPosition.x;
+          this.position.y = yOnlyPosition.y;
+          this.position.z = yOnlyPosition.z;
+          this.rotation.z = -Math.atan2(0, vy);
+        }
+      }
+    }
   }
 
   private keysDown: Set<string> = new Set();

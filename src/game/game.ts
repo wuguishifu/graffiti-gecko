@@ -84,7 +84,8 @@ export class Game {
     document.addEventListener('keydown', this.boundKeyDown);
     document.addEventListener('keyup', this.boundKeyUp);
 
-    this.player = new Player(this.gl);
+    // Pass the level reference to the player
+    this.player = new Player(this.gl, this.level);
     this.camera = new Camera(this.canvas.clientWidth / this.canvas.clientHeight, this.player);
 
     this.running = true;

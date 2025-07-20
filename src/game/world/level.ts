@@ -14,6 +14,8 @@ interface Cell {
   finalTile?: TileType;
 }
 
+const walkableTiles: TileType[] = ['grass', 'stone'];
+
 export class Level {
   private gl: WebGLRenderingContext;
   private tiles: Tile[][] = [];
@@ -326,5 +328,32 @@ export class Level {
         });
       });
     });
+  }
+
+  // Add this new method to check if a position is walkable
+  public isWalkable(x: number, y: number): boolean {
+    // Check bounds
+    if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+      return false;
+    }
+
+    // Check if tile exists at this position
+    const tile = this.tiles[y]?.[x];
+    if (!tile) {
+      return false;
+    }
+
+    // Define which tile types are walkable
+    return walkableTiles.includes(tile.variant);
+  }
+
+  // Add a method to get tile type at position (useful for debugging)
+  public getTileType(x: number, y: number): TileType | null {
+    if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+      return null;
+    }
+
+    const tile = this.tiles[y]?.[x];
+    return tile ? tile.variant : null;
   }
 }
