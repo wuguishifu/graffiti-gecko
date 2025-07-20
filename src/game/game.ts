@@ -1,3 +1,5 @@
+import { gameActions } from '../state/gameSlice';
+import { store } from '../state/store';
 import { Camera } from './graphics/camera';
 import { buildProgramInfo, initShaderProgram } from './graphics/shader-source';
 import { TextureManager } from './graphics/texture-manager';
@@ -16,6 +18,18 @@ export class Game {
   private programInfo: ProgramInfo;
   private player: Player;
   private level: Level;
+  private running: boolean = false;
+
+  public pause() {
+    this.running = false;
+  }
+
+  public resume() {
+    if (!this.running) {
+      this.running = true;
+      this.run();
+    }
+  }
 
   private boundKeyDown: (event: KeyboardEvent) => void;
   private boundKeyUp: (event: KeyboardEvent) => void;
@@ -23,6 +37,10 @@ export class Game {
   private onKeyDown(event: KeyboardEvent) {
     console.log(`Key pressed: ${event.key}`);
     this.player.onKeyDown(event);
+
+    if (event.key === 'Escape') {
+      store.dispatch(gameActions.setSprayAreaVisible(false));
+    }
   }
 
   private onKeyUp(event: KeyboardEvent) {
@@ -69,6 +87,7 @@ export class Game {
     this.player = new Player(this.gl);
     this.camera = new Camera(this.canvas.clientWidth / this.canvas.clientHeight, this.player);
 
+    this.running = true;
     this.setup().then(() => this.run());
   }
 
@@ -81,6 +100,9 @@ export class Game {
   }
 
   public run() {
+    if (!this.running) {
+      return;
+    }
     this.camera.update();
     this.player.update();
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
