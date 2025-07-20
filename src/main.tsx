@@ -5,7 +5,7 @@ import { createRoot } from 'react-dom/client';
 import { Provider as ReduxProvider } from 'react-redux';
 import { BrowserRouter, Route, Routes } from 'react-router';
 
-import { Game } from './app/game';
+import { GamePage } from './app/game';
 import { MainMenu } from './app/menu';
 import { store } from './state/store';
 
@@ -15,7 +15,7 @@ createRoot(document.getElementById('root')!).render(
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<MainMenu />} />
-          <Route path="/game" element={<Game />} />
+          <Route path="/game" element={<GamePage />} />
         </Routes>
       </BrowserRouter>
     </ReduxProvider>
