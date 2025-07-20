@@ -5,6 +5,7 @@ import { GameProvider } from '../state/game-context';
 import { GamePauser } from '../state/game-pauser';
 import { gameActions } from '../state/gameSlice';
 import { useAppDispatch, useAppSelector } from '../state/useAppState';
+import { Hud } from '../ui/hud';
 
 export function GamePage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -57,6 +58,7 @@ export function GamePage() {
             )}
           </div>
         </div>
+        <Hud />
         <SprayArea ref={sprayAreaRef} />
         <GamePauser />
       </main>

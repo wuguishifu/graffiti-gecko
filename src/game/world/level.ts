@@ -1,8 +1,10 @@
+import { gameActions } from '../../state/gameSlice';
+import { store } from '../../state/store';
+import { SprayCan } from '../entities/spray-can';
 import type { Camera } from '../graphics/camera';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
 import { Tile } from '../tiles/tile';
-import { SprayCan } from '../entities/spray-can';
 
 type TileType = 'grass' | 'stone' | 'building';
 
@@ -367,12 +369,14 @@ export class Level {
 
     for (let i = 0; i < Math.min(numSprayCans, shuffledPoints.length); i++) {
       const point = shuffledPoints[i];
-      const sprayCan = new SprayCan(this.gl);
+      const sprayCan = new SprayCan(this.gl, i);
       sprayCan.position.x = point.x;
       sprayCan.position.y = point.y;
       sprayCan.position.z = 0.1; // Slightly above ground
       this.sprayCans.push(sprayCan);
     }
+
+    store.dispatch(gameActions.setSprayCans(this.sprayCans.map(sprayCan => sprayCan.id)));
 
     console.log(`Spawned ${this.sprayCans.length} spray cans at building-road intersections`);
   }

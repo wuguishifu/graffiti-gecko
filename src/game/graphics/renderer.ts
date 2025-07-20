@@ -20,11 +20,12 @@ type RenderProps = {
     }
     texture?: Texture;
     useTexture?: boolean;
+    alphaMultiplier?: number;
   }
   camera: Camera;
 }
 
-export default function renderObject({ gl, object: { mesh, model, texture, useTexture = false }, camera, info }: RenderProps) {
+export default function renderObject({ gl, object: { mesh, model, texture, useTexture = false, alphaMultiplier = 1.0 }, camera, info }: RenderProps) {
   const modelMatrix = mat4.create();
   mat4.translate(modelMatrix, modelMatrix, model.position.toReadonlyVec3());
   mat4.rotateX(modelMatrix, modelMatrix, model.rotation.x);
@@ -35,44 +36,45 @@ export default function renderObject({ gl, object: { mesh, model, texture, useTe
   gl.useProgram(info.program);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, mesh.pbo);
-  gl.vertexAttribPointer(info.attributes['aPosition'], 3, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(info.attributes['aPosition']);
+  gl.vertexAttribPointer(info.attributes.aPosition, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(info.attributes.aPosition);
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, mesh.nbo);
-  gl.vertexAttribPointer(info.attributes['aNormal'], 3, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(info.attributes['aNormal']);
+  gl.vertexAttribPointer(info.attributes.aNormal, 3, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(info.attributes.aNormal);
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, mesh.tbo);
-  gl.vertexAttribPointer(info.attributes['aTextureCoord'], 2, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(info.attributes['aTextureCoord']);
+  gl.vertexAttribPointer(info.attributes.aTextureCoord, 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(info.attributes.aTextureCoord);
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
   if (texture && useTexture) {
     texture.bind(0);
-    gl.uniform1i(info.uniforms['uTexture'], 0);
-    gl.uniform1i(info.uniforms['useTexture'], 1);
+    gl.uniform1i(info.uniforms.uTexture, 0);
+    gl.uniform1i(info.uniforms.useTexture, 1);
   } else {
-    gl.uniform1i(info.uniforms['useTexture'], 0);
+    gl.uniform1i(info.uniforms.useTexture, 0);
   }
 
-  gl.uniformMatrix4fv(info.uniforms['vView'], false, camera.viewMatrix());
-  gl.uniformMatrix4fv(info.uniforms['vProjection'], false, camera.projectionMatrix());
-  gl.uniformMatrix4fv(info.uniforms['vModel'], false, modelMatrix);
-  gl.uniform3fv(info.uniforms['viewPos'], camera.position.toArray());
+  gl.uniformMatrix4fv(info.uniforms.vView, false, camera.viewMatrix());
+  gl.uniformMatrix4fv(info.uniforms.vProjection, false, camera.projectionMatrix());
+  gl.uniformMatrix4fv(info.uniforms.vModel, false, modelMatrix);
+  gl.uniform3fv(info.uniforms.viewPos, camera.position.toArray());
 
-  gl.uniform3fv(info.uniforms['lightPos'], [0, 5, 0]);
-  gl.uniform3fv(info.uniforms['lightColor'], [1, 1, 1]);
-  gl.uniform1f(info.uniforms['lightLevel'], 1.0);
+  gl.uniform3fv(info.uniforms.lightPos, [0, 5, 0]);
+  gl.uniform3fv(info.uniforms.lightColor, [1, 1, 1]);
+  gl.uniform1f(info.uniforms.lightLevel, 1.0);
+  gl.uniform1f(info.uniforms.alphaMultiplier, alphaMultiplier);
 
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.ibo);
   gl.drawElements(gl.TRIANGLES, mesh.vertexCount, gl.UNSIGNED_SHORT, 0);
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 
-  gl.disableVertexAttribArray(info.attributes['aPosition']);
-  gl.disableVertexAttribArray(info.attributes['aNormal']);
-  gl.disableVertexAttribArray(info.attributes['aTextureCoord']);
+  gl.disableVertexAttribArray(info.attributes.aPosition);
+  gl.disableVertexAttribArray(info.attributes.aNormal);
+  gl.disableVertexAttribArray(info.attributes.aTextureCoord);
 
   gl.useProgram(null);
 };

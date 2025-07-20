@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { useGame } from '../state/game-context';
 import { gameActions } from '../state/gameSlice';
 import { useAppDispatch, useAppSelector } from '../state/useAppState';
 
@@ -13,6 +14,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
   const [isPainting, setIsPainting] = useState(false);
   const [overlapPercentage, setOverlapPercentage] = useState(0);
   const throttledTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { gameInstance } = useGame();
 
   useImperativeHandle(ref, () => ({
     reset: () => {
@@ -223,9 +225,14 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     throttledCalculateOverlap();
   };
 
+  const activeSprayCanId = useAppSelector((state) => state.game.activeSprayCanId);
   const dispatch = useAppDispatch();
   const [sprayComplete, setSprayComplete] = useState(false);
   const onSprayComplete = () => {
+    if (gameInstance.current && activeSprayCanId != null) {
+      gameInstance.current.completeSprayCan(activeSprayCanId);
+    }
+    dispatch(gameActions.completeSprayCan());
     setSprayComplete(true);
     setTimeout(() => {
       dispatch(gameActions.setSprayAreaVisible(false));

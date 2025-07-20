@@ -10,6 +10,7 @@ uniform float lightLevel;
 uniform vec3 lightColor;
 uniform sampler2D uTexture;
 uniform bool useTexture;
+uniform float alphaMultiplier;
 
 void main(void) {
     vec3 color;
@@ -35,6 +36,8 @@ void main(void) {
     vec3 specular = specularStrength * spec * lightColor;
 
     vec3 colorResult = (ambient + diffuse + specular) * color;
+
+    alpha *= alphaMultiplier;
 
     gl_FragColor = vec4(colorResult, alpha);
 }

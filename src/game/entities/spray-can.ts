@@ -9,8 +9,10 @@ import { Vector3 } from '../math';
 export class SprayCan extends RenderObject {
   private mesh: Mesh;
   private textureManager: TextureManager;
+  public id: number;
+  public isCompleted: boolean = false;
 
-  constructor(gl: WebGLRenderingContext) {
+  constructor(gl: WebGLRenderingContext, id: number) {
     super(
       new Vector3(0, 0, 0),
       new Vector3(0, 0, 0),
@@ -18,6 +20,7 @@ export class SprayCan extends RenderObject {
     );
 
     this.mesh = squareMesh(gl);
+    this.id = id;
     this.textureManager = TextureManager.getInstance(gl);
   }
 
@@ -30,6 +33,7 @@ export class SprayCan extends RenderObject {
         model: this.model,
         texture: this.textureManager.getEntityTexture('spray-can'),
         useTexture: this.textureManager.isEntityTextureReady('spray-can'),
+        alphaMultiplier: this.isCompleted ? 0.25 : 1.0,
       },
       camera,
     });
