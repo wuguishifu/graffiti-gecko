@@ -84,8 +84,8 @@ export class Level {
   }
 
   private createInitialRoads() {
-    // Create horizontal roads every 4-5 cells
-    for (let y = 4; y < this.height; y += 5) {
+    // Create horizontal roads every 4-5 cells, starting at y=0 to ensure (0,0) is on a road
+    for (let y = 0; y < this.height; y += 5) {
       for (let x = 0; x < this.width; x++) {
         this.grid[y][x].possibleTiles = new Set(['stone']);
         this.grid[y][x].collapsed = true;
@@ -93,8 +93,8 @@ export class Level {
       }
     }
 
-    // Create vertical roads every 4-5 cells
-    for (let x = 4; x < this.width; x += 5) {
+    // Create vertical roads every 4-5 cells, starting at x=0 to ensure (0,0) is on a road
+    for (let x = 0; x < this.width; x += 5) {
       for (let y = 0; y < this.height; y++) {
         if (!this.grid[y][x].collapsed) {
           this.grid[y][x].possibleTiles = new Set(['stone']);
