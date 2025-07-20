@@ -165,6 +165,9 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
     // Reset overlap percentage
     setOverlapPercentage(0);
+
+    // Reset completion flag
+    hasCompletedSprayCan.current = false;
   };
 
   const startPainting = (e: React.MouseEvent | React.TouchEvent) => {
@@ -229,8 +232,16 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
   const dispatch = useAppDispatch();
   const [sprayComplete, setSprayComplete] = useState(false);
   const sprayCompleteTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasCompletedSprayCan = useRef(false);
 
   const onSprayComplete = () => {
+    // Prevent multiple completions for the same spray can
+    if (hasCompletedSprayCan.current) {
+      return;
+    }
+
+    hasCompletedSprayCan.current = true;
+
     if (gameInstance.current && activeSprayCanId != null) {
       gameInstance.current.completeSprayCan(activeSprayCanId);
     }
@@ -246,6 +257,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
       dispatch(gameActions.setSprayAreaVisible(false));
       resetCanvas();
       setSprayComplete(false);
+      hasCompletedSprayCan.current = false;
       sprayCompleteTimeoutRef.current = null;
     }, 2000);
   };

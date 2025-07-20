@@ -50,6 +50,7 @@ export const gameSlice = createSlice({
     completeSprayCan: (state) => {
       if (state.activeSprayCanId !== undefined) {
         state.sprayCans[state.activeSprayCanId] = true;
+        console.log(`Completing spray can ${state.activeSprayCanId}, total now: ${state.totalSprayCansCompleted + 1}`);
       }
       state.totalSprayCansCompleted++;
     },

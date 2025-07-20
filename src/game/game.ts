@@ -202,6 +202,8 @@ export class Game {
 
     if (allCompleted) {
       console.log('Level completed! Generating next level...');
+      console.log(`Completed ${sprayCans.length} spray cans in this level`);
+      console.log(`Total completed so far: ${store.getState().game.totalSprayCansCompleted}`);
 
       // Increment level in store
       store.dispatch(gameActions.incrementLevel());
