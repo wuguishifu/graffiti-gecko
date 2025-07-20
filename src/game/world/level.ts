@@ -482,6 +482,11 @@ export class Level {
       this.cops.push(cop);
     }
 
+    // Set other cops reference for collision avoidance
+    this.cops.forEach(cop => {
+      cop.setOtherCops(this.cops);
+    });
+
     console.log(`Spawned ${this.cops.length} cops at stone locations`);
   }
 
