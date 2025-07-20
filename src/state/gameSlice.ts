@@ -1,7 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 type GameSliceState = {
-  score: number;
   sprayAreaVisible: boolean;
   nearSprayCan: boolean;
   sprayCans: Record<number, boolean>;
@@ -13,7 +12,6 @@ type GameSliceState = {
 };
 
 const initialState: GameSliceState = {
-  score: 0,
   sprayAreaVisible: false,
   nearSprayCan: false,
   sprayCans: {},
@@ -26,9 +24,6 @@ export const gameSlice = createSlice({
   name: 'game',
   initialState,
   reducers: {
-    incrementScore: (state, action: PayloadAction<number | undefined>) => {
-      state.score += action.payload ?? 1;
-    },
     setSprayAreaVisible: (state, action: PayloadAction<boolean>) => {
       state.sprayAreaVisible = action.payload;
     },
@@ -54,6 +49,7 @@ export const gameSlice = createSlice({
       if (state.activeSprayCanId !== undefined) {
         state.sprayCans[state.activeSprayCanId] = true;
       }
+      state.totalSprayCansCompleted++;
     },
     setLives: (state, action: PayloadAction<number>) => {
       state.lives = action.payload;
@@ -63,9 +59,6 @@ export const gameSlice = createSlice({
     },
     setDistanceTraveled: (state, action: PayloadAction<number>) => {
       state.distanceTraveled = action.payload;
-    },
-    incrementTotalSprayCansCompleted: (state) => {
-      state.totalSprayCansCompleted++;
     },
     reset: () => initialState,
   },

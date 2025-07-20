@@ -137,6 +137,7 @@ export class Game {
     const detectionRadius = 1.5; // Distance within which player can interact with spray can
 
     const nearestSprayCan = sprayCans.find(sprayCan => {
+      if (sprayCan.isCompleted) return false;
       const distance = Math.sqrt(
         Math.pow(playerPos.x - sprayCan.position.x, 2) +
         Math.pow(playerPos.y - sprayCan.position.y, 2)
@@ -185,13 +186,11 @@ export class Game {
   }
 
   public completeSprayCan(id: number) {
-    console.log({ id });
     const sprayCans = this.level.getSprayCans();
     const active = sprayCans.find(sprayCan => sprayCan.id === id);
     if (active) {
       active.isCompleted = true;
     }
-    store.dispatch(gameActions.incrementTotalSprayCansCompleted());
   }
 
   public destroy() {
