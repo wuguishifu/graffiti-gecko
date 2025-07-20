@@ -3,7 +3,7 @@ import type { Mesh } from '../graphics/mesh';
 import { RenderObject } from '../graphics/render-object';
 import renderObject from '../graphics/renderer';
 import type { ProgramInfo } from '../graphics/types';
-import { Vector3, Vector4 } from '../math';
+import { Vector3 } from '../math';
 import { Tile } from '../tiles/tile';
 
 export class Player extends RenderObject {
@@ -16,7 +16,7 @@ export class Player extends RenderObject {
       new Vector3(0.5, 0.5, 0.5),
     );
 
-    this.mesh = Tile.mesh(gl, new Vector4(0, 1, 0, 1));
+    this.mesh = Tile.mesh(gl);
   }
 
   public render(gl: WebGLRenderingContext, programInfo: ProgramInfo, camera: Camera) {

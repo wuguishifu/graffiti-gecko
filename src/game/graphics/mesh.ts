@@ -1,4 +1,4 @@
-import { Vector3, Vector4 } from '../math';
+import { Vector3 } from '../math';
 
 export class Mesh {
   vertices: Vertex[];
@@ -6,7 +6,7 @@ export class Mesh {
 
   pbo: WebGLBuffer | null;
   nbo: WebGLBuffer | null;
-  cbo: WebGLBuffer | null;
+  tbo: WebGLBuffer | null;
 
   ibo: WebGLBuffer | null;
   vertexCount: number;
@@ -17,7 +17,7 @@ export class Mesh {
 
     this.pbo = gl.createBuffer();
     this.nbo = gl.createBuffer();
-    this.cbo = gl.createBuffer();
+    this.tbo = gl.createBuffer();
     this.ibo = gl.createBuffer();
 
     gl.bindBuffer(gl.ARRAY_BUFFER, this.pbo);
@@ -26,8 +26,8 @@ export class Mesh {
     gl.bindBuffer(gl.ARRAY_BUFFER, this.nbo);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertices.flatMap(v => Object.values(v.normal))), gl.STATIC_DRAW);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.cbo);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertices.flatMap(v => Object.values(v.color))), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ARRAY_BUFFER, this.tbo);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.vertices.flatMap(v => v.textureCoord)), gl.STATIC_DRAW);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.ibo);
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.indices), gl.STATIC_DRAW);
@@ -42,7 +42,7 @@ export class Mesh {
     return {
       pbo: this.pbo,
       nbo: this.nbo,
-      cbo: this.cbo,
+      tbo: this.tbo,
       ibo: this.ibo,
       vertexCount: this.vertexCount
     };
@@ -52,25 +52,11 @@ export class Mesh {
 export class Vertex {
   position: Vector3;
   normal: Vector3;
-  color: Vector4;
+  textureCoord: [number, number];
 
-  constructor(position: Vector3, normal: Vector3, color: Vector4) {
+  constructor(position: Vector3, normal: Vector3, textureCoord: [number, number]) {
     this.position = position;
     this.normal = normal;
-    this.color = color;
-  }
-}
-
-export class Triangle {
-  v1: Vector3;
-  v2: Vector3;
-  v3: Vector3;
-  normal: Vector3;
-
-  constructor(v1: Vector3, v2: Vector3, v3: Vector3, normal?: Vector3) {
-    this.v1 = v1;
-    this.v2 = v2;
-    this.v3 = v3;
-    this.normal = normal || new Vector3(0, 1, 0); // default to up
+    this.textureCoord = textureCoord;
   }
 }

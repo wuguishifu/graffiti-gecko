@@ -2,7 +2,7 @@ precision mediump float;
 
 attribute vec3 aPosition;
 attribute vec3 aNormal;
-attribute vec4 aColor;
+attribute vec2 aTextureCoord;
 
 uniform mat4 vModel;
 uniform mat4 vView;
@@ -16,5 +16,5 @@ void main() {
     gl_Position = vProjection * vView * vModel * vec4(aPosition, 1.0);
     passNormal = normalize(vec3(vModel * vec4(aNormal, 0.0)));
     passFragPos = vec3(vModel * vec4(aPosition, 1.0));
-    passColor = aColor;
+    passColor = vec4(aTextureCoord, 0.0, 1.0);
 }

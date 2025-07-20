@@ -41,9 +41,9 @@ export default function renderObject({ gl, object: { mesh, model }, camera, info
   gl.enableVertexAttribArray(info.attributes['aNormal']);
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, mesh.cbo);
-  gl.vertexAttribPointer(info.attributes['aColor'], 4, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(info.attributes['aColor']);
+  gl.bindBuffer(gl.ARRAY_BUFFER, mesh.tbo);
+  gl.vertexAttribPointer(info.attributes['aTextureCoord'], 2, gl.FLOAT, false, 0, 0);
+  gl.enableVertexAttribArray(info.attributes['aTextureCoord']);
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
   gl.uniformMatrix4fv(info.uniforms['vView'], false, camera.viewMatrix());
