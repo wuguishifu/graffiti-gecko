@@ -21,11 +21,18 @@ export class Level {
   private height = 20;
   private grid: Cell[][] = [];
 
-  // Define adjacency rules - more flexible to avoid contradictions
+  // Define adjacency rules for city blocks
   private rules: Record<TileType, TileType[]> = {
-    grass: ['stone', 'grass'], // Grass can be next to grass or stone
-    stone: ['grass', 'building', 'stone'], // Stone can be next to anything
-    building: ['stone', 'building'] // Building can be next to stone or building
+    grass: ['stone', 'grass'], // Grass can be next to grass or stone (parks)
+    stone: ['grass', 'building', 'stone'], // Stone can be next to anything (roads)
+    building: ['stone', 'building'] // Building can be next to stone or building (city blocks)
+  };
+
+  // Add weights to favor larger city blocks
+  private tileWeights: Record<TileType, number> = {
+    grass: 0.2,    // Less common - parks
+    stone: 0.3,    // Roads
+    building: 0.5  // Most common - buildings
   };
 
   constructor(gl: WebGLRenderingContext) {
@@ -70,6 +77,31 @@ export class Level {
         };
       }
     }
+
+    // Create initial city structure with stone roads
+    this.createInitialRoads();
+  }
+
+  private createInitialRoads() {
+    // Create horizontal roads every 4-5 cells
+    for (let y = 4; y < this.height; y += 5) {
+      for (let x = 0; x < this.width; x++) {
+        this.grid[y][x].possibleTiles = new Set(['stone']);
+        this.grid[y][x].collapsed = true;
+        this.grid[y][x].finalTile = 'stone';
+      }
+    }
+
+    // Create vertical roads every 4-5 cells
+    for (let x = 4; x < this.width; x += 5) {
+      for (let y = 0; y < this.height; y++) {
+        if (!this.grid[y][x].collapsed) {
+          this.grid[y][x].possibleTiles = new Set(['stone']);
+          this.grid[y][x].collapsed = true;
+          this.grid[y][x].finalTile = 'stone';
+        }
+      }
+    }
   }
 
   private collapseWaveFunction() {
@@ -111,10 +143,24 @@ export class Level {
 
     if (candidates.length === 0) return null;
 
-    // Randomly select from cells with lowest entropy
+    // Prefer cells that are adjacent to already collapsed cells (for better city block formation)
+    const adjacentCandidates = candidates.filter(cell => this.hasCollapsedNeighbors(cell));
+
+    if (adjacentCandidates.length > 0) {
+      const selectedCell = adjacentCandidates[Math.floor(Math.random() * adjacentCandidates.length)];
+      console.log(`Selected adjacent cell (${selectedCell.x}, ${selectedCell.y}) with entropy ${selectedCell.possibleTiles.size}`);
+      return selectedCell;
+    }
+
+    // Fallback to any cell with lowest entropy
     const selectedCell = candidates[Math.floor(Math.random() * candidates.length)];
     console.log(`Selected cell (${selectedCell.x}, ${selectedCell.y}) with entropy ${selectedCell.possibleTiles.size}`);
     return selectedCell;
+  }
+
+  private hasCollapsedNeighbors(cell: Cell): boolean {
+    const neighbors = this.getNeighbors(cell);
+    return neighbors.some(neighbor => neighbor.collapsed);
   }
 
   private collapseCell(cell: Cell) {
@@ -123,13 +169,34 @@ export class Level {
       throw new Error(`Cannot collapse cell (${cell.x}, ${cell.y}) - no possible tiles`);
     }
 
-    const selectedTile = possibleTiles[Math.floor(Math.random() * possibleTiles.length)];
+    // Use weighted selection to favor certain tiles
+    const selectedTile = this.selectWeightedTile(possibleTiles);
     console.log(`Collapsing cell (${cell.x}, ${cell.y}) to ${selectedTile} from options: ${possibleTiles}`);
 
     cell.collapsed = true;
     cell.finalTile = selectedTile;
     cell.possibleTiles.clear();
     cell.possibleTiles.add(selectedTile);
+  }
+
+  private selectWeightedTile(possibleTiles: TileType[]): TileType {
+    // Calculate total weight for possible tiles
+    const totalWeight = possibleTiles.reduce((sum, tile) => sum + this.tileWeights[tile], 0);
+
+    // Generate random value
+    const random = Math.random() * totalWeight;
+
+    // Select tile based on weight
+    let currentWeight = 0;
+    for (const tile of possibleTiles) {
+      currentWeight += this.tileWeights[tile];
+      if (random <= currentWeight) {
+        return tile;
+      }
+    }
+
+    // Fallback to last tile
+    return possibleTiles[possibleTiles.length - 1];
   }
 
   private propagateConstraints(collapsedCell: Cell) {
