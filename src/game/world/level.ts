@@ -507,4 +507,18 @@ export class Level {
   public getHeight(): number {
     return this.height;
   }
+
+  public destroy(): void {
+    // Clean up tiles
+    this.tiles = [];
+
+    // Clean up spray cans
+    this.sprayCans = [];
+
+    // Clean up cops
+    this.cops = [];
+
+    // Clear grid
+    this.grid = [];
+  }
 }

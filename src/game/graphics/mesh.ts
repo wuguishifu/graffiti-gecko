@@ -4,11 +4,11 @@ export class Mesh {
   vertices: Vertex[];
   indices: number[];
 
-  pbo: WebGLBuffer | null;
-  nbo: WebGLBuffer | null;
-  tbo: WebGLBuffer | null;
+  pbo: WebGLBuffer;
+  nbo: WebGLBuffer;
+  tbo: WebGLBuffer;
 
-  ibo: WebGLBuffer | null;
+  ibo: WebGLBuffer;
   vertexCount: number;
 
   constructor(gl: WebGLRenderingContext, vertices: Vertex[], indices: number[]) {
@@ -47,6 +47,21 @@ export class Mesh {
       vertexCount: this.vertexCount
     };
   }
+
+  destroy(gl: WebGLRenderingContext): void {
+    if (this.pbo) {
+      gl.deleteBuffer(this.pbo);
+    }
+    if (this.nbo) {
+      gl.deleteBuffer(this.nbo);
+    }
+    if (this.tbo) {
+      gl.deleteBuffer(this.tbo);
+    }
+    if (this.ibo) {
+      gl.deleteBuffer(this.ibo);
+    }
+  }
 }
 
 export class Vertex {
@@ -81,4 +96,10 @@ export function squareMesh(gl: WebGLRenderingContext): Mesh {
   }
   defaultSquareMesh = new Mesh(gl, squareVertices, squareIndices);
   return defaultSquareMesh;
+}
+
+export function resetSquareMesh(): void {
+  if (defaultSquareMesh) {
+    defaultSquareMesh = null;
+  }
 }

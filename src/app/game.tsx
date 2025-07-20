@@ -21,11 +21,16 @@ export function GamePage() {
 
   useEffect(() => {
     if (canvasRef.current) {
+      // Reset game state for new session
+      dispatch(gameActions.reset());
       gameInstance.current = new Game(canvasRef.current);
     }
 
     return () => {
-      gameInstance.current?.destroy();
+      if (gameInstance.current) {
+        gameInstance.current.destroy();
+        gameInstance.current = null;
+      }
     }
   }, []);
 

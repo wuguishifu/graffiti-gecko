@@ -1,6 +1,7 @@
 import { gameActions } from '../state/gameSlice';
 import { store } from '../state/store';
 import { Camera } from './graphics/camera';
+import { resetSquareMesh } from './graphics/mesh';
 import { buildProgramInfo, initShaderProgram } from './graphics/shader-source';
 import { TextureManager } from './graphics/texture-manager';
 import type { ProgramInfo } from './graphics/types';
@@ -193,7 +194,21 @@ export class Game {
   }
 
   public destroy() {
+    // Stop the game loop
+    this.running = false;
+
+    // Remove event listeners
     document.removeEventListener('keydown', this.boundKeyDown);
     document.removeEventListener('keyup', this.boundKeyUp);
+
+    this.gl.deleteProgram(this.shaderProgram);
+    this.level.destroy();
+    this.player.destroy();
+
+    // Reset TextureManager instance to allow proper cleanup
+    TextureManager.resetInstance();
+
+    // Reset shared mesh resources
+    resetSquareMesh();
   }
 }

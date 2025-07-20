@@ -106,4 +106,27 @@ export class TextureManager {
   public getAllTileVariants(): TileVariant[] {
     return Object.keys(tileVariantToTextureMap) as TileVariant[];
   }
+
+  public destroy(): void {
+    // Clean up all textures
+    for (const texture of this.tileTextures.values()) {
+      texture.destroy();
+    }
+    for (const texture of this.entityTextures.values()) {
+      texture.destroy();
+    }
+
+    // Clear maps
+    this.tileTextures.clear();
+    this.entityTextures.clear();
+    this.tileLoadingPromises.clear();
+    this.entityLoadingPromises.clear();
+  }
+
+  public static resetInstance(): void {
+    if (TextureManager.instance) {
+      TextureManager.instance.destroy();
+      TextureManager.instance = null as any;
+    }
+  }
 } 

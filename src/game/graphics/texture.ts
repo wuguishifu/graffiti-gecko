@@ -46,4 +46,11 @@ export class Texture {
   public unbind(): void {
     this.gl.bindTexture(this.gl.TEXTURE_2D, null);
   }
+
+  public destroy(): void {
+    if (this.texture) {
+      this.gl.deleteTexture(this.texture);
+      this.texture = null;
+    }
+  }
 } 

@@ -15,6 +15,7 @@ export class Player extends RenderObject {
   private mesh: Mesh;
   private textureManager: TextureManager;
   private level: Level;
+  private gl: WebGLRenderingContext;
   private lives: number = PLAYER_LIVES;
   private invincibilityTimer: number = 0;
   private invincibilityDuration: number = 60; // 1 second at 60fps
@@ -31,6 +32,7 @@ export class Player extends RenderObject {
       new Vector3(1, 1, 1),
     );
 
+    this.gl = gl;
     this.mesh = squareMesh(gl);
     this.textureManager = TextureManager.getInstance(gl);
     this.level = level;
@@ -205,5 +207,12 @@ export class Player extends RenderObject {
 
   public onKeyUp(event: KeyboardEvent) {
     this.keysDown.delete(event.key.toLowerCase());
+  }
+
+  public destroy(): void {
+    // Clean up mesh resources
+    if (this.mesh) {
+      this.mesh.destroy(this.gl);
+    }
   }
 }

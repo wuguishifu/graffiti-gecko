@@ -228,18 +228,41 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
   const activeSprayCanId = useAppSelector((state) => state.game.activeSprayCanId);
   const dispatch = useAppDispatch();
   const [sprayComplete, setSprayComplete] = useState(false);
+  const sprayCompleteTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const onSprayComplete = () => {
     if (gameInstance.current && activeSprayCanId != null) {
       gameInstance.current.completeSprayCan(activeSprayCanId);
     }
     dispatch(gameActions.completeSprayCan());
     setSprayComplete(true);
-    setTimeout(() => {
+
+    // Clear any existing timeout
+    if (sprayCompleteTimeoutRef.current) {
+      clearTimeout(sprayCompleteTimeoutRef.current);
+    }
+
+    sprayCompleteTimeoutRef.current = setTimeout(() => {
       dispatch(gameActions.setSprayAreaVisible(false));
       resetCanvas();
       setSprayComplete(false);
+      sprayCompleteTimeoutRef.current = null;
     }, 2000);
   };
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (throttledTimeoutRef.current) {
+        clearTimeout(throttledTimeoutRef.current);
+        throttledTimeoutRef.current = null;
+      }
+      if (sprayCompleteTimeoutRef.current) {
+        clearTimeout(sprayCompleteTimeoutRef.current);
+        sprayCompleteTimeoutRef.current = null;
+      }
+    };
+  }, []);
 
   return (
     <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center' style={{ zIndex: sprayAreaVisible ? 1000 : -10 }}>
