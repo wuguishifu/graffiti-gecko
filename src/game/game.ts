@@ -41,6 +41,12 @@ export class Game {
     if (event.key === 'Escape') {
       store.dispatch(gameActions.setSprayAreaVisible(false));
     }
+
+    if (event.key === ' ') {
+      if (store.getState().game.nearSprayCan) {
+        store.dispatch(gameActions.setSprayAreaVisible(true));
+      }
+    }
   }
 
   private onKeyUp(event: KeyboardEvent) {
