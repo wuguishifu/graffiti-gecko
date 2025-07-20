@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { useAppSelector } from '../state/useAppState';
+import { gameActions } from '../state/gameSlice';
+import { useAppDispatch, useAppSelector } from '../state/useAppState';
 
 export type SprayAreaRef = {
   reset: () => void;
@@ -131,12 +132,16 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     // Calculate overlap percentage
     const overlapPercentage = tagPixels > 0 ? (overlappingPixels / tagPixels) * 100 : 0;
     setOverlapPercentage(Math.round(overlapPercentage));
+
+    if (overlapPercentage >= 75) {
+      onSprayComplete();
+    }
   };
 
   const throttledCalculateOverlap = () => {
     // Clear existing timeout
     if (throttledTimeoutRef.current) {
-      return;;
+      return;
     }
 
     // Set new timeout
@@ -218,6 +223,17 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     throttledCalculateOverlap();
   };
 
+  const dispatch = useAppDispatch();
+  const [sprayComplete, setSprayComplete] = useState(false);
+  const onSprayComplete = () => {
+    setSprayComplete(true);
+    setTimeout(() => {
+      dispatch(gameActions.setSprayAreaVisible(false));
+      resetCanvas();
+      setSprayComplete(false);
+    }, 2000);
+  };
+
   return (
     <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center' style={{ zIndex: sprayAreaVisible ? 1000 : -10 }}>
       <img
@@ -263,6 +279,14 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
             {overlapPercentage}%
           </div>
         </div>
+      )}
+
+      {/* Spray complete splash */}
+      {sprayComplete && (
+        <img
+          className='absolute h-3/4 select-none pointer-events-none scale-bounce'
+          src='/assets/tags/spray-complete.png'
+        />
       )}
     </div>
   );
