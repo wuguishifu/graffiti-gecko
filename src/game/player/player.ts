@@ -1,3 +1,5 @@
+import { gameActions } from '../../state/gameSlice';
+import { store } from '../../state/store';
 import type { Camera } from '../graphics/camera';
 import { squareMesh, type Mesh } from '../graphics/mesh';
 import { RenderObject } from '../graphics/render-object';
@@ -35,6 +37,8 @@ export class Player extends RenderObject {
     });
   }
 
+  private buttonVisible = false;
+
   public update() {
     let vx = 0;
     let vy = 0;
@@ -50,6 +54,18 @@ export class Player extends RenderObject {
     if (ax === 0 && vy === 0) return;
     this.position.add(new Vector3(vx, vy, 0));
     this.rotation.z = -Math.atan2(vx, vy);
+
+    if (this.position.x < 0) {
+      if (this.buttonVisible) {
+        store.dispatch(gameActions.setButtonVisible(false));
+        this.buttonVisible = false;
+      }
+    } else {
+      if (!this.buttonVisible) {
+        store.dispatch(gameActions.setButtonVisible(true));
+        this.buttonVisible = true;
+      }
+    }
   }
 
   private keysDown: Set<string> = new Set();
