@@ -8,6 +8,8 @@ type GameSliceState = {
   activeSprayCanId?: number;
   lives: number;
   gameOverFlag?: boolean;
+  distanceTraveled: number;
+  totalSprayCansCompleted: number;
 };
 
 const initialState: GameSliceState = {
@@ -16,6 +18,8 @@ const initialState: GameSliceState = {
   nearSprayCan: false,
   sprayCans: {},
   lives: 3,
+  distanceTraveled: 0,
+  totalSprayCansCompleted: 0,
 }
 
 export const gameSlice = createSlice({
@@ -56,6 +60,12 @@ export const gameSlice = createSlice({
     },
     setGameOverFlag: (state, action: PayloadAction<boolean>) => {
       state.gameOverFlag = action.payload;
+    },
+    setDistanceTraveled: (state, action: PayloadAction<number>) => {
+      state.distanceTraveled = action.payload;
+    },
+    incrementTotalSprayCansCompleted: (state) => {
+      state.totalSprayCansCompleted++;
     },
     reset: () => initialState,
   },

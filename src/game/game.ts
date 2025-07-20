@@ -168,6 +168,7 @@ export class Game {
 
         if (this.player.getLives() === 0) {
           store.dispatch(gameActions.setGameOverFlag(true));
+          store.dispatch(gameActions.setDistanceTraveled(this.player.getTotalDistanceTraveled()));
         }
 
         // Update game state
@@ -188,6 +189,7 @@ export class Game {
     if (active) {
       active.isCompleted = true;
     }
+    store.dispatch(gameActions.incrementTotalSprayCansCompleted());
   }
 
   public destroy() {

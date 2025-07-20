@@ -21,6 +21,8 @@ export class Player extends RenderObject {
   private isInvincible: boolean = false;
   private flashTimer: number = 0;
   private flashInterval: number = 10; // Flash every 10 frames
+  private totalDistanceTraveled: number = 0;
+  private lastPosition: Vector3;
 
   constructor(gl: WebGLRenderingContext, level: Level) {
     super(
@@ -32,6 +34,7 @@ export class Player extends RenderObject {
     this.mesh = squareMesh(gl);
     this.textureManager = TextureManager.getInstance(gl);
     this.level = level;
+    this.lastPosition = new Vector3(0, 0, 0);
 
     store.dispatch(gameActions.setLives(PLAYER_LIVES));
   }
@@ -93,10 +96,22 @@ export class Player extends RenderObject {
     const newY = Math.round(newPosition.y);
 
     if (this.level.isWalkable(newX, newY)) {
+      // Calculate distance traveled
+      const distance = Math.sqrt(
+        Math.pow(newPosition.x - this.lastPosition.x, 2) +
+        Math.pow(newPosition.y - this.lastPosition.y, 2)
+      );
+      this.totalDistanceTraveled += distance;
+
       this.position.x = newPosition.x;
       this.position.y = newPosition.y;
       this.position.z = newPosition.z;
       this.rotation.z = -Math.atan2(vx, vy);
+
+      // Update last position
+      this.lastPosition.x = this.position.x;
+      this.lastPosition.y = this.position.y;
+      this.lastPosition.z = this.position.z;
     } else {
       // Try moving only on X axis
       const xOnlyPosition = new Vector3(
@@ -108,10 +123,22 @@ export class Player extends RenderObject {
       const xOnlyY = Math.round(xOnlyPosition.y);
 
       if (this.level.isWalkable(xOnlyX, xOnlyY)) {
+        // Calculate distance traveled
+        const distance = Math.sqrt(
+          Math.pow(xOnlyPosition.x - this.lastPosition.x, 2) +
+          Math.pow(xOnlyPosition.y - this.lastPosition.y, 2)
+        );
+        this.totalDistanceTraveled += distance;
+
         this.position.x = xOnlyPosition.x;
         this.position.y = xOnlyPosition.y;
         this.position.z = xOnlyPosition.z;
         this.rotation.z = -Math.atan2(vx, 0);
+
+        // Update last position
+        this.lastPosition.x = this.position.x;
+        this.lastPosition.y = this.position.y;
+        this.lastPosition.z = this.position.z;
       } else {
         // Try moving only on Y axis
         const yOnlyPosition = new Vector3(
@@ -123,10 +150,22 @@ export class Player extends RenderObject {
         const yOnlyY = Math.round(yOnlyPosition.y);
 
         if (this.level.isWalkable(yOnlyX, yOnlyY)) {
+          // Calculate distance traveled
+          const distance = Math.sqrt(
+            Math.pow(yOnlyPosition.x - this.lastPosition.x, 2) +
+            Math.pow(yOnlyPosition.y - this.lastPosition.y, 2)
+          );
+          this.totalDistanceTraveled += distance;
+
           this.position.x = yOnlyPosition.x;
           this.position.y = yOnlyPosition.y;
           this.position.z = yOnlyPosition.z;
           this.rotation.z = -Math.atan2(0, vy);
+
+          // Update last position
+          this.lastPosition.x = this.position.x;
+          this.lastPosition.y = this.position.y;
+          this.lastPosition.z = this.position.z;
         }
       }
     }
@@ -151,6 +190,10 @@ export class Player extends RenderObject {
 
   public isInvulnerable(): boolean {
     return this.isInvincible;
+  }
+
+  public getTotalDistanceTraveled(): number {
+    return this.totalDistanceTraveled;
   }
 
   private keysDown: Set<string> = new Set();
