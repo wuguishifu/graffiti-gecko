@@ -198,6 +198,10 @@ export class Player extends RenderObject {
     return this.totalDistanceTraveled;
   }
 
+  public setLevel(level: Level) {
+    this.level = level;
+  }
+
   private keysDown: Set<string> = new Set();
 
   public onKeyDown(event: KeyboardEvent) {

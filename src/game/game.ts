@@ -83,7 +83,9 @@ export class Game {
       program: this.shaderProgram,
     };
 
-    this.level = new Level(this.gl);
+    // Get current level from store
+    const currentLevel = store.getState().game.currentLevel;
+    this.level = new Level(this.gl, currentLevel);
 
     this.boundKeyDown = this.onKeyDown.bind(this);
     this.boundKeyUp = this.onKeyUp.bind(this);
@@ -120,6 +122,7 @@ export class Game {
     this.level.updateCops();
     this.checkPlayerNearSprayCan();
     this.checkPlayerNearCops();
+    this.checkLevelCompletion();
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     this.render();
     requestAnimationFrame(() => this.run());
@@ -190,6 +193,36 @@ export class Game {
     const active = sprayCans.find(sprayCan => sprayCan.id === id);
     if (active) {
       active.isCompleted = true;
+    }
+  }
+
+  private checkLevelCompletion() {
+    const sprayCans = this.level.getSprayCans();
+    const allCompleted = sprayCans.length > 0 && sprayCans.every(sprayCan => sprayCan.isCompleted);
+
+    if (allCompleted) {
+      console.log('Level completed! Generating next level...');
+
+      // Increment level in store
+      store.dispatch(gameActions.incrementLevel());
+      const newLevel = store.getState().game.currentLevel;
+
+      // Generate new level with increased difficulty
+      this.level.destroy();
+      this.level = new Level(this.gl, newLevel);
+
+      // Reset player position to center of new level
+      this.player.position.x = 10;
+      this.player.position.y = 10;
+      this.player.position.z = 0;
+
+      // Update player's level reference
+      this.player.setLevel(this.level);
+
+      // Set player reference in new level for cop spawning
+      this.level.setPlayer(this.player);
+
+      console.log(`Generated level ${newLevel} with increased difficulty`);
     }
   }
 

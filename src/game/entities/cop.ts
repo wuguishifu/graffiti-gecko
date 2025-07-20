@@ -34,7 +34,7 @@ export class Cop extends RenderObject {
   private fleeDuration: number = 60; // 1 second at 60fps
   private fleeTarget: { x: number; y: number } | null = null;
 
-  constructor(gl: WebGLRenderingContext, level: Level, player: Player, id: number, x: number, y: number) {
+  constructor(gl: WebGLRenderingContext, level: Level, player: Player, id: number, x: number, y: number, difficultyLevel: number = 1) {
     super(
       new Vector3(x, y, 0),
       new Vector3(0, 0, 0),
@@ -46,6 +46,11 @@ export class Cop extends RenderObject {
     this.level = level;
     this.player = player;
     this.id = id;
+
+    // Scale speed based on difficulty level
+    // Level 1: 0.05, Level 2: 0.06, Level 3: 0.07, etc. (capped at 0.12 for balance)
+    const speedIncrease = Math.min(difficultyLevel - 1, 7) * 0.01; // +0.01 per level, max +0.07
+    this.speed = 0.05 + speedIncrease;
   }
 
   public setOtherCops(cops: Cop[]) {

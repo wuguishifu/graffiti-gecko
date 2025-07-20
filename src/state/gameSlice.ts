@@ -9,6 +9,7 @@ type GameSliceState = {
   gameOverFlag?: boolean;
   distanceTraveled: number;
   totalSprayCansCompleted: number;
+  currentLevel: number;
 };
 
 const initialState: GameSliceState = {
@@ -18,6 +19,7 @@ const initialState: GameSliceState = {
   lives: 3,
   distanceTraveled: 0,
   totalSprayCansCompleted: 0,
+  currentLevel: 1,
 }
 
 export const gameSlice = createSlice({
@@ -59,6 +61,12 @@ export const gameSlice = createSlice({
     },
     setDistanceTraveled: (state, action: PayloadAction<number>) => {
       state.distanceTraveled = action.payload;
+    },
+    setCurrentLevel: (state, action: PayloadAction<number>) => {
+      state.currentLevel = action.payload;
+    },
+    incrementLevel: (state) => {
+      state.currentLevel++;
     },
     reset: () => initialState,
   },
