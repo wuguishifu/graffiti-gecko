@@ -1,13 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useAppSelector } from '../state/useAppState';
 
-export function SprayArea() {
+export type SprayAreaRef = {
+  reset: () => void;
+}
+
+export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
   const sprayAreaVisible = useAppSelector((state) => state.game.sprayAreaVisible);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const tagCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isPainting, setIsPainting] = useState(false);
   const [overlapPercentage, setOverlapPercentage] = useState(0);
   const throttledTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useImperativeHandle(ref, () => ({
+    reset: () => {
+      resetCanvas();
+    },
+  }));
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -136,6 +146,20 @@ export function SprayArea() {
     }, 100);
   };
 
+  const resetCanvas = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Clear the entire canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Reset overlap percentage
+    setOverlapPercentage(0);
+  };
+
   const startPainting = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault(); // Prevent default to avoid conflicts
     if (!sprayAreaVisible) return;
@@ -195,7 +219,7 @@ export function SprayArea() {
   };
 
   return (
-    <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center bg-white/20' style={{ zIndex: sprayAreaVisible ? 1000 : -10 }}>
+    <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center' style={{ zIndex: sprayAreaVisible ? 1000 : -10 }}>
       <img
         className='absolute top-0 left-0 w-full h-full select-none pointer-events-none'
         src='/assets/backgrounds/brick.png'
@@ -225,12 +249,14 @@ export function SprayArea() {
         style={{ display: 'none' }}
       />
 
-      {/* Overlap display */}
+      {/* Overlap display and reset button */}
       {sprayAreaVisible && (
-        <div className='absolute top-4 right-4 bg-black/70 text-white px-3 py-2 rounded-lg font-mono text-sm'>
-          Overlap: {overlapPercentage}%
+        <div className='absolute top-4 right-4 flex flex-col gap-2'>
+          <div className='bg-black/70 text-white px-3 py-2 rounded-lg font-mono text-sm'>
+            Overlap: {overlapPercentage}%
+          </div>
         </div>
       )}
     </div>
   );
-}
+});

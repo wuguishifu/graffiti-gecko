@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { Game } from '../game/game';
-import { SprayArea } from '../spray/spray-area';
+import { SprayArea, type SprayAreaRef } from '../spray/spray-area';
 import { GameProvider } from '../state/game-context';
 import { GamePauser } from '../state/game-pauser';
 import { gameActions } from '../state/gameSlice';
@@ -24,8 +24,11 @@ export function GamePage() {
   }, []);
 
   const onOpenSprayArea = useCallback(() => {
+    sprayAreaRef.current?.reset();
     dispatchRef.current(gameActions.setSprayAreaVisible(true));
   }, []);
+
+  const sprayAreaRef = useRef<SprayAreaRef>(null);
 
   return (
     <GameProvider gameInstance={gameInstance}>
@@ -51,7 +54,7 @@ export function GamePage() {
             </div>
           </div>
         </div>
-        <SprayArea />
+        <SprayArea ref={sprayAreaRef} />
         <GamePauser />
       </main>
     </GameProvider>
