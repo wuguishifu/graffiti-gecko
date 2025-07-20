@@ -248,7 +248,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
       <canvas
         ref={canvasRef}
-        className='absolute top-0 left-0 w-full h-full cursor-crosshair border border-red-500'
+        className='absolute top-0 left-0 w-full h-full cursor-crosshair'
         onMouseDown={startPainting}
         onMouseUp={stopPainting}
         onMouseLeave={stopPainting}

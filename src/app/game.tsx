@@ -34,7 +34,7 @@ export function GamePage() {
   return (
     <GameProvider gameInstance={gameInstance}>
       <main className="h-full flex items-center">
-        <div className="w-full aspect-video border">
+        <div className="w-full aspect-video">
           <canvas
             ref={canvasRef}
             id="gameCanvas"
