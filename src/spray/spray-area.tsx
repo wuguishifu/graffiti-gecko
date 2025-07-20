@@ -249,11 +249,18 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
         style={{ display: 'none' }}
       />
 
-      {/* Overlap display and reset button */}
+      {/* Progress bar */}
       {sprayAreaVisible && (
-        <div className='absolute top-4 right-4 flex flex-col gap-2'>
-          <div className='bg-black/70 text-white px-3 py-2 rounded-lg font-mono text-sm'>
-            Overlap: {overlapPercentage}%
+        <div className='absolute top-4 left-4 bg-black/70 rounded-lg p-2'>
+          <div className='text-white text-xs mb-1 font-mono'>Progress</div>
+          <div className='w-32 h-4 bg-gray-700 rounded-full overflow-hidden'>
+            <div
+              className='h-full bg-gradient-to-r from-green-400 to-green-600 transition-all duration-300 ease-out'
+              style={{ width: `${overlapPercentage}%` }}
+            />
+          </div>
+          <div className='text-white text-xs mt-1 font-mono text-center'>
+            {overlapPercentage}%
           </div>
         </div>
       )}
