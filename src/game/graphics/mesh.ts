@@ -60,3 +60,25 @@ export class Vertex {
     this.textureCoord = textureCoord;
   }
 }
+
+const squareVertices = [
+  new Vertex(new Vector3(-0.5, 0, -0.5), new Vector3(0, 1, 0), [0, 0]),
+  new Vertex(new Vector3(0.5, 0, -0.5), new Vector3(0, 1, 0), [1, 0]),
+  new Vertex(new Vector3(0.5, 0, 0.5), new Vector3(0, 1, 0), [1, 1]),
+  new Vertex(new Vector3(-0.5, 0, 0.5), new Vector3(0, 1, 0), [0, 1])
+];
+
+const squareIndices = [
+  0, 1, 2,
+  0, 2, 3
+];
+
+let defaultSquareMesh: Mesh | null = null;
+
+export function squareMesh(gl: WebGLRenderingContext): Mesh {
+  if (defaultSquareMesh) {
+    return defaultSquareMesh;
+  }
+  defaultSquareMesh = new Mesh(gl, squareVertices, squareIndices);
+  return defaultSquareMesh;
+}

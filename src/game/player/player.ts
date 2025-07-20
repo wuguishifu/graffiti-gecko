@@ -1,22 +1,25 @@
 import type { Camera } from '../graphics/camera';
-import type { Mesh } from '../graphics/mesh';
+import { squareMesh, type Mesh } from '../graphics/mesh';
 import { RenderObject } from '../graphics/render-object';
 import renderObject from '../graphics/renderer';
+import { Texture } from '../graphics/texture';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
-import { Tile } from '../tiles/tile';
 
 export class Player extends RenderObject {
   private mesh: Mesh;
+  private texture: Texture;
 
   constructor(gl: WebGLRenderingContext) {
     super(
       new Vector3(0, 0, 0),
       new Vector3(0, 0, 0),
-      new Vector3(0.5, 0.5, 0.5),
+      new Vector3(1, 1, 1),
     );
 
-    this.mesh = Tile.mesh(gl);
+    this.mesh = squareMesh(gl);
+    this.texture = new Texture(gl);
+    this.texture.loadFromImage('/assets/gecko.PNG').catch(console.error);
   }
 
   public render(gl: WebGLRenderingContext, programInfo: ProgramInfo, camera: Camera) {
@@ -26,6 +29,8 @@ export class Player extends RenderObject {
       object: {
         mesh: this.mesh,
         model: this.model,
+        texture: this.texture,
+        useTexture: true,
       },
       camera,
     });
@@ -43,7 +48,9 @@ export class Player extends RenderObject {
     if (this.keysDown.has('a')) vx -= ax;
     if (this.keysDown.has('d')) vx += ax;
 
+    if (ax === 0 && vy === 0) return;
     this.position.add(new Vector3(vx, 0, vy));
+    this.rotation.y = Math.atan2(vx, vy);
   }
 
   private keysDown: Set<string> = new Set();

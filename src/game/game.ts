@@ -16,7 +16,7 @@ export class Game {
   private shaderProgram: WebGLProgram;
   private programInfo: ProgramInfo;
   private player: Player;
-  private tile: Tile;
+  private tiles: Tile[] = [];
 
   private boundKeyDown: (event: KeyboardEvent) => void;
   private boundKeyUp: (event: KeyboardEvent) => void;
@@ -65,11 +65,30 @@ export class Game {
     document.addEventListener('keydown', this.boundKeyDown);
     document.addEventListener('keyup', this.boundKeyUp);
 
-    this.tile = new Tile(
-      new Vector3(0, 0, 0),
-      new Vector3(0, 0, 0),
-      new Vector3(1, 1, 1),
-    )
+    this.tiles.push(
+      new Tile({
+        position: new Vector3(0, 0, 0),
+        rotation: new Vector3(0, 0, 0),
+        scale: new Vector3(1, 1, 1),
+        variant: 'grass',
+        gl: this.gl
+      }),
+      new Tile({
+        position: new Vector3(1, 0, 0),
+        rotation: new Vector3(0, 0, 0),
+        scale: new Vector3(1, 1, 1),
+        variant: 'stone',
+        gl: this.gl
+      }),
+      new Tile({
+        position: new Vector3(-1, 0, 0),
+        rotation: new Vector3(0, 0, 0),
+        scale: new Vector3(1, 1, 1),
+        variant: 'building',
+        gl: this.gl
+      }),
+    );
+
 
     this.player = new Player(this.gl);
     this.camera = new Camera(this.canvas.clientWidth / this.canvas.clientHeight, this.player);
@@ -86,14 +105,18 @@ export class Game {
   }
 
   public render() {
-    renderObject({
-      gl: this.gl,
-      info: this.programInfo,
-      object: {
-        mesh: this.tile.mesh(this.gl),
-        model: this.tile.model,
-      },
-      camera: this.camera,
+    this.tiles.forEach(tile => {
+      renderObject({
+        gl: this.gl,
+        info: this.programInfo,
+        object: {
+          mesh: tile.mesh(this.gl),
+          model: tile.model,
+          texture: tile.texture,
+          useTexture: tile.isTextureReady,
+        },
+        camera: this.camera,
+      });
     });
 
     this.player.render(this.gl, this.programInfo, this.camera);

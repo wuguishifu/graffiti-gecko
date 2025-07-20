@@ -2,6 +2,8 @@ import { mat4 } from 'gl-matrix';
 import { Vector3 } from '../math';
 import { Player } from '../player/player';
 
+const ZOOM = 10;
+
 export class Camera {
   private player: Player;
   private up: Vector3;
@@ -23,7 +25,7 @@ export class Camera {
   update() {
     this.position = new Vector3(
       this.player.position.x,
-      this.player.position.y - 20,
+      this.player.position.y - ZOOM,
       this.player.position.z
     );
   }

@@ -10,11 +10,11 @@ uniform mat4 vProjection;
 
 varying vec3 passNormal;
 varying vec3 passFragPos;
-varying vec4 passColor;
+varying vec2 passTextureCoord;
 
 void main() {
     gl_Position = vProjection * vView * vModel * vec4(aPosition, 1.0);
     passNormal = normalize(vec3(vModel * vec4(aNormal, 0.0)));
     passFragPos = vec3(vModel * vec4(aPosition, 1.0));
-    passColor = vec4(aTextureCoord, 0.0, 1.0);
+    passTextureCoord = aTextureCoord;
 }

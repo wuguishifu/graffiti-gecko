@@ -2,17 +2,26 @@ precision mediump float;
 
 varying vec3 passNormal;
 varying vec3 passFragPos;
-varying vec4 passColor;
+varying vec2 passTextureCoord;
 
 uniform vec3 viewPos;
-
 uniform vec3 lightPos;
 uniform float lightLevel;
 uniform vec3 lightColor;
+uniform sampler2D uTexture;
+uniform bool useTexture;
 
 void main(void) {
-    vec3 color = vec3(passColor.xyz);
-    float alpha = passColor.w;
+    vec3 color;
+    float alpha = 1.0;
+    
+    if (useTexture) {
+        vec4 texColor = texture2D(uTexture, passTextureCoord);
+        color = texColor.rgb;
+        alpha = texColor.a;
+    } else {
+        color = vec3(0.5, 0.5, 0.5);
+    }
 
     vec3 ambient = lightLevel * lightColor;
     vec3 lightDir = normalize(lightPos - passFragPos);

@@ -2,6 +2,7 @@ import { mat4 } from 'gl-matrix';
 import { Vector3 } from '../math';
 import { Camera } from './camera';
 import { Mesh } from './mesh';
+import { Texture } from './texture';
 
 type RenderProps = {
   gl: WebGLRenderingContext;
@@ -17,11 +18,13 @@ type RenderProps = {
       rotation: Vector3,
       scale: Vector3
     }
+    texture?: Texture;
+    useTexture?: boolean;
   }
   camera: Camera;
 }
 
-export default function renderObject({ gl, object: { mesh, model }, camera, info }: RenderProps) {
+export default function renderObject({ gl, object: { mesh, model, texture, useTexture = false }, camera, info }: RenderProps) {
   const modelMatrix = mat4.create();
   mat4.translate(modelMatrix, modelMatrix, model.position.toReadonlyVec3());
   mat4.rotateX(modelMatrix, modelMatrix, model.rotation.x);
@@ -46,6 +49,14 @@ export default function renderObject({ gl, object: { mesh, model }, camera, info
   gl.enableVertexAttribArray(info.attributes['aTextureCoord']);
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
+  if (texture && useTexture) {
+    texture.bind(0);
+    gl.uniform1i(info.uniforms['uTexture'], 0);
+    gl.uniform1i(info.uniforms['useTexture'], 1);
+  } else {
+    gl.uniform1i(info.uniforms['useTexture'], 0);
+  }
+
   gl.uniformMatrix4fv(info.uniforms['vView'], false, camera.viewMatrix());
   gl.uniformMatrix4fv(info.uniforms['vProjection'], false, camera.projectionMatrix());
   gl.uniformMatrix4fv(info.uniforms['vModel'], false, modelMatrix);
@@ -61,7 +72,7 @@ export default function renderObject({ gl, object: { mesh, model }, camera, info
 
   gl.disableVertexAttribArray(info.attributes['aPosition']);
   gl.disableVertexAttribArray(info.attributes['aNormal']);
-  gl.disableVertexAttribArray(info.attributes['aColor']);
+  gl.disableVertexAttribArray(info.attributes['aTextureCoord']);
 
   gl.useProgram(null);
 };

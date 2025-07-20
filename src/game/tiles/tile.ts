@@ -1,30 +1,49 @@
-import { Mesh, Vertex } from '../graphics/mesh';
+import { Mesh, squareMesh } from '../graphics/mesh';
 import { RenderObject } from '../graphics/render-object';
+import { Texture } from '../graphics/texture';
 import { Vector3 } from '../math';
 
-export class Tile extends RenderObject {
-  public static mesh(gl: WebGLRenderingContext): Mesh {
-    const vertices = [
-      new Vertex(new Vector3(-0.5, 0, -0.5), new Vector3(0, 1, 0), [0, 0]),
-      new Vertex(new Vector3(0.5, 0, -0.5), new Vector3(0, 1, 0), [1, 0]),
-      new Vertex(new Vector3(0.5, 0, 0.5), new Vector3(0, 1, 0), [1, 1]),
-      new Vertex(new Vector3(-0.5, 0, 0.5), new Vector3(0, 1, 0), [0, 1])
-    ];
+type TileVariant = 'grass' | 'stone' | 'building';
 
-    return new Mesh(gl, vertices, [
-      0, 1, 2,
-      0, 2, 3
-    ]);
+type TileProps = {
+  position: Vector3;
+  rotation: Vector3;
+  scale: Vector3;
+  variant: TileVariant;
+  gl: WebGLRenderingContext;
+}
+
+const variantToTextureMap: Record<TileVariant, string> = {
+  grass: '/assets/tiles/grass.JPG',
+  stone: '/assets/tiles/stone.JPG',
+  building: '/assets/tiles/building.JPG',
+};
+
+export class Tile extends RenderObject {
+  public variant: TileVariant;
+  public texture: Texture;
+  private textureLoaded: boolean = false;
+
+  constructor({ position, rotation, scale, variant, gl }: TileProps) {
+    super(position, rotation, scale);
+    this.variant = variant;
+
+    this.texture = new Texture(gl);
+    this.texture.loadFromImage(variantToTextureMap[variant])
+      .then(() => {
+        this.textureLoaded = true;
+      })
+      .catch(console.error);
   }
 
-  constructor(position: Vector3, rotation: Vector3, scale: Vector3) {
-    super(position, rotation, scale);
+  public get isTextureReady(): boolean {
+    return this.textureLoaded;
   }
 
   private defaultMesh: Mesh | null = null;
   public mesh(gl: WebGLRenderingContext): Mesh {
     if (!this.defaultMesh) {
-      this.defaultMesh = Tile.mesh(gl);
+      this.defaultMesh = squareMesh(gl);
     }
     return this.defaultMesh;
   }
