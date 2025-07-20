@@ -1,5 +1,4 @@
 import type { Camera } from '../graphics/camera';
-import renderObject from '../graphics/renderer';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
 import { Tile } from '../tiles/tile';
@@ -315,17 +314,7 @@ export class Level {
   public render(gl: WebGLRenderingContext, programInfo: ProgramInfo, camera: Camera) {
     this.tiles.forEach(row => {
       row.forEach(tile => {
-        renderObject({
-          gl,
-          info: programInfo,
-          object: {
-            mesh: tile.mesh(gl),
-            model: tile.model,
-            texture: tile.texture,
-            useTexture: tile.isTextureReady,
-          },
-          camera,
-        });
+        tile.render(gl, programInfo, camera);
       });
     });
   }

@@ -1,6 +1,9 @@
+import type { Camera } from '../graphics/camera';
 import { Mesh, squareMesh } from '../graphics/mesh';
 import { RenderObject } from '../graphics/render-object';
+import renderObject from '../graphics/renderer';
 import { TextureManager } from '../graphics/texture-manager';
+import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
 
 type TileVariant = 'grass' | 'stone' | 'building';
@@ -37,5 +40,20 @@ export class Tile extends RenderObject {
       this.defaultMesh = squareMesh(gl);
     }
     return this.defaultMesh;
+  }
+
+  public render(gl: WebGLRenderingContext, programInfo: ProgramInfo, camera: Camera) {
+    renderObject({
+      gl,
+      info: programInfo,
+      object: {
+        mesh: this.mesh(gl),
+        model: this.model,
+        texture: this.texture,
+        useTexture: this.isTextureReady,
+      },
+      camera,
+    });
+
   }
 }

@@ -1,7 +1,7 @@
 import { Texture } from './texture';
 
 type TileVariant = 'grass' | 'stone' | 'building';
-type EntityVariant = 'gecko';
+type EntityVariant = 'gecko' | 'spray-can';
 
 const tileVariantToTextureMap: Record<TileVariant, string> = {
   grass: '/assets/tiles/grass.JPG',
@@ -11,6 +11,7 @@ const tileVariantToTextureMap: Record<TileVariant, string> = {
 
 const entityVariantToTextureMap: Record<EntityVariant, string> = {
   gecko: '/assets/gecko.PNG',
+  'spray-can': '/assets/entities/spray-can.png',
 };
 
 export class TextureManager {
