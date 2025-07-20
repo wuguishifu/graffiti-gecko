@@ -2,13 +2,13 @@ import type { Camera } from '../graphics/camera';
 import { squareMesh, type Mesh } from '../graphics/mesh';
 import { RenderObject } from '../graphics/render-object';
 import renderObject from '../graphics/renderer';
-import { Texture } from '../graphics/texture';
+import { TextureManager } from '../graphics/texture-manager';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
 
 export class Player extends RenderObject {
   private mesh: Mesh;
-  private texture: Texture;
+  private textureManager: TextureManager;
 
   constructor(gl: WebGLRenderingContext) {
     super(
@@ -18,8 +18,7 @@ export class Player extends RenderObject {
     );
 
     this.mesh = squareMesh(gl);
-    this.texture = new Texture(gl);
-    this.texture.loadFromImage('/assets/gecko.PNG').catch(console.error);
+    this.textureManager = TextureManager.getInstance(gl);
   }
 
   public render(gl: WebGLRenderingContext, programInfo: ProgramInfo, camera: Camera) {
@@ -29,8 +28,8 @@ export class Player extends RenderObject {
       object: {
         mesh: this.mesh,
         model: this.model,
-        texture: this.texture,
-        useTexture: true,
+        texture: this.textureManager.getEntityTexture('gecko'),
+        useTexture: this.textureManager.isEntityTextureReady('gecko'),
       },
       camera,
     });

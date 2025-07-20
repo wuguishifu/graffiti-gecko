@@ -1,6 +1,7 @@
 import { Camera } from './graphics/camera';
 import renderObject from './graphics/renderer';
 import { buildProgramInfo, initShaderProgram } from './graphics/shader-source';
+import { TextureManager } from './graphics/texture-manager';
 import type { ProgramInfo } from './graphics/types';
 import { Vector3 } from './math';
 import { Player } from './player/player';
@@ -65,6 +66,8 @@ export class Game {
     document.addEventListener('keydown', this.boundKeyDown);
     document.addEventListener('keyup', this.boundKeyUp);
 
+    this.player = new Player(this.gl);
+    this.camera = new Camera(this.canvas.clientWidth / this.canvas.clientHeight, this.player);
     this.tiles.push(
       new Tile({
         position: new Vector3(0, 0, 0),
@@ -89,11 +92,15 @@ export class Game {
       }),
     );
 
+    this.setup().then(() => this.run());
+  }
 
-    this.player = new Player(this.gl);
-    this.camera = new Camera(this.canvas.clientWidth / this.canvas.clientHeight, this.player);
-
-    this.run();
+  public async setup() {
+    const textureManager = TextureManager.getInstance(this.gl);
+    await Promise.all([
+      textureManager.preloadAllTileTextures(),
+      textureManager.preloadEntityTexture('gecko'),
+    ]);
   }
 
   public run() {

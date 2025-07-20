@@ -1,6 +1,6 @@
 import { Mesh, squareMesh } from '../graphics/mesh';
 import { RenderObject } from '../graphics/render-object';
-import { Texture } from '../graphics/texture';
+import { TextureManager } from '../graphics/texture-manager';
 import { Vector3 } from '../math';
 
 type TileVariant = 'grass' | 'stone' | 'building';
@@ -13,31 +13,22 @@ type TileProps = {
   gl: WebGLRenderingContext;
 }
 
-const variantToTextureMap: Record<TileVariant, string> = {
-  grass: '/assets/tiles/grass.JPG',
-  stone: '/assets/tiles/stone.JPG',
-  building: '/assets/tiles/building.JPG',
-};
-
 export class Tile extends RenderObject {
   public variant: TileVariant;
-  public texture: Texture;
-  private textureLoaded: boolean = false;
+  private textureManager: TextureManager;
 
   constructor({ position, rotation, scale, variant, gl }: TileProps) {
     super(position, rotation, scale);
     this.variant = variant;
+    this.textureManager = TextureManager.getInstance(gl);
+  }
 
-    this.texture = new Texture(gl);
-    this.texture.loadFromImage(variantToTextureMap[variant])
-      .then(() => {
-        this.textureLoaded = true;
-      })
-      .catch(console.error);
+  public get texture() {
+    return this.textureManager.getTileTexture(this.variant);
   }
 
   public get isTextureReady(): boolean {
-    return this.textureLoaded;
+    return this.textureManager.isTileTextureReady(this.variant);
   }
 
   private defaultMesh: Mesh | null = null;
