@@ -90,6 +90,9 @@ export class Game {
 
     // Pass the level reference to the player
     this.player = new Player(this.gl, this.level);
+
+    // Set player reference in level for cop spawning
+    this.level.setPlayer(this.player);
     this.camera = new Camera(this.canvas.clientWidth / this.canvas.clientHeight, this.player);
 
     this.running = true;
@@ -102,6 +105,7 @@ export class Game {
       textureManager.preloadAllTileTextures(),
       textureManager.preloadEntityTexture('gecko'),
       textureManager.preloadEntityTexture('spray-can'),
+      textureManager.preloadEntityTexture('cop'),
     ]);
   }
 
@@ -111,7 +115,9 @@ export class Game {
     }
     this.camera.update();
     this.player.update();
+    this.level.updateCops();
     this.checkPlayerNearSprayCan();
+    this.checkPlayerNearCops();
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     this.render();
     requestAnimationFrame(() => this.run());
@@ -144,6 +150,22 @@ export class Game {
       if (isNearSprayCan) {
         store.dispatch(gameActions.setActiveSprayCanId(nearestSprayCan.id));
       }
+    }
+  }
+
+  private checkPlayerNearCops() {
+    const cops = this.level.getCops();
+    const playerPos = this.player.position;
+    const captureRadius = 1.0; // Distance within which cops can capture player
+
+    const nearbyCop = cops.find(cop => {
+      return cop.isNearPlayer(captureRadius);
+    });
+
+    if (nearbyCop) {
+      console.log('Player captured by cop!');
+      // You could add game over logic here
+      // For now, just log the capture
     }
   }
 

@@ -1,10 +1,12 @@
 import { gameActions } from '../../state/gameSlice';
 import { store } from '../../state/store';
 import { SprayCan } from '../entities/spray-can';
+import { Cop } from '../entities/cop';
 import type { Camera } from '../graphics/camera';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
 import { Tile } from '../tiles/tile';
+import type { Player } from '../player/player';
 
 type TileType = 'grass' | 'stone' | 'building';
 
@@ -25,6 +27,8 @@ export class Level {
   private height = 20;
   private grid: Cell[][] = [];
   private sprayCans: SprayCan[] = [];
+  private cops: Cop[] = [];
+  private player: Player | null = null;
 
   // Define adjacency rules for city blocks
   private rules: Record<TileType, TileType[]> = {
@@ -43,6 +47,12 @@ export class Level {
   constructor(gl: WebGLRenderingContext) {
     this.gl = gl;
     this.generate();
+  }
+
+  public setPlayer(player: Player) {
+    this.player = player;
+    // Spawn cops after player is set
+    this.spawnCops();
   }
 
   public generate() {
@@ -330,6 +340,11 @@ export class Level {
     this.sprayCans.forEach(sprayCan => {
       sprayCan.render(gl, programInfo, camera);
     });
+
+    // Render cops
+    this.cops.forEach(cop => {
+      cop.render(gl, programInfo, camera);
+    });
   }
 
   // Add this new method to check if a position is walkable
@@ -426,5 +441,57 @@ export class Level {
 
   public getSprayCans(): SprayCan[] {
     return this.sprayCans;
+  }
+
+  private spawnCops() {
+    this.cops = [];
+
+    if (!this.player) {
+      console.warn('Cannot spawn cops: player not set');
+      return;
+    }
+
+    // Find suitable spawn points (stone tiles away from player)
+    const spawnPoints: { x: number; y: number }[] = [];
+    const playerX = Math.round(this.player.position.x);
+    const playerY = Math.round(this.player.position.y);
+    const minDistanceFromPlayer = 8;
+
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        const tileType = this.getTileType(x, y);
+        if (tileType === 'stone') {
+          const distanceFromPlayer = Math.sqrt(
+            Math.pow(x - playerX, 2) + Math.pow(y - playerY, 2)
+          );
+          if (distanceFromPlayer >= minDistanceFromPlayer) {
+            spawnPoints.push({ x, y });
+          }
+        }
+      }
+    }
+
+    // Spawn 2-4 cops at random stone locations
+    const numCops = Math.floor(Math.random() * 3) + 2; // 2-4 cops
+    const shuffledPoints = [...spawnPoints].sort(() => Math.random() - 0.5);
+
+    for (let i = 0; i < Math.min(numCops, shuffledPoints.length); i++) {
+      const point = shuffledPoints[i];
+      const cop = new Cop(this.gl, this, this.player, i, point.x, point.y);
+      cop.position.z = 0.1; // Slightly above ground
+      this.cops.push(cop);
+    }
+
+    console.log(`Spawned ${this.cops.length} cops at stone locations`);
+  }
+
+  public updateCops() {
+    this.cops.forEach(cop => {
+      cop.update();
+    });
+  }
+
+  public getCops(): Cop[] {
+    return this.cops;
   }
 }
