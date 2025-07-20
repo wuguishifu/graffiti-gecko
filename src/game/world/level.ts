@@ -2,6 +2,7 @@ import type { Camera } from '../graphics/camera';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
 import { Tile } from '../tiles/tile';
+import { SprayCan } from '../entities/spray-can';
 
 type TileType = 'grass' | 'stone' | 'building';
 
@@ -21,6 +22,7 @@ export class Level {
   private width = 20;
   private height = 20;
   private grid: Cell[][] = [];
+  private sprayCans: SprayCan[] = [];
 
   // Define adjacency rules for city blocks
   private rules: Record<TileType, TileType[]> = {
@@ -51,6 +53,7 @@ export class Level {
         this.initializeGrid();
         this.collapseWaveFunction();
         this.createTiles();
+        this.spawnSprayCans();
         console.log('Level generated successfully!');
         return;
       } catch (error) {
@@ -309,6 +312,9 @@ export class Level {
         });
       }
     }
+
+    // Spawn spray cans in fallback level too
+    this.spawnSprayCans();
   }
 
   public render(gl: WebGLRenderingContext, programInfo: ProgramInfo, camera: Camera) {
@@ -316,6 +322,11 @@ export class Level {
       row.forEach(tile => {
         tile.render(gl, programInfo, camera);
       });
+    });
+
+    // Render spray cans
+    this.sprayCans.forEach(sprayCan => {
+      sprayCan.render(gl, programInfo, camera);
     });
   }
 
@@ -344,5 +355,72 @@ export class Level {
 
     const tile = this.tiles[y]?.[x];
     return tile ? tile.variant : null;
+  }
+
+  private spawnSprayCans() {
+    this.sprayCans = [];
+    const spawnPoints = this.findBuildingRoadIntersections();
+
+    // Spawn 3-5 spray cans at random intersection points
+    const numSprayCans = Math.floor(Math.random() * 3) + 3; // 3-5 spray cans
+    const shuffledPoints = [...spawnPoints].sort(() => Math.random() - 0.5);
+
+    for (let i = 0; i < Math.min(numSprayCans, shuffledPoints.length); i++) {
+      const point = shuffledPoints[i];
+      const sprayCan = new SprayCan(this.gl);
+      sprayCan.position.x = point.x;
+      sprayCan.position.y = point.y;
+      sprayCan.position.z = 0.1; // Slightly above ground
+      this.sprayCans.push(sprayCan);
+    }
+
+    console.log(`Spawned ${this.sprayCans.length} spray cans at building-road intersections`);
+  }
+
+  private findBuildingRoadIntersections(): { x: number; y: number }[] {
+    const intersections: { x: number; y: number }[] = [];
+
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        const currentTile = this.getTileType(x, y);
+
+        if (currentTile === 'stone') {
+          // Check if this road tile is adjacent to a building
+          const neighbors = this.getNeighborTiles(x, y);
+          const hasBuildingNeighbor = neighbors.some(tile => tile === 'building');
+
+          if (hasBuildingNeighbor) {
+            intersections.push({ x, y });
+          }
+        }
+      }
+    }
+
+    return intersections;
+  }
+
+  private getNeighborTiles(x: number, y: number): TileType[] {
+    const neighbors: TileType[] = [];
+    const directions = [
+      { dx: -1, dy: 0 },
+      { dx: 1, dy: 0 },
+      { dx: 0, dy: -1 },
+      { dx: 0, dy: 1 }
+    ];
+
+    for (const { dx, dy } of directions) {
+      const nx = x + dx;
+      const ny = y + dy;
+      const tileType = this.getTileType(nx, ny);
+      if (tileType) {
+        neighbors.push(tileType);
+      }
+    }
+
+    return neighbors;
+  }
+
+  public getSprayCans(): SprayCan[] {
+    return this.sprayCans;
   }
 }

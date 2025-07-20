@@ -97,6 +97,7 @@ export class Game {
     await Promise.all([
       textureManager.preloadAllTileTextures(),
       textureManager.preloadEntityTexture('gecko'),
+      textureManager.preloadEntityTexture('spray-can'),
     ]);
   }
 
