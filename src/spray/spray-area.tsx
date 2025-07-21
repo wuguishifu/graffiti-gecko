@@ -312,19 +312,6 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
         ref={tagCanvasRef}
       />
 
-      <canvas
-        ref={canvasRef}
-        className='absolute top-0 left-0 w-full h-full cursor-crosshair'
-        onMouseDown={startPainting}
-        onMouseUp={stopPainting}
-        onMouseLeave={stopPainting}
-        onMouseMove={paint}
-        onTouchStart={startPainting}
-        onTouchEnd={stopPainting}
-        onTouchMove={paint}
-        style={{ touchAction: 'none' }}
-      />
-
       <div className='relative w-full aspect-[2.5] pointer-events-none select-none'>
         {/* Progress bar */}
         {sprayAreaVisible && (
@@ -352,6 +339,18 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
         </div>
       </div>
 
+      <canvas
+        ref={canvasRef}
+        className='absolute top-0 left-0 w-full h-full cursor-crosshair'
+        onMouseDown={startPainting}
+        onMouseUp={stopPainting}
+        onMouseLeave={stopPainting}
+        onMouseMove={paint}
+        onTouchStart={startPainting}
+        onTouchEnd={stopPainting}
+        onTouchMove={paint}
+        style={{ touchAction: 'none' }}
+      />
 
       {/* Spray complete splash */}
       {sprayComplete && (
