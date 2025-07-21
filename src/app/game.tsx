@@ -5,6 +5,7 @@ import { SprayArea, type SprayAreaRef } from '../spray/spray-area';
 import { GameProvider } from '../state/game-context';
 import { GamePauser } from '../state/game-pauser';
 import { gameActions } from '../state/gameSlice';
+import { store } from '../state/store';
 import { useAppDispatch, useAppSelector } from '../state/useAppState';
 import { Hud } from '../ui/hud';
 import { PauseMenu } from '../ui/pause-menu';
@@ -48,6 +49,21 @@ export function GamePage() {
   }, [gameOverFlag]);
 
   const pauseMenuVisible = useAppSelector((state) => state.game.pauseMenuVisible);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === ' ' && store.getState().game.nearSprayCan && !store.getState().game.sprayAreaVisible) {
+        event.preventDefault();
+        sprayAreaRef.current?.reset();
+        onOpenSprayArea();
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, []);
 
   return (
     <GameProvider gameInstance={gameInstance}>

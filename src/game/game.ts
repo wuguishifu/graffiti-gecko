@@ -49,12 +49,6 @@ export class Game {
 
       store.dispatch(gameActions.setPauseMenuVisible(true));
     }
-
-    if (event.key === ' ') {
-      if (store.getState().game.nearSprayCan) {
-        store.dispatch(gameActions.setSprayAreaVisible(true));
-      }
-    }
   }
 
   private onKeyUp(event: KeyboardEvent) {
@@ -126,7 +120,7 @@ export class Game {
     }
     this.camera.update();
     this.player.update();
-    // this.level.updateCops();
+    this.level.updateCops();
     this.checkPlayerNearSprayCan();
     this.checkPlayerNearCops();
     this.checkLevelCompletion();

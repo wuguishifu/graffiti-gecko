@@ -7,6 +7,27 @@ export type SprayAreaRef = {
   reset: () => void;
 }
 
+const tagImages = [
+  '/assets/tags/b.png',
+  '/assets/tags/crown.png',
+  '/assets/tags/f.png',
+  '/assets/tags/heart.png',
+  '/assets/tags/s.png',
+  '/assets/tags/scribble.png',
+  '/assets/tags/sparkle.png',
+  '/assets/tags/star1.png',
+  '/assets/tags/star2.png',
+  '/assets/tags/y.png',
+  '/assets/tags/z.png',
+] as const;
+
+const selectRandomTagImage = () => {
+  const randomIndex = Math.floor(Math.random() * tagImages.length);
+  return tagImages[randomIndex];
+};
+
+type TagImages = typeof tagImages[number];
+
 export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
   const sprayAreaVisible = useAppSelector((state) => state.game.sprayAreaVisible);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -18,9 +39,17 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
   const sprayColor = useAppSelector((state) => state.data.sprayColor);
 
+  const [src, setSrc] = useState<TagImages>(selectRandomTagImage());
+  const previousSrc = useRef<TagImages | null>(src);
+
   useImperativeHandle(ref, () => ({
     reset: () => {
       resetCanvas();
+      let newSrc: TagImages;
+      do {
+        newSrc = selectRandomTagImage();
+      } while (newSrc === previousSrc.current);
+      setSrc(newSrc);
     },
   }));
 
@@ -82,16 +111,16 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
       // Calculate tag position to center it and make it half height
       const tagAspectRatio = tagImg.width / tagImg.height;
-      const tagHeight = rect.height / 3;
+      const tagHeight = rect.height * 2 / 3;
       const tagWidth = tagHeight * tagAspectRatio;
       const tagX = (rect.width - tagWidth) / 2;
-      const tagY = (rect.height - tagHeight) / 2;
+      const tagY = (rect.height - tagHeight) * 2.2 / 3;
 
       // Draw the tag image
       tagCtx.drawImage(tagImg, tagX, tagY, tagWidth, tagHeight);
     };
-    tagImg.src = '/assets/tags/z.png';
-  }, []);
+    tagImg.src = src;
+  }, [src]);
 
   const calculateOverlap = () => {
     const canvas = canvasRef.current;
@@ -277,9 +306,10 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
         src='/assets/backgrounds/brick.webp'
       />
 
-      <img
-        className='absolute h-1/3 select-none pointer-events-none opacity-50'
-        src='/assets/tags/z.png'
+      {/* Hidden canvas for tag processing */}
+      <canvas
+        className='absolute pointer-events-none select-none'
+        ref={tagCanvasRef}
       />
 
       <canvas
@@ -293,12 +323,6 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
         onTouchEnd={stopPainting}
         onTouchMove={paint}
         style={{ touchAction: 'none' }}
-      />
-
-      {/* Hidden canvas for tag processing */}
-      <canvas
-        ref={tagCanvasRef}
-        style={{ display: 'none' }}
       />
 
       <div className='relative w-full aspect-[2.5] pointer-events-none select-none'>
