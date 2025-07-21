@@ -4,9 +4,11 @@ import { Game } from '../game/game';
 import { SprayArea, type SprayAreaRef } from '../spray/spray-area';
 import { GameProvider } from '../state/game-context';
 import { GamePauser } from '../state/game-pauser';
-import { gameActions } from '../state/gameSlice';
-import { useAppDispatch, useAppSelector } from '../state/useAppState';
+import { gameActions } from '../state/game-slice';
+import { store } from '../state/store';
+import { useAppDispatch, useAppSelector } from '../state/use-app-state';
 import { Hud } from '../ui/hud';
+import { PauseMenu } from '../ui/pause-menu';
 
 export function GamePage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -14,7 +16,6 @@ export function GamePage() {
 
   const dispatch = useAppDispatch();
   const dispatchRef = useRef(dispatch);
-  const nearSprayCan = useAppSelector((state) => state.game.nearSprayCan);
   const gameOverFlag = useAppSelector((state) => state.game.gameOverFlag);
 
   const navigate = useNavigate();
@@ -47,6 +48,23 @@ export function GamePage() {
     }
   }, [gameOverFlag]);
 
+  const pauseMenuVisible = useAppSelector((state) => state.game.pauseMenuVisible);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === ' ' && store.getState().game.nearSprayCan && !store.getState().game.sprayAreaVisible) {
+        event.preventDefault();
+        sprayAreaRef.current?.reset();
+        onOpenSprayArea();
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, []);
+
   return (
     <GameProvider gameInstance={gameInstance}>
       <main className="h-full flex items-center">
@@ -62,19 +80,10 @@ export function GamePage() {
           </canvas>
         </div>
         <div className='absolute top-0 left-0 w-full h-full px-20 py-16'>
-          <div className='relative w-full h-full'>
-            {nearSprayCan && (
-              <div
-                className='absolute bottom-0 right-0 bg-white/50 w-40 h-20 rounded-xl flex items-center justify-center hover:opacity-80 cursor-pointer'
-                onClick={onOpenSprayArea}
-              >
-                <img src="/assets/icons/can.png" />
-              </div>
-            )}
-          </div>
         </div>
-        <Hud />
+        <Hud onOpenSprayArea={onOpenSprayArea} />
         <SprayArea ref={sprayAreaRef} />
+        {pauseMenuVisible && <PauseMenu />}
         <GamePauser />
       </main>
     </GameProvider>

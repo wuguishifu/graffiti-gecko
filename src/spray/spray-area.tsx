@@ -1,11 +1,32 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useGame } from '../state/game-context';
-import { gameActions } from '../state/gameSlice';
-import { useAppDispatch, useAppSelector } from '../state/useAppState';
+import { gameActions } from '../state/game-slice';
+import { useAppDispatch, useAppSelector } from '../state/use-app-state';
 
 export type SprayAreaRef = {
   reset: () => void;
 }
+
+const tagImages = [
+  '/assets/tags/b.png',
+  '/assets/tags/crown.png',
+  '/assets/tags/f.png',
+  '/assets/tags/heart.png',
+  '/assets/tags/s.png',
+  '/assets/tags/scribble.png',
+  '/assets/tags/sparkle.png',
+  '/assets/tags/star1.png',
+  '/assets/tags/star2.png',
+  '/assets/tags/y.png',
+  '/assets/tags/z.png',
+] as const;
+
+const selectRandomTagImage = () => {
+  const randomIndex = Math.floor(Math.random() * tagImages.length);
+  return tagImages[randomIndex];
+};
+
+type TagImages = typeof tagImages[number];
 
 export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
   const sprayAreaVisible = useAppSelector((state) => state.game.sprayAreaVisible);
@@ -16,9 +37,19 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
   const throttledTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { gameInstance } = useGame();
 
+  const sprayColor = useAppSelector((state) => state.data.sprayColor);
+
+  const [src, setSrc] = useState<TagImages>(selectRandomTagImage());
+  const previousSrc = useRef<TagImages | null>(src);
+
   useImperativeHandle(ref, () => ({
     reset: () => {
       resetCanvas();
+      let newSrc: TagImages;
+      do {
+        newSrc = selectRandomTagImage();
+      } while (newSrc === previousSrc.current);
+      setSrc(newSrc);
     },
   }));
 
@@ -80,16 +111,16 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
       // Calculate tag position to center it and make it half height
       const tagAspectRatio = tagImg.width / tagImg.height;
-      const tagHeight = rect.height / 2;
+      const tagHeight = rect.height * 2 / 3;
       const tagWidth = tagHeight * tagAspectRatio;
       const tagX = (rect.width - tagWidth) / 2;
-      const tagY = (rect.height - tagHeight) / 2;
+      const tagY = (rect.height - tagHeight) * 2.2 / 3;
 
       // Draw the tag image
       tagCtx.drawImage(tagImg, tagX, tagY, tagWidth, tagHeight);
     };
-    tagImg.src = '/assets/tags/z.png';
-  }, []);
+    tagImg.src = src;
+  }, [src]);
 
   const calculateOverlap = () => {
     const canvas = canvasRef.current;
@@ -109,17 +140,9 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
     // Compare pixels
     for (let i = 0; i < paintedData.data.length; i += 4) {
-      const paintedRed = paintedData.data[i];
-      const paintedGreen = paintedData.data[i + 1];
-      const paintedBlue = paintedData.data[i + 2];
       const paintedAlpha = paintedData.data[i + 3];
-
       const tagAlpha = tagData.data[i + 3];
-
-      // Check if pixel is painted (red with some alpha)
-      const isPainted = paintedRed > 100 && paintedGreen < 50 && paintedBlue < 50 && paintedAlpha > 50;
-
-      // Check if pixel is part of the tag (non-transparent)
+      const isPainted = paintedAlpha > 50;
       const isTagPixel = tagAlpha > 50;
 
       if (isPainted && isTagPixel) {
@@ -135,7 +158,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     const overlapPercentage = tagPixels > 0 ? (overlappingPixels / tagPixels) * 100 : 0;
     setOverlapPercentage(Math.round(overlapPercentage));
 
-    if (overlapPercentage >= 75) {
+    if (overlapPercentage >= 85) {
       onSprayComplete();
     }
   };
@@ -210,7 +233,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     const y = clientY - rect.top;
 
     // Create spray effect with multiple dots
-    ctx.fillStyle = '#FF0000';
+    ctx.fillStyle = sprayColor;
     ctx.globalAlpha = 0.7;
 
     for (let i = 0; i < 8; i++) {
@@ -280,13 +303,41 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center' style={{ zIndex: sprayAreaVisible ? 1000 : -10 }}>
       <img
         className='absolute top-0 left-0 w-full h-full select-none pointer-events-none'
-        src='/assets/backgrounds/brick.png'
+        src='/assets/backgrounds/brick.webp'
       />
 
-      <img
-        className='absolute h-1/2 select-none pointer-events-none opacity-50'
-        src='/assets/tags/z.png'
+      {/* Hidden canvas for tag processing */}
+      <canvas
+        className='absolute pointer-events-none select-none'
+        ref={tagCanvasRef}
       />
+
+      <div className='relative w-full aspect-[2.5] pointer-events-none select-none'>
+        {/* Progress bar */}
+        {sprayAreaVisible && (
+          <div className='relative w-[450px] h-[32px] overflow-hidden top-8 left-8'>
+            {/* Parallelogram background */}
+            <div
+              className='absolute inset-0 bg-black'
+              style={{ clipPath: 'polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%)' }}
+            />
+            {/* Parallelogram fill */}
+            <div
+              className='absolute inset-0 bg-[#FFDE00] transition-all duration-300 ease-out'
+              style={{ clipPath: `polygon(10% 0%, ${10 + (overlapPercentage * 0.8)}% 0%, ${overlapPercentage * 0.8}% 100%, 0% 100%)` }}
+            />
+            {/* 85% marker line */}
+            <div
+              className='absolute top-0 bottom-0 w-[3px] bg-[#FFDE00]'
+              style={{ left: `${10 + (85 * 0.8) - 5.1}%`, transform: 'skewX(-54.583deg)', }}
+            />
+          </div>
+        )}
+        <img src='/assets/copy/fill-to-complete.svg' className='absolute top-18 left-32' />
+        <div className='absolute top-8 left-0 w-full flex justify-center'>
+          <img src='/assets/copy/tag-it.svg' />
+        </div>
+      </div>
 
       <canvas
         ref={canvasRef}
@@ -301,34 +352,15 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
         style={{ touchAction: 'none' }}
       />
 
-      {/* Hidden canvas for tag processing */}
-      <canvas
-        ref={tagCanvasRef}
-        style={{ display: 'none' }}
-      />
-
-      {/* Progress bar */}
-      {sprayAreaVisible && (
-        <div className='absolute top-4 left-4 bg-black/70 rounded-lg p-2'>
-          <div className='text-white text-xs mb-1 font-mono'>Progress</div>
-          <div className='w-32 h-4 bg-gray-700 rounded-full overflow-hidden'>
-            <div
-              className='h-full bg-gradient-to-r from-green-400 to-green-600 transition-all duration-300 ease-out'
-              style={{ width: `${overlapPercentage}%` }}
-            />
-          </div>
-          <div className='text-white text-xs mt-1 font-mono text-center'>
-            {overlapPercentage}%
-          </div>
-        </div>
-      )}
-
       {/* Spray complete splash */}
       {sprayComplete && (
-        <img
-          className='absolute h-3/4 select-none pointer-events-none scale-bounce'
-          src='/assets/tags/spray-complete.png'
-        />
+        <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center pointer-events-none select-none z-0'>
+          <img
+            className='absolute h-3/4 select-none pointer-events-none scale-bounce -z-10'
+            src='/assets/tags/spray-bg.webp'
+          />
+          <img src='/assets/copy/tag-complete.svg' className='w-1/4 scale-bounce' />
+        </div>
       )}
     </div>
   );

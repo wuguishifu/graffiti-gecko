@@ -4,13 +4,13 @@ type TileVariant = 'grass' | 'stone' | 'building';
 type EntityVariant = 'gecko' | 'spray-can' | 'cop';
 
 const tileVariantToTextureMap: Record<TileVariant, string> = {
-  grass: '/assets/tiles/grass.JPG',
-  stone: '/assets/tiles/stone.JPG',
-  building: '/assets/tiles/building.JPG',
+  grass: '/assets/tiles/grass.jpg',
+  stone: '/assets/tiles/stone.jpg',
+  building: '/assets/tiles/building.jpg',
 };
 
 const entityVariantToTextureMap: Record<EntityVariant, string> = {
-  gecko: '/assets/gecko.PNG',
+  gecko: '/assets/gecko.png',
   'spray-can': '/assets/entities/spray-can.png',
   cop: '/assets/entities/cop.png',
 };

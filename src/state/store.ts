@@ -1,18 +1,37 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import { gameSlice } from './gameSlice';
+import { persistReducer, type PersistConfig } from 'redux-persist';
+import persistStore from 'redux-persist/es/persistStore';
+import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
+import { dataSlice } from './data-slice';
+import { gameSlice } from './game-slice';
+import { reduxLocalStorage } from './local-storage';
 
 const rootReducer = combineReducers({
   [gameSlice.name]: gameSlice.reducer,
+  [dataSlice.name]: dataSlice.reducer,
 });
 
+const persistConfig: PersistConfig<RootState> = {
+  key: 'root',
+  storage: reduxLocalStorage,
+  whitelist: [
+    dataSlice.name,
+  ],
+  stateReconciler: autoMergeLevel2
+};
+
+const persistedReducer = persistReducer<RootState>(persistConfig, rootReducer);
+
 export const store = configureStore({
-  reducer: rootReducer,
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      immutableCheck: true,
-      serializableCheck: true,
+      immutableCheck: false,
+      serializableCheck: false,
     }),
 });
+
+export const persistor = persistStore(store);
 
 export type RootState = ReturnType<typeof rootReducer>;
 export type AppDispatch = typeof store.dispatch;

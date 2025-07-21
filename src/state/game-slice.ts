@@ -1,5 +1,10 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
+/*
+  Redux slice for managing game state.
+  Things in this slice will not be persisted across sessions.
+*/
+
 type GameSliceState = {
   sprayAreaVisible: boolean;
   nearSprayCan: boolean;
@@ -10,6 +15,8 @@ type GameSliceState = {
   distanceTraveled: number;
   totalSprayCansCompleted: number;
   currentLevel: number;
+  pauseMenuVisible?: boolean;
+  timeLeft: number;
 };
 
 const initialState: GameSliceState = {
@@ -20,6 +27,7 @@ const initialState: GameSliceState = {
   distanceTraveled: 0,
   totalSprayCansCompleted: 0,
   currentLevel: 1,
+  timeLeft: 60 * 5,
 }
 
 export const gameSlice = createSlice({
@@ -68,6 +76,12 @@ export const gameSlice = createSlice({
     },
     incrementLevel: (state) => {
       state.currentLevel++;
+    },
+    setPauseMenuVisible: (state, action: PayloadAction<boolean>) => {
+      state.pauseMenuVisible = action.payload;
+    },
+    setTimeLeft: (state, action: PayloadAction<number>) => {
+      state.timeLeft = action.payload;
     },
     reset: () => initialState,
   },

@@ -1,3 +1,42 @@
+/* Custom Font Declarations */
+@font-face {
+  font-family: 'Blank River';
+  src: url('/fonts/Blank River.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Graffiti Youth';
+  src: url('/fonts/GraffitiYouth-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a,
+button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+a,
+button::-moz-focus-inner {
+  border: 0;
+}
+
+/* CSS Custom Properties for Fonts */
+:root {
+  --font-blank-river: 'Blank River', serif;
+  --font-graffiti-youth: 'Graffiti Youth', cursive;
+}
+
 @import "tailwindcss";
 
 body {
@@ -24,4 +63,17 @@ body {
 
 .scale-bounce {
   animation: scaleBounce 0.6s ease-out;
+}
+
+/* Custom Font Utility Classes */
+.font-blank-river {
+  font-family: 'Blank River', serif;
+}
+
+.font-graffiti-youth {
+  font-family: 'Graffiti Youth', cursive;
+}
+
+.shadow {
+  filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
 }

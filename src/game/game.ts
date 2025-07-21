@@ -1,4 +1,4 @@
-import { gameActions } from '../state/gameSlice';
+import { gameActions } from '../state/game-slice';
 import { store } from '../state/store';
 import { Camera } from './graphics/camera';
 import { resetSquareMesh } from './graphics/mesh';
@@ -39,13 +39,15 @@ export class Game {
     this.player.onKeyDown(event);
 
     if (event.key === 'Escape') {
-      store.dispatch(gameActions.setSprayAreaVisible(false));
-    }
-
-    if (event.key === ' ') {
-      if (store.getState().game.nearSprayCan) {
-        store.dispatch(gameActions.setSprayAreaVisible(true));
+      if (store.getState().game.sprayAreaVisible) {
+        return store.dispatch(gameActions.setSprayAreaVisible(false));
       }
+
+      if (store.getState().game.pauseMenuVisible) {
+        return store.dispatch(gameActions.setPauseMenuVisible(false));
+      }
+
+      store.dispatch(gameActions.setPauseMenuVisible(true));
     }
   }
 
@@ -54,7 +56,6 @@ export class Game {
   }
 
   constructor(canvas: HTMLCanvasElement) {
-    store.dispatch(gameActions.reset());
     this.canvas = canvas;
     const gl = canvas.getContext('webgl', { antialias: false });
     if (!gl) {
