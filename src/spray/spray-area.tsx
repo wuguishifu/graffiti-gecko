@@ -82,7 +82,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
       // Calculate tag position to center it and make it half height
       const tagAspectRatio = tagImg.width / tagImg.height;
-      const tagHeight = rect.height / 2;
+      const tagHeight = rect.height / 3;
       const tagWidth = tagHeight * tagAspectRatio;
       const tagX = (rect.width - tagWidth) / 2;
       const tagY = (rect.height - tagHeight) / 2;
@@ -129,7 +129,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     const overlapPercentage = tagPixels > 0 ? (overlappingPixels / tagPixels) * 100 : 0;
     setOverlapPercentage(Math.round(overlapPercentage));
 
-    if (overlapPercentage >= 75) {
+    if (overlapPercentage >= 85) {
       onSprayComplete();
     }
   };
@@ -278,7 +278,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
       />
 
       <img
-        className='absolute h-1/2 select-none pointer-events-none opacity-50'
+        className='absolute h-1/3 select-none pointer-events-none opacity-50'
         src='/assets/tags/z.png'
       />
 
@@ -301,21 +301,33 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
         style={{ display: 'none' }}
       />
 
-      {/* Progress bar */}
-      {sprayAreaVisible && (
-        <div className='absolute top-4 left-4 bg-black/70 rounded-lg p-2'>
-          <div className='text-white text-xs mb-1 font-mono'>Progress</div>
-          <div className='w-32 h-4 bg-gray-700 rounded-full overflow-hidden'>
+      <div className='relative w-full aspect-[2.5] pointer-events-none select-none'>
+        {/* Progress bar */}
+        {sprayAreaVisible && (
+          <div className='relative w-[450px] h-[32px] overflow-hidden top-8 left-8'>
+            {/* Parallelogram background */}
             <div
-              className='h-full bg-gradient-to-r from-green-400 to-green-600 transition-all duration-300 ease-out'
-              style={{ width: `${overlapPercentage}%` }}
+              className='absolute inset-0 bg-black'
+              style={{ clipPath: 'polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%)' }}
+            />
+            {/* Parallelogram fill */}
+            <div
+              className='absolute inset-0 bg-[#FFDE00] transition-all duration-300 ease-out'
+              style={{ clipPath: `polygon(10% 0%, ${10 + (overlapPercentage * 0.8)}% 0%, ${overlapPercentage * 0.8}% 100%, 0% 100%)` }}
+            />
+            {/* 85% marker line */}
+            <div
+              className='absolute top-0 bottom-0 w-[3px] bg-[#FFDE00]'
+              style={{ left: `${10 + (85 * 0.8) - 5.1}%`, transform: 'skewX(-54.583deg)', }}
             />
           </div>
-          <div className='text-white text-xs mt-1 font-mono text-center'>
-            {overlapPercentage}%
-          </div>
+        )}
+        <img src='/assets/copy/fill-to-complete.svg' className='absolute top-18 left-32' />
+        <div className='absolute top-8 left-0 w-full flex justify-center'>
+          <img src='/assets/copy/tag-it.svg' />
         </div>
-      )}
+      </div>
+
 
       {/* Spray complete splash */}
       {sprayComplete && (
