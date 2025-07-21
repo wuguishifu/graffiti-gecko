@@ -1,14 +1,16 @@
 import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router';
 import { useAppSelector } from '../state/useAppState';
 
 export function GameOver() {
   const totalSprayCansCompleted = useAppSelector((state) => state.game.totalSprayCansCompleted);
   const currentLevel = useAppSelector((state) => state.game.currentLevel);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
-        window.location.href = '/';
+        navigate('/');
       }
     }
 
@@ -16,7 +18,7 @@ export function GameOver() {
     return () => {
       document.removeEventListener('keydown', onKeyDown);
     }
-  }, []);
+  }, [navigate]);
 
   return (
     <main className='absolute top-0 left-0 w-full h-full flex items-center justify-center select-none'>
@@ -28,12 +30,12 @@ export function GameOver() {
           <img src='/assets/copy/tags-completed.svg' className='pointer-events-none' />
           <p className='text-5xl font-graffiti-youth !text-black'>{totalSprayCansCompleted}</p>
         </div>
-        <a href='/game' className='hover:scale-110 transition-transform'>
+        <Link to='/game' className='hover:scale-110 transition-transform'>
           <img src='/assets/copy/new-run.svg' />
-        </a>
-        <a href='/' className='hover:scale-110 transition-transform'>
+        </Link>
+        <Link to='/' className='hover:scale-110 transition-transform'>
           <img src='/assets/copy/main-menu.svg' />
-        </a>
+        </Link>
       </div>
     </main>
   );

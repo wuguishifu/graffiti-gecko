@@ -1,8 +1,10 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import { dataSlice } from './dataSlice';
 import { gameSlice } from './gameSlice';
 
 const rootReducer = combineReducers({
   [gameSlice.name]: gameSlice.reducer,
+  [dataSlice.name]: dataSlice.reducer,
 });
 
 export const store = configureStore({

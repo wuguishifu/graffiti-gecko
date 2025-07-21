@@ -27,9 +27,9 @@ export function PauseMenu() {
             <p className='text-5xl font-graffiti-youth !text-black'>{secondsToTimeString(timeLeft)}</p>
           </div>
         </div>
-        <div className='hover:scale-110 transition-transform cursor-pointer' onClick={() => dispatch(gameActions.setPauseMenuVisible(false))}>
+        <button className='hover:scale-110 transition-transform cursor-pointer' onClick={() => dispatch(gameActions.setPauseMenuVisible(false))}>
           <img src='/assets/copy/continue.svg' />
-        </div>
+        </button>
         <a href='/' className='hover:scale-110 transition-transform'>
           <img src='/assets/copy/quit-game.svg' />
         </a>

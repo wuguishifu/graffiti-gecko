@@ -62,7 +62,6 @@ export class Game {
   }
 
   constructor(canvas: HTMLCanvasElement) {
-    store.dispatch(gameActions.reset());
     this.canvas = canvas;
     const gl = canvas.getContext('webgl', { antialias: false });
     if (!gl) {

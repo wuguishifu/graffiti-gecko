@@ -16,6 +16,8 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
   const throttledTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { gameInstance } = useGame();
 
+  const sprayColor = useAppSelector((state) => state.data.sprayColor);
+
   useImperativeHandle(ref, () => ({
     reset: () => {
       resetCanvas();
@@ -109,17 +111,9 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
     // Compare pixels
     for (let i = 0; i < paintedData.data.length; i += 4) {
-      const paintedRed = paintedData.data[i];
-      const paintedGreen = paintedData.data[i + 1];
-      const paintedBlue = paintedData.data[i + 2];
       const paintedAlpha = paintedData.data[i + 3];
-
       const tagAlpha = tagData.data[i + 3];
-
-      // Check if pixel is painted (red with some alpha)
-      const isPainted = paintedRed > 100 && paintedGreen < 50 && paintedBlue < 50 && paintedAlpha > 50;
-
-      // Check if pixel is part of the tag (non-transparent)
+      const isPainted = paintedAlpha > 50;
       const isTagPixel = tagAlpha > 50;
 
       if (isPainted && isTagPixel) {
@@ -210,7 +204,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     const y = clientY - rect.top;
 
     // Create spray effect with multiple dots
-    ctx.fillStyle = '#FF0000';
+    ctx.fillStyle = sprayColor;
     ctx.globalAlpha = 0.7;
 
     for (let i = 0; i < 8; i++) {
