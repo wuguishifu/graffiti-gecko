@@ -1,4 +1,4 @@
-import { gameActions } from '../state/gameSlice';
+import { gameActions } from '../state/game-slice';
 import { store } from '../state/store';
 import { Camera } from './graphics/camera';
 import { resetSquareMesh } from './graphics/mesh';

@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useGame } from '../state/game-context';
-import { gameActions } from '../state/gameSlice';
-import { useAppDispatch, useAppSelector } from '../state/useAppState';
+import { gameActions } from '../state/game-slice';
+import { useAppDispatch, useAppSelector } from '../state/use-app-state';
 
 export type SprayAreaRef = {
   reset: () => void;

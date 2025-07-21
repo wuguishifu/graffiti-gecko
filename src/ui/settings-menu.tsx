@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
-import { dataActions } from '../state/dataSlice';
-import { useAppDispatch, useAppSelector } from '../state/useAppState';
+import { dataActions } from '../state/data-slice';
+import { useAppDispatch, useAppSelector } from '../state/use-app-state';
 
 const colors = [
   '#FF00D0',

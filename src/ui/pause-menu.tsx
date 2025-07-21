@@ -1,5 +1,5 @@
-import { gameActions } from '../state/gameSlice';
-import { useAppDispatch, useAppSelector } from '../state/useAppState';
+import { gameActions } from '../state/game-slice';
+import { useAppDispatch, useAppSelector } from '../state/use-app-state';
 import { secondsToTimeString } from '../util/time-utils';
 
 export function PauseMenu() {

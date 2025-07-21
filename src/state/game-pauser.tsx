@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useGame } from './game-context';
-import { useAppSelector } from './useAppState';
+import { useAppSelector } from './use-app-state';
 
 export function GamePauser() {
   const { gameInstance } = useGame();

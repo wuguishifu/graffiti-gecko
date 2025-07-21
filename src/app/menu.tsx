@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { SettingsMenu } from '../ui/settings-menu';
-import { useAppDispatch } from '../state/useAppState';
-import { gameActions } from '../state/gameSlice';
+import { useAppDispatch } from '../state/use-app-state';
+import { gameActions } from '../state/game-slice';
 
 export function MainMenu() {
   const [showSettings, setShowSettings] = useState(false);

@@ -1,4 +1,4 @@
-import { useAppSelector } from '../state/useAppState';
+import { useAppSelector } from '../state/use-app-state';
 
 type HudProps = {
   onOpenSprayArea: () => void;

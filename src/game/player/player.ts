@@ -1,4 +1,4 @@
-import { gameActions } from '../../state/gameSlice';
+import { gameActions } from '../../state/game-slice';
 import { store } from '../../state/store';
 import type { Camera } from '../graphics/camera';
 import { squareMesh, type Mesh } from '../graphics/mesh';

@@ -1,6 +1,6 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import { dataSlice } from './dataSlice';
-import { gameSlice } from './gameSlice';
+import { dataSlice } from './data-slice';
+import { gameSlice } from './game-slice';
 
 const rootReducer = combineReducers({
   [gameSlice.name]: gameSlice.reducer,

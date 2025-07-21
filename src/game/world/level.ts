@@ -1,4 +1,4 @@
-import { gameActions } from '../../state/gameSlice';
+import { gameActions } from '../../state/game-slice';
 import { store } from '../../state/store';
 import { Cop } from '../entities/cop';
 import { SprayCan } from '../entities/spray-can';

@@ -4,9 +4,9 @@ import { Game } from '../game/game';
 import { SprayArea, type SprayAreaRef } from '../spray/spray-area';
 import { GameProvider } from '../state/game-context';
 import { GamePauser } from '../state/game-pauser';
-import { gameActions } from '../state/gameSlice';
+import { gameActions } from '../state/game-slice';
 import { store } from '../state/store';
-import { useAppDispatch, useAppSelector } from '../state/useAppState';
+import { useAppDispatch, useAppSelector } from '../state/use-app-state';
 import { Hud } from '../ui/hud';
 import { PauseMenu } from '../ui/pause-menu';
 
