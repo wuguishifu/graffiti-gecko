@@ -11,7 +11,7 @@ export function PauseMenu() {
 
   return (
     <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-black select-none'>
-      <img className='absolute top-0 left-0 w-full h-full object-cover -z-20 pointer-events-none' src='/assets/backgrounds/wall.png' />
+      <img className='absolute top-0 left-0 w-full h-full object-cover -z-20 pointer-events-none' src='/assets/backgrounds/wall.webp' />
       <img
         className='absolute h-[90%] select-none pointer-events-none -z-10' src='/assets/tags/spray-bg.webp' />
       <div className='flex flex-col items-center gap-8'>

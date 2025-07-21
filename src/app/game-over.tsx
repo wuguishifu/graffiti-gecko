@@ -20,7 +20,7 @@ export function GameOver() {
 
   return (
     <main className='absolute top-0 left-0 w-full h-full flex items-center justify-center select-none'>
-      <img className='absolute top-0 left-0 w-full h-full -z-10 object-cover' src='/assets/backgrounds/brick.png' />
+      <img className='absolute top-0 left-0 w-full h-full -z-10 object-cover' src='/assets/backgrounds/brick.webp' />
       <div className='flex flex-col items-center gap-8'>
         <img src='/assets/copy/run-over.svg' className='pointer-events-none' />
         <p className='text-6xl font-blank-river'>Level {currentLevel}</p>

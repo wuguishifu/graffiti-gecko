@@ -280,7 +280,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center' style={{ zIndex: sprayAreaVisible ? 1000 : -10 }}>
       <img
         className='absolute top-0 left-0 w-full h-full select-none pointer-events-none'
-        src='/assets/backgrounds/brick.png'
+        src='/assets/backgrounds/brick.webp'
       />
 
       <img
