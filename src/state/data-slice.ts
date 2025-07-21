@@ -1,5 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
+/*
+  Redux slice for managing settings and app data.
+  Things in this slice WILL be persisted across sessions.
+*/
+
 type DataSliceState = {
   sprayColor: string;
 };

@@ -1,5 +1,10 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
+/*
+  Redux slice for managing game state.
+  Things in this slice will not be persisted across sessions.
+*/
+
 type GameSliceState = {
   sprayAreaVisible: boolean;
   nearSprayCan: boolean;
