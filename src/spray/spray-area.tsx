@@ -325,10 +325,13 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
       {/* Spray complete splash */}
       {sprayComplete && (
-        <img
-          className='absolute h-3/4 select-none pointer-events-none scale-bounce'
-          src='/assets/tags/spray-complete.png'
-        />
+        <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center pointer-events-none select-none z-0'>
+          <img
+            className='absolute h-3/4 select-none pointer-events-none scale-bounce -z-10'
+            src='/assets/tags/spray-bg.webp'
+          />
+          <img src='/assets/copy/tag-complete.svg' className='w-1/4 scale-bounce' />
+        </div>
       )}
     </div>
   );

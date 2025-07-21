@@ -1,8 +1,22 @@
+import { useEffect } from 'react';
 import { useAppSelector } from '../state/useAppState';
 
 export function GameOver() {
   const totalSprayCansCompleted = useAppSelector((state) => state.game.totalSprayCansCompleted);
   const currentLevel = useAppSelector((state) => state.game.currentLevel);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        window.location.href = '/';
+      }
+    }
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+    }
+  }, []);
 
   return (
     <main className='absolute top-0 left-0 w-full h-full flex items-center justify-center select-none'>

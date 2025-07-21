@@ -39,7 +39,15 @@ export class Game {
     this.player.onKeyDown(event);
 
     if (event.key === 'Escape') {
-      store.dispatch(gameActions.setSprayAreaVisible(false));
+      if (store.getState().game.sprayAreaVisible) {
+        return store.dispatch(gameActions.setSprayAreaVisible(false));
+      }
+
+      if (store.getState().game.pauseMenuVisible) {
+        return store.dispatch(gameActions.setPauseMenuVisible(false));
+      }
+
+      store.dispatch(gameActions.setPauseMenuVisible(true));
     }
 
     if (event.key === ' ') {

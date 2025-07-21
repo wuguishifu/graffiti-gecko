@@ -7,6 +7,7 @@ import { GamePauser } from '../state/game-pauser';
 import { gameActions } from '../state/gameSlice';
 import { useAppDispatch, useAppSelector } from '../state/useAppState';
 import { Hud } from '../ui/hud';
+import { PauseMenu } from '../ui/pause-menu';
 
 export function GamePage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -47,6 +48,8 @@ export function GamePage() {
     }
   }, [gameOverFlag]);
 
+  const pauseMenuVisible = useAppSelector((state) => state.game.pauseMenuVisible);
+
   return (
     <GameProvider gameInstance={gameInstance}>
       <main className="h-full flex items-center">
@@ -75,6 +78,7 @@ export function GamePage() {
         </div>
         <Hud />
         <SprayArea ref={sprayAreaRef} />
+        {pauseMenuVisible && <PauseMenu />}
         <GamePauser />
       </main>
     </GameProvider>
