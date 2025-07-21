@@ -15,6 +15,22 @@
   font-display: swap;
 }
 
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+a,
+button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+a,
+button::-moz-focus-inner {
+  border: 0;
+}
+
 /* CSS Custom Properties for Fonts */
 :root {
   --font-blank-river: 'Blank River', serif;

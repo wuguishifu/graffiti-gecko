@@ -1,12 +1,18 @@
 import { useAppSelector } from '../state/useAppState';
 
-export function Hud() {
+type HudProps = {
+  onOpenSprayArea: () => void;
+}
+
+export function Hud({ onOpenSprayArea }: HudProps) {
   const sprayCans = useAppSelector((state) => state.game.sprayCans);
   const lives = useAppSelector((state) => state.game.lives);
   const currentLevel = useAppSelector((state) => state.game.currentLevel);
 
   const totalCompleted = Object.values(sprayCans).filter(completed => completed).length;
   const totalSprayCans = Object.keys(sprayCans).length;
+
+  const nearSprayCan = useAppSelector((state) => state.game.nearSprayCan);
 
   return (
     <div className='absolute top-0 left-0 w-full h-full px-20 py-16'>
@@ -17,6 +23,15 @@ export function Hud() {
         <div className='absolute top-0 right-0'>
           Lives: {lives}
         </div>
+        {nearSprayCan && (
+          <button
+            className='absolute bottom-0 right-0 cursor-pointer hover:scale-110 transition-transform'
+            onClick={onOpenSprayArea}
+            tabIndex={-1}
+          >
+            <img src="/assets/icons/can.png" className='size-64 pointer-events-none select-none' tabIndex={-1} />
+          </button>
+        )}
       </div>
     </div>
   )

@@ -30,10 +30,10 @@ export function MainMenu() {
       />
       <div className='text-center absolute top-[50%] left-[30%] flex flex-col gap-8'>
         <Link to='/game' className='hover:scale-110 transition-transform' onClick={() => dispatch(gameActions.reset())}>
-          <img src='/assets/copy/start-run.svg' />
+          <img src='/assets/copy/start-run.svg' className='select-none pointer-events-none' />
         </Link>
         <button className='hover:scale-110 transition-transform cursor-pointer' onClick={() => setShowSettings(true)}>
-          <img src='/assets/copy/settings.svg' />
+          <img src='/assets/copy/settings.svg' className='select-none pointer-events-none' />
         </button>
       </div>
       {showSettings && <SettingsMenu onHide={() => setShowSettings(false)} />}

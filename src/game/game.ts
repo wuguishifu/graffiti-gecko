@@ -126,7 +126,7 @@ export class Game {
     }
     this.camera.update();
     this.player.update();
-    this.level.updateCops();
+    // this.level.updateCops();
     this.checkPlayerNearSprayCan();
     this.checkPlayerNearCops();
     this.checkLevelCompletion();
