@@ -24,6 +24,14 @@ export class Player extends RenderObject {
   private flashInterval: number = 10; // Flash every 10 frames
   private totalDistanceTraveled: number = 0;
   private lastPosition: Vector3;
+  private stamina: number = 100; // 0-100 percent
+  private staminaDepleteRate: number = 0.7; // percent per frame while sprinting
+  private staminaRegenRate: number = 0.3; // percent per frame while recovering
+  private staminaRegenDelay: number = 60; // frames to wait after hitting 0 (1s at 60fps)
+  private staminaRegenDelayTimer: number = 0;
+  private lastEnergyPercent: number = 100;
+  private energyUpdateThrottle: number = 6; // only update Redux every 6 frames
+  private energyUpdateFrame: number = 0;
 
   constructor(gl: WebGLRenderingContext, level: Level) {
     super(
@@ -76,8 +84,46 @@ export class Player extends RenderObject {
     let vx = 0;
     let vy = 0;
     let ax = 0.1;
+    const isTryingToSprint = this.keysDown.has('shift');
+    const isMoving = this.keysDown.has('w') || this.keysDown.has('a') || this.keysDown.has('s') || this.keysDown.has('d');
+    let canSprint = isTryingToSprint && this.stamina > 0 && this.staminaRegenDelayTimer === 0;
 
-    if (this.keysDown.has('shift')) ax = 0.2;
+    // Sprinting logic
+    if (canSprint) {
+      ax = 0.2;
+      this.stamina -= this.staminaDepleteRate;
+      if (this.stamina <= 0) {
+        this.stamina = 0;
+        this.staminaRegenDelayTimer = this.staminaRegenDelay;
+      }
+    } else {
+      ax = 0.1;
+      // Only start regen delay if we just hit 0 and are still trying to sprint
+      if (this.stamina === 0 && isTryingToSprint && this.staminaRegenDelayTimer === 0) {
+        this.staminaRegenDelayTimer = this.staminaRegenDelay;
+      }
+    }
+
+    // Regen delay countdown
+    if (this.staminaRegenDelayTimer > 0) {
+      this.staminaRegenDelayTimer--;
+    } else if (!canSprint && this.stamina < 100) {
+      // Only regen if not sprinting and delay is over
+      this.stamina += this.staminaRegenRate;
+      if (this.stamina > 100) this.stamina = 100;
+    }
+
+    // Clamp stamina
+    if (this.stamina < 0) this.stamina = 0;
+    if (this.stamina > 100) this.stamina = 100;
+
+    // Throttle Redux updates for energyPercent
+    this.energyUpdateFrame = (this.energyUpdateFrame + 1) % this.energyUpdateThrottle;
+    const roundedEnergy = Math.round(this.stamina);
+    if ((roundedEnergy !== this.lastEnergyPercent && this.energyUpdateFrame === 0) || this.lastEnergyPercent !== roundedEnergy && (roundedEnergy === 0 || roundedEnergy === 100)) {
+      store.dispatch(gameActions.setEnergyPercent(roundedEnergy));
+      this.lastEnergyPercent = roundedEnergy;
+    }
 
     if (this.keysDown.has('w')) vy += ax;
     if (this.keysDown.has('s')) vy -= ax;
