@@ -9,7 +9,7 @@ export function Lives() {
   const totalTime = useAppSelector((state) => state.dev.overrideTotalTime || 300);
 
   return (
-    <div className='bg-[#665F4D] border-3 border-[#18191B] px-4 py-2 flex rounded-xl items-center gap-2'>
+    <div className='bg-[#665F4D] border-3 border-[#18191B] px-4 h-12 flex rounded-xl items-center gap-2'>
       {Array.from({ length: totalLives }, (_, index) => (
         lives > index
           ? <img key={index} src='/assets/icons/heart-full.png' className='size-8' />
@@ -20,8 +20,8 @@ export function Lives() {
           <Timer
             remainingDurationSeconds={timeLeft}
             totalDurationSeconds={totalTime}
-            size={76}
-            strokeWidth={4}
+            size={64}
+            strokeWidth={3}
           />
         </div>
       </div>
