@@ -85,7 +85,6 @@ export class Player extends RenderObject {
     let vy = 0;
     let ax = 0.1;
     const isTryingToSprint = this.keysDown.has('shift');
-    const isMoving = this.keysDown.has('w') || this.keysDown.has('a') || this.keysDown.has('s') || this.keysDown.has('d');
     let canSprint = isTryingToSprint && this.stamina > 0 && this.staminaRegenDelayTimer === 0;
 
     // Sprinting logic
