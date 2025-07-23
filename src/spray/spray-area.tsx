@@ -158,7 +158,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     const overlapPercentage = tagPixels > 0 ? (overlappingPixels / tagPixels) * 100 : 0;
     setOverlapPercentage(Math.round(overlapPercentage));
 
-    if (overlapPercentage >= 85) {
+    if (overlapPercentage >= 90) {
       onSprayComplete();
     }
   };
@@ -235,10 +235,12 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     ctx.fillStyle = sprayColor;
     ctx.globalAlpha = 0.7;
 
-    for (let i = 0; i < 8; i++) {
+    const numSprays = Math.random() * 5 + 3;
+
+    for (let i = 0; i < numSprays; i++) {
       const sprayX = x + (Math.random() - 0.5) * 40;
       const sprayY = y + (Math.random() - 0.5) * 40;
-      const size = Math.random() * 8 + 4;
+      const size = Math.random() * 4 + 4;
 
       ctx.beginPath();
       ctx.arc(sprayX, sprayY, size, 0, Math.PI * 2);
@@ -327,7 +329,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
           {/* 85% marker line */}
           <div
             className='absolute top-0 bottom-0 w-[3px] bg-[#FFDE00]'
-            style={{ left: `${10 + (85 * 0.8) - 5.1}%`, transform: 'skewX(-54.583deg)', }}
+            style={{ left: `${10 + (90 * 0.8) - 5.1}%`, transform: 'skewX(-54.583deg)', }}
           />
         </div>
         <img src='/assets/copy/fill-to-complete.svg' className='absolute top-18 left-32' />
