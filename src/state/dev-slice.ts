@@ -1,7 +1,8 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 type DevSliceState = {
   disableCopAi: boolean;
+  overrideTotalTime?: number;
   isDirty: boolean;
 };
 
@@ -16,6 +17,9 @@ export const devSlice = createSlice({
   reducers: {
     toggleCopAi: (state) => {
       state.disableCopAi = !state.disableCopAi;
+    },
+    setTotalTime: (state, action: PayloadAction<number | undefined>) => {
+      state.overrideTotalTime = action.payload;
     },
     reset: () => initialState,
   },
