@@ -24,12 +24,15 @@ export class Game {
   private programInfo: ProgramInfo;
   private player: Player;
   private level: Level;
-  private running: boolean = false;
-  private timerInterval: number | null = null;
+  private running = false;
+  private static timerInterval: number | null = null;
+  private static timerRunning = false;
 
-  public pause() {
+  public pause(stopTimer = true) {
     this.running = false;
-    this.stopTimer();
+    if (stopTimer) {
+      this.stopTimer();
+    }
   }
 
   public resume() {
@@ -68,9 +71,11 @@ export class Game {
   };
 
   private startTimer() {
-    if (this.timerInterval !== null) return;
-    this.timerInterval = window.setInterval(() => {
-      if (!this.running) return;
+    if (Game.timerRunning) return;
+    Game.timerRunning = true;
+    if (Game.timerInterval !== null) return;
+    Game.timerInterval = window.setInterval(() => {
+      if (!Game.timerRunning) return;
       const state = store.getState();
       const timeLeft = state.game.timeLeft;
       if (timeLeft > 0) {
@@ -83,9 +88,10 @@ export class Game {
   }
 
   private stopTimer() {
-    if (this.timerInterval !== null) {
-      clearInterval(this.timerInterval);
-      this.timerInterval = null;
+    if (Game.timerInterval) {
+      clearInterval(Game.timerInterval);
+      Game.timerInterval = null;
+      Game.timerRunning = false;
     }
   }
 

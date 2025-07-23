@@ -9,11 +9,17 @@ export function GamePauser() {
   const pauseMenuVisible = useAppSelector((state) => state.game.pauseMenuVisible);
 
   useEffect(() => {
-    if (sprayAreaVisible || pauseMenuVisible) {
-      gameInstance.current?.pause();
-    } else {
-      gameInstance.current?.resume();
+    if (sprayAreaVisible) {
+      gameInstance.current?.pause(false);
+      return;
     }
+
+    if (pauseMenuVisible) {
+      gameInstance.current?.pause();
+      return;
+    }
+
+    gameInstance.current?.resume();
   }, [gameInstance, sprayAreaVisible, pauseMenuVisible]);
 
   return null;
