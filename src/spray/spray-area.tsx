@@ -1,3 +1,4 @@
+import { Lives } from '@/components/lives';
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useGame } from '../state/game-context';
 import { gameActions } from '../state/game-slice';
@@ -29,7 +30,6 @@ const selectRandomTagImage = () => {
 type TagImages = typeof tagImages[number];
 
 export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
-  const sprayAreaVisible = useAppSelector((state) => state.game.sprayAreaVisible);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const tagCanvasRef = useRef<HTMLCanvasElement>(null);
   const [isPainting, setIsPainting] = useState(false);
@@ -195,7 +195,6 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
   const startPainting = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault(); // Prevent default to avoid conflicts
-    if (!sprayAreaVisible) return;
     setIsPainting(true);
     paint(e);
   };
@@ -207,7 +206,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
   const paint = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault(); // Prevent default to avoid conflicts
-    if (!isPainting || !sprayAreaVisible) return;
+    if (!isPainting) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -300,7 +299,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
   }, []);
 
   return (
-    <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center' style={{ zIndex: sprayAreaVisible ? 1000 : -10 }}>
+    <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center z-1000'>
       <img
         className='absolute top-0 left-0 w-full h-full select-none pointer-events-none'
         src='/assets/backgrounds/brick.webp'
@@ -314,28 +313,29 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
       <div className='relative w-full aspect-[2.5] pointer-events-none select-none'>
         {/* Progress bar */}
-        {sprayAreaVisible && (
-          <div className='relative w-[450px] h-[32px] overflow-hidden top-8 left-8'>
-            {/* Parallelogram background */}
-            <div
-              className='absolute inset-0 bg-black'
-              style={{ clipPath: 'polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%)' }}
-            />
-            {/* Parallelogram fill */}
-            <div
-              className='absolute inset-0 bg-[#FFDE00] transition-all duration-300 ease-out'
-              style={{ clipPath: `polygon(10% 0%, ${10 + (overlapPercentage * 0.8)}% 0%, ${overlapPercentage * 0.8}% 100%, 0% 100%)` }}
-            />
-            {/* 85% marker line */}
-            <div
-              className='absolute top-0 bottom-0 w-[3px] bg-[#FFDE00]'
-              style={{ left: `${10 + (85 * 0.8) - 5.1}%`, transform: 'skewX(-54.583deg)', }}
-            />
-          </div>
-        )}
+        <div className='relative w-[450px] h-[32px] overflow-hidden top-8 left-8'>
+          {/* Parallelogram background */}
+          <div
+            className='absolute inset-0 bg-black'
+            style={{ clipPath: 'polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%)' }}
+          />
+          {/* Parallelogram fill */}
+          <div
+            className='absolute inset-0 bg-[#FFDE00] transition-all duration-300 ease-out'
+            style={{ clipPath: `polygon(10% 0%, ${10 + (overlapPercentage * 0.8)}% 0%, ${overlapPercentage * 0.8}% 100%, 0% 100%)` }}
+          />
+          {/* 85% marker line */}
+          <div
+            className='absolute top-0 bottom-0 w-[3px] bg-[#FFDE00]'
+            style={{ left: `${10 + (85 * 0.8) - 5.1}%`, transform: 'skewX(-54.583deg)', }}
+          />
+        </div>
         <img src='/assets/copy/fill-to-complete.svg' className='absolute top-18 left-32' />
         <div className='absolute top-8 left-0 w-full flex justify-center'>
           <img src='/assets/copy/tag-it.svg' />
+        </div>
+        <div className='absolute -top-8 right-20'>
+          <Lives />
         </div>
       </div>
 

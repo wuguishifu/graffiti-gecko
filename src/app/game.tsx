@@ -66,6 +66,8 @@ export function GamePage() {
     };
   }, []);
 
+  const sprayAreaVisible = useAppSelector((state) => state.game.sprayAreaVisible);
+
   return (
     <GameProvider gameInstance={gameInstance}>
       <main className="h-full flex items-center bg-black">
@@ -83,7 +85,7 @@ export function GamePage() {
         <div className='absolute top-0 left-0 w-full h-full px-20 py-16'>
         </div>
         <Hud onOpenSprayArea={onOpenSprayArea} />
-        <SprayArea ref={sprayAreaRef} />
+        {sprayAreaVisible && <SprayArea ref={sprayAreaRef} />}
         {pauseMenuVisible && <PauseMenu />}
         <GamePauser />
       </main>
