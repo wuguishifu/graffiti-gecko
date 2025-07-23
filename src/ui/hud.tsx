@@ -1,6 +1,7 @@
 import { Lives } from '@/components/lives';
 import { Tags } from '@/components/tags';
 import { useAppSelector } from '../state/use-app-state';
+import { Energy } from '@/components/energy';
 
 type HudProps = {
   onOpenSprayArea: () => void;
@@ -11,12 +12,11 @@ export function Hud({ onOpenSprayArea }: HudProps) {
   const devMode = useAppSelector((state) => state.dev.isDirty);
 
   return (
-    <div className='absolute top-0 left-0 w-full h-full px-20 py-16'>
+    <div className='absolute top-0 left-0 w-full h-full px-20 py-8'>
       <div className='relative w-full h-full'>
-        <div className='absolute top-0 left-0'>
+        <div className='flex flex-row items-center justify-between select-none pointer-events-none'>
           <Tags />
-        </div>
-        <div className='absolute top-0 right-0'>
+          <Energy />
           <Lives />
         </div>
         {nearSprayCan && (

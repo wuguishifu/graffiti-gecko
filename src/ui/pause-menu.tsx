@@ -33,6 +33,7 @@ export function PauseMenu() {
               <Timer
                 remainingDurationSeconds={timeLeft}
                 totalDurationSeconds={totalDuration}
+                strokeWidth={3}
               />
             </div>
           </Pill>
