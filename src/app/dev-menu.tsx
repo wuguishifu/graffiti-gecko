@@ -1,12 +1,28 @@
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { devActions } from '@/state/dev-slice';
 import { useAppDispatch, useAppSelector } from '@/state/use-app-state';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router';
 
 export function DevMenu() {
   const devState = useAppSelector((state) => state.dev);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        navigate('/');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   return (
     <main className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>
@@ -22,6 +38,9 @@ export function DevMenu() {
         <Button onClick={() => dispatch(devActions.reset())} className='cursor-pointer'>
           Reset
         </Button>
+        <Link to='/' className={buttonVariants({ variant: 'default' })}>
+          Back
+        </Link>
       </div>
     </main>
   );

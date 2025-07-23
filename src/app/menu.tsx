@@ -1,8 +1,9 @@
+import { buttonVariants } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
-import { SettingsMenu } from '../ui/settings-menu';
-import { useAppDispatch } from '../state/use-app-state';
 import { gameActions } from '../state/game-slice';
+import { useAppDispatch } from '../state/use-app-state';
+import { SettingsMenu } from '../ui/settings-menu';
 
 export function MainMenu() {
   const [showSettings, setShowSettings] = useState(false);
@@ -35,6 +36,11 @@ export function MainMenu() {
         <button className='hover:scale-110 transition-transform cursor-pointer' onClick={() => setShowSettings(true)}>
           <img src='/assets/copy/settings.svg' className='select-none pointer-events-none' />
         </button>
+      </div>
+      <div className='absolute top-0 right-0 opacity-0 hover:opacity-100 transition-opacity duration-300'>
+        <Link to="/dev" className={buttonVariants({ variant: 'default' })}>
+          Dev
+        </Link>
       </div>
       {showSettings && <SettingsMenu onHide={() => setShowSettings(false)} />}
     </main>

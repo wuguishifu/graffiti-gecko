@@ -2,10 +2,12 @@ import { createSlice } from '@reduxjs/toolkit';
 
 type DevSliceState = {
   disableCopAi: boolean;
+  isDirty: boolean;
 };
 
 const initialState: DevSliceState = {
   disableCopAi: false,
+  isDirty: false,
 };
 
 export const devSlice = createSlice({
@@ -17,6 +19,16 @@ export const devSlice = createSlice({
     },
     reset: () => initialState,
   },
+  extraReducers: (builder) => {
+    builder.addMatcher(
+      (action) =>
+        action.type.startsWith(devSlice.name + '/') &&
+        action.type !== devSlice.actions.reset.type,
+      (state) => {
+        state.isDirty = true
+      }
+    );
+  }
 });
 
 export const devActions = devSlice.actions;
