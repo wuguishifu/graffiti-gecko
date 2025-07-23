@@ -10,7 +10,7 @@ export function PauseMenu() {
 
   const dispatch = useAppDispatch();
 
-  const durationLeft = useAppSelector((state) => state.dev.overrideTotalTime || 300);
+  const totalDuration = useAppSelector((state) => state.dev.overrideTotalTime || 300);
 
   return (
     <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-black select-none'>
@@ -31,8 +31,8 @@ export function PauseMenu() {
             <p className='text-7xl font-graffiti-youth !text-black'>{secondsToTimeString(timeLeft)}</p>
             <div className='absolute -left-12'>
               <Timer
-                remainingDurationSeconds={240}
-                totalDurationSeconds={durationLeft}
+                remainingDurationSeconds={timeLeft}
+                totalDurationSeconds={totalDuration}
               />
             </div>
           </Pill>
