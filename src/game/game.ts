@@ -13,6 +13,7 @@ import { Level } from './world/level';
 
 type DevOptions = {
   disableCopAi?: boolean;
+  overrideTotalTime?: number;
 }
 
 export class Game {
@@ -24,14 +25,17 @@ export class Game {
   private player: Player;
   private level: Level;
   private running: boolean = false;
+  private timerInterval: number | null = null;
 
   public pause() {
     this.running = false;
+    this.stopTimer();
   }
 
   public resume() {
     if (!this.running) {
       this.running = true;
+      this.startTimer();
       this.run();
     }
   }
@@ -63,8 +67,32 @@ export class Game {
     disableCopAi: false,
   };
 
+  private startTimer() {
+    if (this.timerInterval !== null) return;
+    this.timerInterval = window.setInterval(() => {
+      if (!this.running) return;
+      const state = store.getState();
+      const timeLeft = state.game.timeLeft;
+      if (timeLeft > 0) {
+        store.dispatch(gameActions.setTimeLeft(timeLeft - 1));
+        if (timeLeft - 1 === 0) {
+          store.dispatch(gameActions.setGameOverFlag(true));
+        }
+      }
+    }, 1000);
+  }
+
+  private stopTimer() {
+    if (this.timerInterval !== null) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = null;
+    }
+  }
+
   constructor(canvas: HTMLCanvasElement, devOptions: DevOptions) {
     this.devOptions = { ...this.devOptions, ...devOptions };
+
+    store.dispatch(gameActions.setTimeLeft(devOptions.overrideTotalTime || 300));
 
     this.canvas = canvas;
     const gl = canvas.getContext('webgl', { antialias: false });
@@ -111,7 +139,10 @@ export class Game {
     this.camera = new Camera(this.canvas.clientWidth / this.canvas.clientHeight, this.player);
 
     this.running = true;
-    this.setup().then(() => this.run());
+    this.setup().then(() => {
+      this.startTimer();
+      this.run();
+    });
   }
 
   public async setup() {
@@ -246,6 +277,7 @@ export class Game {
   public destroy() {
     // Stop the game loop
     this.running = false;
+    this.stopTimer();
 
     // Remove event listeners
     document.removeEventListener('keydown', this.boundKeyDown);

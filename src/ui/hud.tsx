@@ -1,3 +1,4 @@
+import { Lives } from '@/components/lives';
 import { useAppSelector } from '../state/use-app-state';
 
 type HudProps = {
@@ -6,7 +7,6 @@ type HudProps = {
 
 export function Hud({ onOpenSprayArea }: HudProps) {
   const sprayCans = useAppSelector((state) => state.game.sprayCans);
-  const lives = useAppSelector((state) => state.game.lives);
   const currentLevel = useAppSelector((state) => state.game.currentLevel);
 
   const totalCompleted = Object.values(sprayCans).filter(completed => completed).length;
@@ -23,7 +23,7 @@ export function Hud({ onOpenSprayArea }: HudProps) {
           Level {currentLevel} - {totalCompleted} / {totalSprayCans} tags completed
         </div>
         <div className='absolute top-0 right-0'>
-          Lives: {lives}
+          <Lives />
         </div>
         {nearSprayCan && (
           <button

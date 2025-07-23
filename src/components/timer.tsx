@@ -1,16 +1,18 @@
 export function Timer({
   remainingDurationSeconds,
-  totalDurationSeconds
+  totalDurationSeconds,
+  size = 120,
+  strokeWidth = 8,
 }: {
   remainingDurationSeconds: number;
   totalDurationSeconds: number;
+  size?: number;
+  strokeWidth?: number;
 }) {
   const clampedRemaining = Math.max(0, Math.min(remainingDurationSeconds, totalDurationSeconds));
   const elapsed = totalDurationSeconds - clampedRemaining;
   const percentElapsed = totalDurationSeconds === 0 ? 0 : elapsed / totalDurationSeconds;
 
-  const size = 120;
-  const strokeWidth = 8;
   const radius = (size - strokeWidth) / 2;
   const center = size / 2;
 
