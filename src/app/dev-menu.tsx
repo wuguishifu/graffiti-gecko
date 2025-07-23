@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { devActions } from '@/state/dev-slice';
@@ -18,6 +19,9 @@ export function DevMenu() {
             onCheckedChange={() => dispatch(devActions.toggleCopAi())}
           />
         </Label>
+        <Button onClick={() => dispatch(devActions.reset())} className='cursor-pointer'>
+          Reset
+        </Button>
       </div>
     </main>
   );

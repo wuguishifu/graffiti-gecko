@@ -15,6 +15,7 @@ export const devSlice = createSlice({
     toggleCopAi: (state) => {
       state.disableCopAi = !state.disableCopAi;
     },
+    reset: () => initialState,
   },
 });
 
