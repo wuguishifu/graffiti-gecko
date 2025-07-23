@@ -3,12 +3,14 @@ import { persistReducer, type PersistConfig } from 'redux-persist';
 import persistStore from 'redux-persist/es/persistStore';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 import { dataSlice } from './data-slice';
+import { devSlice } from './dev-slice';
 import { gameSlice } from './game-slice';
 import { reduxLocalStorage } from './local-storage';
 
 const rootReducer = combineReducers({
   [gameSlice.name]: gameSlice.reducer,
   [dataSlice.name]: dataSlice.reducer,
+  [devSlice.name]: devSlice.reducer,
 });
 
 const persistConfig: PersistConfig<RootState> = {
@@ -16,6 +18,7 @@ const persistConfig: PersistConfig<RootState> = {
   storage: reduxLocalStorage,
   whitelist: [
     dataSlice.name,
+    devSlice.name,
   ],
   stateReconciler: autoMergeLevel2
 };

@@ -17,6 +17,7 @@ export function GamePage() {
   const dispatch = useAppDispatch();
   const dispatchRef = useRef(dispatch);
   const gameOverFlag = useAppSelector((state) => state.game.gameOverFlag);
+  const devOptions = useAppSelector((state) => state.dev);
 
   const navigate = useNavigate();
 
@@ -24,7 +25,7 @@ export function GamePage() {
     if (canvasRef.current) {
       // Reset game state for new session
       dispatch(gameActions.reset());
-      gameInstance.current = new Game(canvasRef.current);
+      gameInstance.current = new Game(canvasRef.current, devOptions);
     }
 
     return () => {

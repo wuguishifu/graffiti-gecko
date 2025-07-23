@@ -11,6 +11,10 @@ import fsSource from './shaders/fragment.glsl?raw';
 import vsSource from './shaders/vertex.glsl?raw';
 import { Level } from './world/level';
 
+type DevOptions = {
+  disableCopAi?: boolean;
+}
+
 export class Game {
   private canvas: HTMLCanvasElement;
   private gl: WebGLRenderingContext;
@@ -55,7 +59,13 @@ export class Game {
     this.player.onKeyUp(event);
   }
 
-  constructor(canvas: HTMLCanvasElement) {
+  private devOptions = {
+    disableCopAi: false,
+  };
+
+  constructor(canvas: HTMLCanvasElement, devOptions: DevOptions) {
+    this.devOptions = { ...this.devOptions, ...devOptions };
+
     this.canvas = canvas;
     const gl = canvas.getContext('webgl', { antialias: false });
     if (!gl) {
@@ -120,9 +130,13 @@ export class Game {
     }
     this.camera.update();
     this.player.update();
-    this.level.updateCops();
+
+    if (!this.devOptions.disableCopAi) {
+      this.level.updateCops();
+      this.checkPlayerNearCops();
+    }
+
     this.checkPlayerNearSprayCan();
-    this.checkPlayerNearCops();
     this.checkLevelCompletion();
     this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
     this.render();

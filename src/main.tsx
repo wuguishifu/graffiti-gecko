@@ -6,6 +6,7 @@ import { Provider as ReduxProvider } from 'react-redux';
 import { BrowserRouter, Route, Routes } from 'react-router';
 
 import { PersistGate } from 'redux-persist/integration/react';
+import { DevMenu } from './app/dev-menu';
 import { GamePage } from './app/game';
 import { GameOver } from './app/game-over';
 import { MainMenu } from './app/menu';
@@ -20,6 +21,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/" element={<MainMenu />} />
             <Route path="/game" element={<GamePage />} />
             <Route path="/game-over" element={<GameOver />} />
+            <Route path="/dev" element={<DevMenu />} />
           </Routes>
         </BrowserRouter>
       </PersistGate>

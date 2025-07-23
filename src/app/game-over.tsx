@@ -22,8 +22,8 @@ export function GameOver() {
 
   return (
     <main className='absolute top-0 left-0 w-full h-full flex items-center justify-center select-none'>
-      <img className='absolute top-0 left-0 w-full h-full -z-10 object-cover' src='/assets/backgrounds/brick.webp' />
-      <div className='flex flex-col items-center gap-8'>
+      <img className='absolute top-0 left-0 w-full h-full object-cover' src='/assets/backgrounds/brick.webp' />
+      <div className='flex flex-col items-center gap-8 z-10'>
         <img src='/assets/copy/run-over.svg' className='pointer-events-none' />
         <p className='text-6xl font-blank-river'>Level {currentLevel}</p>
         <div className='bg-[#EF64C9]/80 rounded-xl px-20 py-4 flex flex-col items-center gap-2 shadow'>
