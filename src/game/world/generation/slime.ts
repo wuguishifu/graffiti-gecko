@@ -101,8 +101,8 @@ export class Slime {
       });
     }
 
-    // Collect all stone tile positions (excluding center)
-    const stonePositions: { x: number; y: number }[] = [];
+    // Collect all stone tile positions (including center)
+    const stonePositions: { x: number; y: number }[] = [center];
     for (let y = 0; y < tiles.length; y++) {
       for (let x = 0; x < tiles[0].length; x++) {
         if (
@@ -114,16 +114,66 @@ export class Slime {
       }
     }
 
+    // --- MST (Kruskal's algorithm) ---
+    // Build all possible edges with distances
+    type Edge = { a: number; b: number; dist: number };
+    const edges: Edge[] = [];
+    for (let i = 0; i < stonePositions.length; i++) {
+      for (let j = i + 1; j < stonePositions.length; j++) {
+        const dx = stonePositions[i].x - stonePositions[j].x;
+        const dy = stonePositions[i].y - stonePositions[j].y;
+        const dist = dx * dx + dy * dy;
+        edges.push({ a: i, b: j, dist });
+      }
+    }
+    edges.sort((e1, e2) => e1.dist - e2.dist);
 
-    // Connect each stone tile to the center
-    for (const pos of stonePositions) {
+    // Disjoint set for Kruskal's
+    const parent = Array(stonePositions.length).fill(0).map((_, i) => i);
+    function find(u: number): number {
+      if (parent[u] !== u) parent[u] = find(parent[u]);
+      return parent[u];
+    }
+    function union(u: number, v: number) {
+      parent[find(u)] = find(v);
+    }
+
+    const mstEdges: Edge[] = [];
+    for (const edge of edges) {
+      if (find(edge.a) !== find(edge.b)) {
+        union(edge.a, edge.b);
+        mstEdges.push(edge);
+      }
+    }
+
+    // --- Add extra random edges for loops ---
+    const extraEdges: Edge[] = [];
+    const numExtra = Math.max(2, Math.floor(stonePositions.length * 0.15));
+    let added = 0;
+    const used = new Set(mstEdges.map(e => `${e.a},${e.b}`));
+    while (added < numExtra) {
+      const idx = Math.floor(Math.random() * edges.length);
+      const edge = edges[idx];
+      const key = `${edge.a},${edge.b}`;
+      if (!used.has(key)) {
+        extraEdges.push(edge);
+        used.add(key);
+        added++;
+      }
+    }
+
+    // --- Lay roads for all edges in MST and extra edges ---
+    const allEdges = [...mstEdges, ...extraEdges];
+    for (const edge of allEdges) {
+      const from = stonePositions[edge.a];
+      const to = stonePositions[edge.b];
       let order: 'horizontal-vertical' | 'vertical-horizontal';
       if (roadBendOrder === 'random') {
         order = Math.random() < 0.5 ? 'horizontal-vertical' : 'vertical-horizontal';
       } else {
         order = roadBendOrder;
       }
-      this.layRoad(center, pos, order, tiles, gl);
+      this.layRoad(from, to, order, tiles, gl);
     }
   }
 
