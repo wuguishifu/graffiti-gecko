@@ -137,6 +137,7 @@ export class Game {
 
     // Set player reference in level for cop spawning
     this.level.setPlayer(this.player);
+    this.level.spawnEntities();
     this.camera = new Camera(this.canvas.clientWidth / this.canvas.clientHeight, this.player);
 
     this.running = true;
@@ -184,7 +185,7 @@ export class Game {
   private checkPlayerNearSprayCan() {
     const sprayCans = this.level.getSprayCans();
     const playerPos = this.player.position;
-    const detectionRadius = 1.5; // Distance within which player can interact with spray can
+    const detectionRadius = 1; // Distance within which player can interact with spray can
 
     const nearestSprayCan = sprayCans.find(sprayCan => {
       if (sprayCan.isCompleted) return false;
@@ -260,14 +261,11 @@ export class Game {
       this.level.destroy();
       this.level = new Level(this.gl, newLevel);
 
-      // Reset player position to center of new level
       this.player.position = this.level.getRandomStoneTile() ?? new Vector3(0, 0, 0);
-
-      // Update player's level reference
       this.player.setLevel(this.level);
 
-      // Set player reference in new level for cop spawning
       this.level.setPlayer(this.player);
+      this.level.spawnEntities();
 
       console.log(`Generated level ${newLevel} with increased difficulty`);
     }

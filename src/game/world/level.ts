@@ -34,6 +34,10 @@ export class Level {
     this.spawnCops();
   }
 
+  public spawnEntities() {
+    this.spawnSprayCans();
+  }
+
   public generate() {
     this.tiles = [];
     this.sprayCans = [];
@@ -236,66 +240,79 @@ export class Level {
     return walkableTiles.includes(tile.variant);
   }
 
-  // Add a method to get tile type at position (useful for debugging)
-  public getTileType(x: number, y: number): TileType | null {
+  public getTile(x: number, y: number): Tile | null {
     if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
       return null;
     }
 
-    const tile = this.tiles[y]?.[x];
-    return tile ? tile.variant : null;
+    return this.tiles[y]?.[x] ?? null;
   }
 
   private spawnSprayCans() {
-    this.sprayCans = [];
-    const spawnPoints = this.findBuildingRoadIntersections();
+    if (!this.player) {
+      return;
+    }
 
-    // Scale number of spray cans based on difficulty
-    // Level 1: 3-5 spray cans, Level 2: 4-6, Level 3: 5-7, etc.
-    const baseSprayCans = Math.floor(Math.random() * 2) + 1; // 1-2 base spray cans
+    const accessiblePositions = this.getAllAccessibleBuildingRoadEdges(this.player.position.x, this.player.position.y);
+    accessiblePositions.sort(() => Math.random() - 0.5); // Shuffle positions
+
+    const baseSprayCans = Math.floor(Math.random() * 2) + 3; // 3-4 base spray cans
     const difficultyBonus = Math.min(this.difficultyLevel - 1, 5); // Cap at +5 for balance
     const numSprayCans = baseSprayCans + difficultyBonus;
 
-    const shuffledPoints = [...spawnPoints].sort(() => Math.random() - 0.5);
-
-    for (let i = 0; i < Math.min(numSprayCans, shuffledPoints.length); i++) {
-      const point = shuffledPoints[i];
+    this.sprayCans = Array.from({ length: Math.min(numSprayCans, accessiblePositions.length) }, (_, i) => {
+      const pos = accessiblePositions[i];
       const sprayCan = new SprayCan(this.gl, i);
-      sprayCan.position.x = point.x;
-      sprayCan.position.y = point.y;
+      sprayCan.position.x = pos.x;
+      sprayCan.position.y = pos.y;
       sprayCan.position.z = 0.1; // Slightly above ground
-      this.sprayCans.push(sprayCan);
-    }
+      return sprayCan;
+    });
 
     store.dispatch(gameActions.setSprayCans(this.sprayCans.map(sprayCan => sprayCan.id)));
 
     console.log(`Spawned ${this.sprayCans.length} spray cans at building-road intersections (Level ${this.difficultyLevel})`);
   }
 
-  private findBuildingRoadIntersections(): { x: number; y: number }[] {
-    const intersections: { x: number; y: number }[] = [];
+  private getAllAccessibleBuildingRoadEdges(x: number, y: number): { x: number; y: number }[] {
+    const visited = new Set<Tile>();
+    const edges: { x: number; y: number }[] = [];
+    this.DFS(x, y, visited, edges);
+    return edges;
+  }
 
-    for (let y = 0; y < this.height; y++) {
-      for (let x = 0; x < this.width; x++) {
-        const currentTile = this.getTileType(x, y);
+  private DFS(x: number, y: number, visited: Set<Tile>, edges: { x: number; y: number }[]) {
+    if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+      return;
+    }
 
-        if (currentTile === 'stone') {
-          // Check if this road tile is adjacent to a building
-          const neighbors = this.getNeighborTiles(x, y);
-          const hasBuildingNeighbor = neighbors.some(tile => tile === 'building');
+    const tile = this.tiles[y]?.[x];
+    if (!tile || !walkableTiles.includes(tile.variant) || visited.has(tile)) {
+      return;
+    }
 
-          if (hasBuildingNeighbor) {
-            intersections.push({ x, y });
-          }
-        }
+    visited.add(tile);
+
+    // Check if this tile is a building-road edge
+    if (tile.variant === 'stone') {
+      const neighbors = this.getNeighborTiles(x, y);
+      const buildingNeighbors = neighbors.filter(tile => tile.variant === 'building');
+      for (const neighbor of buildingNeighbors) {
+        // average position
+        const avgX = (neighbor.position.x + x) / 2;
+        const avgY = (neighbor.position.y + y) / 2;
+        edges.push({ x: avgX, y: avgY });
       }
     }
 
-    return intersections;
+    this.DFS(x + 1, y, visited, edges);
+    this.DFS(x - 1, y, visited, edges);
+    this.DFS(x, y + 1, visited, edges);
+    this.DFS(x, y - 1, visited, edges);
   }
 
-  private getNeighborTiles(x: number, y: number): TileType[] {
-    const neighbors: TileType[] = [];
+  private getNeighborTiles(x: number, y: number): Tile[] {
+    const neighbors: Tile[] = [];
     const directions = [
       { dx: -1, dy: 0 },
       { dx: 1, dy: 0 },
@@ -306,9 +323,9 @@ export class Level {
     for (const { dx, dy } of directions) {
       const nx = x + dx;
       const ny = y + dy;
-      const tileType = this.getTileType(nx, ny);
-      if (tileType) {
-        neighbors.push(tileType);
+      const tile = this.getTile(nx, ny);
+      if (tile) {
+        neighbors.push(tile);
       }
     }
 
@@ -335,7 +352,7 @@ export class Level {
 
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
-        const tileType = this.getTileType(x, y);
+        const tileType = this.getTile(x, y)?.variant;
         if (tileType === 'stone') {
           const distanceFromPlayer = Math.sqrt(
             Math.pow(x - playerX, 2) + Math.pow(y - playerY, 2)
