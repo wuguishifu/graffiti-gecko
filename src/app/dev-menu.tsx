@@ -36,6 +36,13 @@ export function DevMenu() {
             onCheckedChange={() => dispatch(devActions.toggleCopAi())}
           />
         </Label>
+        <Label className='cursor-pointer'>
+          <h2 className='text-xl'>Unlimited Stamina</h2>
+          <Switch
+            checked={devState.unlimitedStamina}
+            onCheckedChange={() => dispatch(devActions.toggleUnlimitedStamina())}
+          />
+        </Label>
         <Label className='flex'>
           <h2 className='text-xl flex-1'>Override Timer</h2>
           <Input

@@ -1,3 +1,4 @@
+import { DevSliceState } from '@/state/dev-slice';
 import { gameActions } from '../../state/game-slice';
 import { store } from '../../state/store';
 import type { Camera } from '../graphics/camera';
@@ -71,7 +72,7 @@ export class Player extends RenderObject {
     });
   }
 
-  public update() {
+  public update(devOptions: DevSliceState) {
     // Update invincibility timer
     if (this.isInvincible) {
       this.invincibilityTimer++;
@@ -90,7 +91,9 @@ export class Player extends RenderObject {
     // Sprinting logic
     if (canSprint) {
       ax = 0.2;
-      this.stamina -= this.staminaDepleteRate;
+      if (!devOptions.unlimitedStamina) {
+        this.stamina -= this.staminaDepleteRate;
+      }
       if (this.stamina <= 0) {
         this.stamina = 0;
         this.staminaRegenDelayTimer = this.staminaRegenDelay;
