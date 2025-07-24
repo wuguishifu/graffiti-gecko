@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
+
 import { useAppSelector } from '../state/use-app-state';
 
 export function GameOver() {

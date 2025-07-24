@@ -1,4 +1,5 @@
 import { mat4 } from 'gl-matrix';
+
 import { Vector3 } from '../math';
 import { Camera } from './camera';
 import { Mesh } from './mesh';

@@ -1,7 +1,8 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
-import { persistReducer, type PersistConfig } from 'redux-persist';
+import { type PersistConfig, persistReducer } from 'redux-persist';
 import persistStore from 'redux-persist/es/persistStore';
 import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
+
 import { dataSlice } from './data-slice';
 import { devSlice } from './dev-slice';
 import { gameSlice } from './game-slice';

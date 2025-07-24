@@ -1,7 +1,8 @@
+import { useAppSelector } from '../state/use-app-state';
+
+import { Energy } from '@/components/energy';
 import { Lives } from '@/components/lives';
 import { Tags } from '@/components/tags';
-import { useAppSelector } from '../state/use-app-state';
-import { Energy } from '@/components/energy';
 
 type HudProps = {
   onOpenSprayArea: () => void;

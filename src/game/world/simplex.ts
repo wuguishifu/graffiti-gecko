@@ -109,7 +109,7 @@ export class SimplexNoise {
   private frequencies: number[];
   private amplitudes: number[];
 
-  constructor(largestFeature: number, persistence: number, seed: number = 0) {
+  constructor(largestFeature: number, persistence: number, seed = 0) {
     const octavesCount = Math.ceil(Math.log2(largestFeature));
     this.octaves = Array.from({ length: octavesCount }, () => new SimplexNoiseOctave(seed));
     this.frequencies = new Array<number>(octavesCount);

@@ -1,6 +1,7 @@
+import { Timer } from './timer';
+
 import { useAppSelector } from '@/state/use-app-state';
 import { secondsToTimeString } from '@/util/time-utils';
-import { Timer } from './timer';
 
 export function Lives() {
   const lives = useAppSelector((state) => state.game.lives);

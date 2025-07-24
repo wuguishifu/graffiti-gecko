@@ -1,11 +1,12 @@
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router';
+
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { devActions } from '@/state/dev-slice';
 import { useAppDispatch, useAppSelector } from '@/state/use-app-state';
-import { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router';
 
 export function DevMenu() {
   const devState = useAppSelector((state) => state.dev);

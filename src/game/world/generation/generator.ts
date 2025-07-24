@@ -1,6 +1,7 @@
+import { SimplexNoise } from '../simplex';
+
 import { Vector3 } from '@/game/math';
 import { Tile } from '@/game/tiles/tile';
-import { SimplexNoise } from '../simplex';
 
 export class Generator {
   static createBaseTiles(gl: WebGLRenderingContext, width: number, height: number, tiles: Tile[][]) {

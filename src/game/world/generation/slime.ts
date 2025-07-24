@@ -73,7 +73,7 @@ export class Slime {
     return samples;
   }
 
-  public static generate(tiles: Tile[][], level: number = 0, roadBendOrder: RoadBendOrder = 'horizontal-vertical') {
+  public static generate(tiles: Tile[][], level = 0, roadBendOrder: RoadBendOrder = 'horizontal-vertical') {
     const center = {
       x: Math.floor(tiles.length / 2),
       y: Math.floor(tiles[0].length / 2)
@@ -226,7 +226,7 @@ export class Slime {
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         if (!visited[y][x] && tiles[y][x].variant === 'grass') {
-          const island: Set<Tile> = new Set();
+          const island = new Set<Tile>();
           dfsGrassIsland(x, y, island);
           if (island.size > 0) {
             grassIslands.push({ tiles: island });

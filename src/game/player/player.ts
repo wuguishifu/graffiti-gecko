@@ -1,14 +1,15 @@
-import { DevSliceState } from '@/state/dev-slice';
 import { gameActions } from '../../state/game-slice';
 import { store } from '../../state/store';
 import type { Camera } from '../graphics/camera';
-import { squareMesh, type Mesh } from '../graphics/mesh';
+import { type Mesh, squareMesh } from '../graphics/mesh';
 import { RenderObject } from '../graphics/render-object';
 import { renderObject } from '../graphics/renderer';
 import { TextureManager } from '../graphics/texture-manager';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
 import type { Level } from '../world/level';
+
+import { DevSliceState } from '@/state/dev-slice';
 
 const PLAYER_LIVES = 3;
 
@@ -18,21 +19,21 @@ export class Player extends RenderObject {
   private level: Level;
   private gl: WebGLRenderingContext;
   private lives: number = PLAYER_LIVES;
-  private invincibilityTimer: number = 0;
-  private invincibilityDuration: number = 60; // 1 second at 60fps
-  private isInvincible: boolean = false;
-  private flashTimer: number = 0;
-  private flashInterval: number = 10; // Flash every 10 frames
-  private totalDistanceTraveled: number = 0;
+  private invincibilityTimer = 0;
+  private invincibilityDuration = 60; // 1 second at 60fps
+  private isInvincible = false;
+  private flashTimer = 0;
+  private flashInterval = 10; // Flash every 10 frames
+  private totalDistanceTraveled = 0;
   private lastPosition: Vector3;
-  private stamina: number = 100; // 0-100 percent
-  private staminaDepleteRate: number = 0.7; // percent per frame while sprinting
-  private staminaRegenRate: number = 0.3; // percent per frame while recovering
-  private staminaRegenDelay: number = 60; // frames to wait after hitting 0 (1s at 60fps)
-  private staminaRegenDelayTimer: number = 0;
-  private lastEnergyPercent: number = 100;
-  private energyUpdateThrottle: number = 6; // only update Redux every 6 frames
-  private energyUpdateFrame: number = 0;
+  private stamina = 100; // 0-100 percent
+  private staminaDepleteRate = 0.7; // percent per frame while sprinting
+  private staminaRegenRate = 0.3; // percent per frame while recovering
+  private staminaRegenDelay = 60; // frames to wait after hitting 0 (1s at 60fps)
+  private staminaRegenDelayTimer = 0;
+  private lastEnergyPercent = 100;
+  private energyUpdateThrottle = 6; // only update Redux every 6 frames
+  private energyUpdateFrame = 0;
 
   constructor(gl: WebGLRenderingContext, level: Level, private devOptions: Partial<DevSliceState>) {
     super(
@@ -255,7 +256,7 @@ export class Player extends RenderObject {
     this.level = level;
   }
 
-  private keysDown: Set<string> = new Set();
+  private keysDown = new Set<string>();
 
   public onKeyDown(event: KeyboardEvent) {
     if (this.keysDown.has(event.key.toLowerCase())) return;

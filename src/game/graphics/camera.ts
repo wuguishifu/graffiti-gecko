@@ -1,4 +1,5 @@
 import { mat4 } from 'gl-matrix';
+
 import { Vector3 } from '../math';
 import { Player } from '../player/player';
 
@@ -12,8 +13,8 @@ export class Camera {
 
   private fov: number = 45 * Math.PI / 180;
   private aspect: number;
-  private zNear: number = 0.1;
-  private zFar: number = 100.0;
+  private zNear = 0.1;
+  private zFar = 100.0;
 
   constructor(aspect: number, player: Player) {
     this.up = new Vector3(0, 1, 0);

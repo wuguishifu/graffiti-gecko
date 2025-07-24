@@ -1,6 +1,7 @@
+import { useEffect, useRef } from 'react';
+
 import { gameActions } from '@/state/game-slice';
 import { useAppDispatch } from '@/state/use-app-state';
-import { useEffect, useRef } from 'react';
 
 export function InitialInteractionDetector() {
   const dispatch = useAppDispatch();

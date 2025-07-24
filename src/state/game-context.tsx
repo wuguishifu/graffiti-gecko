@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+
 import type { Game } from '../game/game';
 
 type GameContextType = {

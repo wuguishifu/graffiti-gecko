@@ -1,3 +1,5 @@
+const a: undefined | number = undefined;
+
 export class Texture {
   private texture: WebGLTexture | null = null;
   private gl: WebGLRenderingContext;
@@ -7,6 +9,8 @@ export class Texture {
   }
 
   public async loadFromImage(imagePath: string): Promise<void> {
+    const b: number = a!;
+
     return new Promise((resolve, reject) => {
       const image = new Image();
       image.onload = () => {
@@ -36,7 +40,7 @@ export class Texture {
     this.gl.bindTexture(this.gl.TEXTURE_2D, null);
   }
 
-  public bind(textureUnit: number = 0): void {
+  public bind(textureUnit = 0): void {
     if (this.texture) {
       this.gl.activeTexture(this.gl.TEXTURE0 + textureUnit);
       this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);

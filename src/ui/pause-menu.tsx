@@ -1,7 +1,8 @@
-import { Timer } from '@/components/timer';
 import { gameActions } from '../state/game-slice';
 import { useAppDispatch, useAppSelector } from '../state/use-app-state';
 import { secondsToTimeString } from '../util/time-utils';
+
+import { Timer } from '@/components/timer';
 
 export function PauseMenu() {
   const currentLevel = useAppSelector((state) => state.game.currentLevel);

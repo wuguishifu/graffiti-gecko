@@ -1,5 +1,5 @@
 import type { Camera } from '../graphics/camera';
-import { squareMesh, type Mesh } from '../graphics/mesh';
+import { type Mesh, squareMesh } from '../graphics/mesh';
 import { RenderObject } from '../graphics/render-object';
 import { renderObject } from '../graphics/renderer';
 import { TextureManager } from '../graphics/texture-manager';
@@ -22,19 +22,19 @@ export class Cop extends RenderObject {
   private textureManager: TextureManager;
   private level: Level;
   private player: Player;
-  private speed: number = 0.05;
-  private chaseRadius: number = 100;
+  private speed = 0.05;
+  private chaseRadius = 100;
   private id: number;
   private path: { x: number; y: number }[] = [];
-  private pathUpdateTimer: number = 0;
-  private pathUpdateInterval: number = 60; // Update path every 60 frames (1 second at 60fps)
+  private pathUpdateTimer = 0;
+  private pathUpdateInterval = 60; // Update path every 60 frames (1 second at 60fps)
   private otherCops: Cop[] = [];
-  private isFleeing: boolean = false;
-  private fleeTimer: number = 0;
-  private fleeDuration: number = 60; // 1 second at 60fps
+  private isFleeing = false;
+  private fleeTimer = 0;
+  private fleeDuration = 60; // 1 second at 60fps
   private fleeTarget: { x: number; y: number } | null = null;
 
-  constructor(gl: WebGLRenderingContext, level: Level, player: Player, id: number, x: number, y: number, difficultyLevel: number = 1) {
+  constructor(gl: WebGLRenderingContext, level: Level, player: Player, id: number, x: number, y: number, difficultyLevel = 1) {
     super(
       new Vector3(x, y, 0),
       new Vector3(0, 0, 0),
@@ -288,7 +288,7 @@ export class Cop extends RenderObject {
 
   private findPath(startX: number, startY: number, goalX: number, goalY: number): { x: number; y: number }[] {
     const openSet: PathNode[] = [];
-    const closedSet: Set<string> = new Set();
+    const closedSet = new Set<string>();
 
     const startNode: PathNode = {
       x: startX,
@@ -493,7 +493,7 @@ export class Cop extends RenderObject {
     return this.id;
   }
 
-  public isNearPlayer(radius: number = 1.5): boolean {
+  public isNearPlayer(radius = 1.5): boolean {
     return this.getDistanceToPlayer() <= radius;
   }
 }

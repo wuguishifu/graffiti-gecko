@@ -1,4 +1,3 @@
-import { DevSliceState } from '@/state/dev-slice';
 import { gameActions } from '../../state/game-slice';
 import { store } from '../../state/store';
 import { Cop } from '../entities/cop';
@@ -9,8 +8,10 @@ import { Vector3 } from '../math';
 import type { Player } from '../player/player';
 import { Tile } from '../tiles/tile';
 import { TileVariant } from '../tiles/types';
-import { Slime } from './generation/slime';
 import { Generator } from './generation/generator';
+import { Slime } from './generation/slime';
+
+import { DevSliceState } from '@/state/dev-slice';
 
 const walkableTiles: TileVariant[] = ['grass', 'stone', 'sand'];
 
@@ -22,7 +23,7 @@ export class Level {
   private cops: Cop[] = [];
   private player: Player | null = null;
 
-  constructor(private gl: WebGLRenderingContext, private difficultyLevel: number = 1, private devOptions: Partial<DevSliceState>) {
+  constructor(private gl: WebGLRenderingContext, private difficultyLevel = 1, private devOptions: Partial<DevSliceState>) {
     this.gl = gl;
     this.difficultyLevel = difficultyLevel;
     this.generate();

@@ -1,10 +1,12 @@
-import { buttonVariants } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
+
 import { soundService } from '../game/sound/sound.ts';
 import { gameActions } from '../state/game-slice';
 import { useAppDispatch } from '../state/use-app-state';
 import { SettingsMenu } from '../ui/settings-menu';
+
+import { buttonVariants } from '@/components/ui/button';
 
 export function MainMenu() {
   const [showSettings, setShowSettings] = useState(false);

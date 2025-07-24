@@ -1,4 +1,3 @@
-import { DevSliceState } from '@/state/dev-slice';
 import { gameActions } from '../state/game-slice';
 import { store } from '../state/store';
 import { Camera } from './graphics/camera';
@@ -6,12 +5,13 @@ import { resetSquareMesh } from './graphics/mesh';
 import { buildProgramInfo, initShaderProgram } from './graphics/shader-source';
 import { TextureManager } from './graphics/texture-manager';
 import type { ProgramInfo } from './graphics/types';
-import { Player } from './player/player';
-
 import { Vector3 } from './math';
+import { Player } from './player/player';
 import fsSource from './shaders/fragment.glsl?raw';
 import vsSource from './shaders/vertex.glsl?raw';
 import { Level } from './world/level';
+
+import { DevSliceState } from '@/state/dev-slice';
 
 export class Game {
   private canvas: HTMLCanvasElement;
