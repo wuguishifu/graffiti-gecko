@@ -33,13 +33,16 @@ export class Player extends RenderObject {
   private lastEnergyPercent: number = 100;
   private energyUpdateThrottle: number = 6; // only update Redux every 6 frames
   private energyUpdateFrame: number = 0;
+  private devOptions: Partial<DevSliceState>;
 
-  constructor(gl: WebGLRenderingContext, level: Level) {
+  constructor(gl: WebGLRenderingContext, level: Level, devOptions: Partial<DevSliceState>) {
     super(
       level.getRandomStoneTile() ?? new Vector3(0, 0, 0),
       new Vector3(0, 0, 0),
       new Vector3(1, 1, 1),
     );
+
+    this.devOptions = devOptions;
 
     this.gl = gl;
     this.mesh = squareMesh(gl);
@@ -72,7 +75,7 @@ export class Player extends RenderObject {
     });
   }
 
-  public update(devOptions: DevSliceState) {
+  public update() {
     // Update invincibility timer
     if (this.isInvincible) {
       this.invincibilityTimer++;
@@ -91,7 +94,7 @@ export class Player extends RenderObject {
     // Sprinting logic
     if (canSprint) {
       ax = 0.2;
-      if (!devOptions.unlimitedStamina) {
+      if (!this.devOptions.unlimitedStamina) {
         this.stamina -= this.staminaDepleteRate;
       }
       if (this.stamina <= 0) {
@@ -226,7 +229,10 @@ export class Player extends RenderObject {
       return false; // No damage taken during invincibility
     }
 
-    this.lives--;
+    if (!this.devOptions.godMode) {
+      this.lives--;
+    }
+
     this.isInvincible = true;
     this.invincibilityTimer = 0;
     this.flashTimer = 0;

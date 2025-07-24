@@ -4,6 +4,7 @@ export type DevSliceState = {
   disableCopAi: boolean;
   unlimitedStamina: boolean;
   overrideTotalTime: number;
+  godMode: boolean;
   isDirty: boolean;
 };
 
@@ -11,6 +12,7 @@ const initialState: DevSliceState = {
   disableCopAi: false,
   unlimitedStamina: false,
   overrideTotalTime: 0,
+  godMode: false,
   isDirty: false,
 };
 
@@ -26,6 +28,9 @@ export const devSlice = createSlice({
     },
     toggleUnlimitedStamina: (state) => {
       state.unlimitedStamina = !state.unlimitedStamina;
+    },
+    toggleGodMode: (state) => {
+      state.godMode = !state.godMode;
     },
     reset: () => initialState,
   },

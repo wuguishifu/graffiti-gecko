@@ -30,12 +30,19 @@ export class Level {
 
   public setPlayer(player: Player) {
     this.player = player;
-    // Spawn cops after player is set
-    this.spawnCops();
   }
 
   public spawnEntities() {
-    this.spawnSprayCans();
+    if (!this.player) {
+      return;
+    }
+
+    const accessibleTiles = new Set<Tile>();
+    const accessibleWalls: { x: number; y: number }[] = [];
+    this.DFS(this.player.position.x, this.player.position.y, accessibleTiles, accessibleWalls);
+
+    this.spawnSprayCans(accessibleWalls);
+    this.spawnCops(this.player, accessibleTiles);
   }
 
   public generate() {
@@ -60,7 +67,6 @@ export class Level {
     // Spawn spray cans in the generated level
     this.growStone(15, 15, 300); // Start at (15,15), grow up to 300 tiles
     this.generateWall()
-    this.spawnSprayCans();
   }
 
 
@@ -248,20 +254,15 @@ export class Level {
     return this.tiles[y]?.[x] ?? null;
   }
 
-  private spawnSprayCans() {
-    if (!this.player) {
-      return;
-    }
-
-    const accessiblePositions = this.getAllAccessibleBuildingRoadEdges(this.player.position.x, this.player.position.y);
-    accessiblePositions.sort(() => Math.random() - 0.5); // Shuffle positions
+  private spawnSprayCans(accessibleWalls: { x: number; y: number }[]) {
+    const randomizedAccessibleWalls = [...accessibleWalls].sort(() => Math.random() - 0.5); // Shuffle positions
 
     const baseSprayCans = Math.floor(Math.random() * 2) + 3; // 3-4 base spray cans
     const difficultyBonus = Math.min(this.difficultyLevel - 1, 5); // Cap at +5 for balance
     const numSprayCans = baseSprayCans + difficultyBonus;
 
-    this.sprayCans = Array.from({ length: Math.min(numSprayCans, accessiblePositions.length) }, (_, i) => {
-      const pos = accessiblePositions[i];
+    this.sprayCans = Array.from({ length: Math.min(numSprayCans, randomizedAccessibleWalls.length) }, (_, i) => {
+      const pos = randomizedAccessibleWalls[i];
       const sprayCan = new SprayCan(this.gl, i);
       sprayCan.position.x = pos.x;
       sprayCan.position.y = pos.y;
@@ -272,13 +273,6 @@ export class Level {
     store.dispatch(gameActions.setSprayCans(this.sprayCans.map(sprayCan => sprayCan.id)));
 
     console.log(`Spawned ${this.sprayCans.length} spray cans at building-road intersections (Level ${this.difficultyLevel})`);
-  }
-
-  private getAllAccessibleBuildingRoadEdges(x: number, y: number): { x: number; y: number }[] {
-    const visited = new Set<Tile>();
-    const edges: { x: number; y: number }[] = [];
-    this.DFS(x, y, visited, edges);
-    return edges;
   }
 
   private DFS(x: number, y: number, visited: Set<Tile>, edges: { x: number; y: number }[]) {
@@ -336,33 +330,23 @@ export class Level {
     return this.sprayCans;
   }
 
-  private spawnCops() {
+  private spawnCops(player: Player, accessibleTiles: Set<Tile>) {
     this.cops = [];
 
-    if (!this.player) {
-      console.warn('Cannot spawn cops: player not set');
-      return;
-    }
-
-    // Find suitable spawn points (stone tiles away from player)
-    const spawnPoints: { x: number; y: number }[] = [];
-    const playerX = Math.round(this.player.position.x);
-    const playerY = Math.round(this.player.position.y);
     const minDistanceFromPlayer = 8;
+    const validSpawnPoints: { x: number; y: number }[] = Array.from(accessibleTiles)
+      .filter(tile => {
+        const dx = tile.position.x - player.position.x;
+        const dy = tile.position.y - player.position.y;
+        const squareDistance = dx * dx + dy * dy;
+        return squareDistance > minDistanceFromPlayer * minDistanceFromPlayer
+      })
+      .map(tile => ({
+        x: tile.position.x,
+        y: tile.position.y
+      }));
 
-    for (let y = 0; y < this.height; y++) {
-      for (let x = 0; x < this.width; x++) {
-        const tileType = this.getTile(x, y)?.variant;
-        if (tileType === 'stone') {
-          const distanceFromPlayer = Math.sqrt(
-            Math.pow(x - playerX, 2) + Math.pow(y - playerY, 2)
-          );
-          if (distanceFromPlayer >= minDistanceFromPlayer) {
-            spawnPoints.push({ x, y });
-          }
-        }
-      }
-    }
+    validSpawnPoints.sort(() => Math.random() - 0.5); // Shuffle positions
 
     // Scale number of cops based on difficulty
     // Level 1: 2-4 cops, Level 2: 3-5, Level 3: 4-6, etc.
@@ -370,11 +354,9 @@ export class Level {
     const difficultyBonus = Math.min(this.difficultyLevel - 1, 4); // Cap at +4 for balance
     const numCops = baseCops + difficultyBonus;
 
-    const shuffledPoints = [...spawnPoints].sort(() => Math.random() - 0.5);
-
-    for (let i = 0; i < Math.min(numCops, shuffledPoints.length); i++) {
-      const point = shuffledPoints[i];
-      const cop = new Cop(this.gl, this, this.player, i, point.x, point.y, this.difficultyLevel);
+    for (let i = 0; i < Math.min(numCops, validSpawnPoints.length); i++) {
+      const point = validSpawnPoints[i];
+      const cop = new Cop(this.gl, this, player, i, point.x, point.y, this.difficultyLevel);
       cop.position.z = 0.1; // Slightly above ground
       this.cops.push(cop);
     }

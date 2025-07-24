@@ -23,7 +23,7 @@ export class Cop extends RenderObject {
   private level: Level;
   private player: Player;
   private speed: number = 0.05;
-  private chaseRadius: number = 12;
+  private chaseRadius: number = 100;
   private id: number;
   private path: { x: number; y: number }[] = [];
   private pathUpdateTimer: number = 0;

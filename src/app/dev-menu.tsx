@@ -37,6 +37,13 @@ export function DevMenu() {
           />
         </Label>
         <Label className='cursor-pointer'>
+          <h2 className='text-xl'>God Mode</h2>
+          <Switch
+            checked={devState.godMode}
+            onCheckedChange={() => dispatch(devActions.toggleGodMode())}
+          />
+        </Label>
+        <Label className='cursor-pointer'>
           <h2 className='text-xl'>Unlimited Stamina</h2>
           <Switch
             checked={devState.unlimitedStamina}

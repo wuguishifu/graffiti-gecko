@@ -133,7 +133,7 @@ export class Game {
     document.addEventListener('keyup', this.boundKeyUp);
 
     // Pass the level reference to the player
-    this.player = new Player(this.gl, this.level);
+    this.player = new Player(this.gl, this.level, this.devOptions);
 
     // Set player reference in level for cop spawning
     this.level.setPlayer(this.player);
@@ -162,7 +162,7 @@ export class Game {
       return;
     }
     this.camera.update();
-    this.player.update(this.devOptions);
+    this.player.update();
 
     if (!this.devOptions.disableCopAi) {
       this.level.updateCops();
