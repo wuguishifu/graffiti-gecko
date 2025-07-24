@@ -1,13 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-type DevSliceState = {
+export type DevSliceState = {
   disableCopAi: boolean;
-  overrideTotalTime?: number;
+  unlimitedStamina: boolean;
+  overrideTotalTime: number;
   isDirty: boolean;
 };
 
 const initialState: DevSliceState = {
   disableCopAi: false,
+  unlimitedStamina: false,
+  overrideTotalTime: 0,
   isDirty: false,
 };
 
@@ -19,7 +22,10 @@ export const devSlice = createSlice({
       state.disableCopAi = !state.disableCopAi;
     },
     setTotalTime: (state, action: PayloadAction<number | undefined>) => {
-      state.overrideTotalTime = action.payload;
+      state.overrideTotalTime = action.payload ?? 0;
+    },
+    toggleUnlimitedStamina: (state) => {
+      state.unlimitedStamina = !state.unlimitedStamina;
     },
     reset: () => initialState,
   },

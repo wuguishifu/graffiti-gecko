@@ -1,3 +1,4 @@
+import { DevSliceState } from '@/state/dev-slice';
 import { gameActions } from '../state/game-slice';
 import { store } from '../state/store';
 import { Camera } from './graphics/camera';
@@ -10,11 +11,6 @@ import { Player } from './player/player';
 import fsSource from './shaders/fragment.glsl?raw';
 import vsSource from './shaders/vertex.glsl?raw';
 import { Level } from './world/level';
-
-type DevOptions = {
-  disableCopAi?: boolean;
-  overrideTotalTime?: number;
-}
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -66,9 +62,7 @@ export class Game {
     this.player.onKeyUp(event);
   }
 
-  private devOptions = {
-    disableCopAi: false,
-  };
+  private devOptions: DevSliceState;
 
   private startTimer() {
     if (Game.timerRunning) return;
@@ -95,8 +89,8 @@ export class Game {
     }
   }
 
-  constructor(canvas: HTMLCanvasElement, devOptions: DevOptions) {
-    this.devOptions = { ...this.devOptions, ...devOptions };
+  constructor(canvas: HTMLCanvasElement, devOptions: DevSliceState) {
+    this.devOptions = devOptions;
 
     store.dispatch(gameActions.setTimeLeft(devOptions.overrideTotalTime || 300));
 
@@ -166,7 +160,7 @@ export class Game {
       return;
     }
     this.camera.update();
-    this.player.update();
+    this.player.update(this.devOptions);
 
     if (!this.devOptions.disableCopAi) {
       this.level.updateCops();
