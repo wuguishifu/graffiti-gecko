@@ -23,7 +23,7 @@ export function DevMenu() {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [navigate]);
 
   return (
     <main className='absolute top-0 left-0 w-full h-full flex items-center justify-center'>

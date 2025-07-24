@@ -10,29 +10,7 @@ import { Tile, TileVariant } from '../tiles/tile';
 
 type TileType = 'grass' | 'stone' | 'building';
 
-interface Cell {
-  x: number;
-  y: number;
-  possibleTiles: Set<TileType>;
-  collapsed: boolean;
-  finalTile?: TileType;
-}
-
 const walkableTiles: TileType[] = ['grass', 'stone'];
-
-// Define adjacency rules for city blocks
-const rules: Record<TileType, TileType[]> = {
-  grass: ['stone', 'grass'], // Grass can be next to grass or stone (parks)
-  stone: ['grass', 'building', 'stone'], // Stone can be next to anything (roads)
-  building: ['stone', 'building'] // Building can be next to stone or building (city blocks)
-};
-
-// Add weights to favor larger city blocks
-const tileWeights: Record<TileType, number> = {
-  grass: 0.2,    // Less common - parks
-  stone: 0.3,    // Roads
-  building: 0.5  // Most common - buildings
-};
 
 export class Level {
   private gl: WebGLRenderingContext;
@@ -82,7 +60,7 @@ export class Level {
   }
 
 
-    public growStone(startX: number, startY: number, maxGrowth: number) {
+  public growStone(startX: number, startY: number, maxGrowth: number) {
     const stoneTiles = new Set<string>();
     const activeTips: [number, number][] = [[startX, startY]]; // branch tips
 
@@ -130,7 +108,7 @@ export class Level {
     }
   }
 
-    public generateWall() {
+  public generateWall() {
     // 8 directions: orthogonal + diagonal
     const directions = [
       [0, 1],    // down

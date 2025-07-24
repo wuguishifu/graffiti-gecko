@@ -16,7 +16,7 @@ const entityVariantToTextureMap: Record<EntityVariant, string> = {
 };
 
 export class TextureManager {
-  private static instance: TextureManager;
+  private static instance: TextureManager | null;
   private tileTextures: Map<TileVariant, Texture> = new Map();
   private entityTextures: Map<EntityVariant, Texture> = new Map();
   private tileLoadingPromises: Map<TileVariant, Promise<void>> = new Map();
@@ -126,7 +126,7 @@ export class TextureManager {
   public static resetInstance(): void {
     if (TextureManager.instance) {
       TextureManager.instance.destroy();
-      TextureManager.instance = null as any;
+      TextureManager.instance = null;
     }
   }
 } 

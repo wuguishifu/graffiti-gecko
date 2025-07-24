@@ -17,15 +17,14 @@ export function GamePage() {
   const dispatch = useAppDispatch();
   const dispatchRef = useRef(dispatch);
   const gameOverFlag = useAppSelector((state) => state.game.gameOverFlag);
-  const devOptions = useAppSelector((state) => state.dev);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     if (canvasRef.current) {
       // Reset game state for new session
-      dispatch(gameActions.reset());
-      gameInstance.current = new Game(canvasRef.current, devOptions);
+      dispatchRef.current(gameActions.reset());
+      gameInstance.current = new Game(canvasRef.current, store.getState().dev);
     }
 
     return () => {
@@ -47,7 +46,7 @@ export function GamePage() {
     if (gameOverFlag) {
       navigate('/game-over');
     }
-  }, [gameOverFlag]);
+  }, [gameOverFlag, navigate]);
 
   const pauseMenuVisible = useAppSelector((state) => state.game.pauseMenuVisible);
 
@@ -64,7 +63,7 @@ export function GamePage() {
     return () => {
       window.removeEventListener('keydown', onKeyDown);
     };
-  }, []);
+  }, [onOpenSprayArea]);
 
   const sprayAreaVisible = useAppSelector((state) => state.game.sprayAreaVisible);
 
