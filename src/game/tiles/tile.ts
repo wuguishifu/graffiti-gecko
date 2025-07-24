@@ -6,7 +6,7 @@ import { TextureManager } from '../graphics/texture-manager';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
 
-type TileVariant = 'grass' | 'stone' | 'building';
+export type TileVariant = 'grass' | 'stone' | 'building';
 
 type TileProps = {
   position: Vector3;
