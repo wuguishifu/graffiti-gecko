@@ -1,12 +1,12 @@
 import type { Camera } from '../graphics/camera';
 import { Mesh, squareMesh } from '../graphics/mesh';
 import { RenderObject } from '../graphics/render-object';
-import renderObject from '../graphics/renderer';
+import { renderObject, renderSimilarObjects } from '../graphics/renderer';
 import { TextureManager } from '../graphics/texture-manager';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
 
-type TileVariant = 'grass' | 'stone' | 'building';
+export type TileVariant = 'grass' | 'stone' | 'building';
 
 type TileProps = {
   position: Vector3;
@@ -54,6 +54,17 @@ export class Tile extends RenderObject {
       },
       camera,
     });
+  }
 
+  public static renderVariantGroup(gl: WebGLRenderingContext, programInfo: ProgramInfo, camera: Camera, tiles: Tile[]) {
+    renderSimilarObjects({
+      gl,
+      info: programInfo,
+      objects: tiles.map(tile => ({ model: tile.model })),
+      mesh: tiles[0].mesh(gl),
+      camera,
+      texture: tiles[0].texture,
+      useTexture: tiles[0].isTextureReady,
+    })
   }
 }

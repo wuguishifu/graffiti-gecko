@@ -1,7 +1,7 @@
 import type { Camera } from '../graphics/camera';
 import { squareMesh, type Mesh } from '../graphics/mesh';
 import { RenderObject } from '../graphics/render-object';
-import renderObject from '../graphics/renderer';
+import { renderObject } from '../graphics/renderer';
 import { TextureManager } from '../graphics/texture-manager';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
