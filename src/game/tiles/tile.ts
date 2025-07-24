@@ -10,8 +10,8 @@ export type TileVariant = 'grass' | 'stone' | 'building';
 
 type TileProps = {
   position: Vector3;
-  rotation: Vector3;
-  scale: Vector3;
+  rotation?: Vector3;
+  scale?: Vector3;
   variant: TileVariant;
   gl: WebGLRenderingContext;
 }

@@ -8,22 +8,21 @@ import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
 import type { Player } from '../player/player';
 import { Tile, TileVariant } from '../tiles/tile';
+import { slime } from './generation/slime';
 
 type TileType = 'grass' | 'stone' | 'building';
 
 const walkableTiles: TileType[] = ['grass', 'stone'];
 
 export class Level {
-  private gl: WebGLRenderingContext;
   private tiles: Tile[][] = [];
   private width = 30;
   private height = 30;
   private sprayCans: SprayCan[] = [];
   private cops: Cop[] = [];
   private player: Player | null = null;
-  private difficultyLevel: number = 1;
 
-  constructor(gl: WebGLRenderingContext, difficultyLevel: number = 1, private devOptions: Partial<DevSliceState>) {
+  constructor(private gl: WebGLRenderingContext, private difficultyLevel: number = 1, private devOptions: Partial<DevSliceState>) {
     this.gl = gl;
     this.difficultyLevel = difficultyLevel;
     this.generate();
@@ -65,58 +64,9 @@ export class Level {
       }
     }
 
-    // Spawn spray cans in the generated level
-    this.growStone(15, 15, 300); // Start at (15,15), grow up to 300 tiles
+    // TODO: Allow roadBendOrder to be set from outside
+    slime(this.tiles, this.gl, 'random');
     this.generateWall()
-  }
-
-
-  public growStone(startX: number, startY: number, maxGrowth: number) {
-    const stoneTiles = new Set<string>();
-    const activeTips: [number, number][] = [[startX, startY]]; // branch tips
-
-    const key = (x: number, y: number) => `${x},${y}`;
-
-    const inBounds = (x: number, y: number) =>
-      x >= 0 && x < this.width && y >= 0 && y < this.height;
-
-    const getNeighbors = (x: number, y: number) => {
-      return [
-        [x + 1, y],
-        [x - 1, y],
-        [x, y + 1],
-        [x, y - 1]
-      ].filter(([nx, ny]) => inBounds(nx, ny) && !stoneTiles.has(key(nx, ny)));
-    };
-
-    // Start with first tile
-    stoneTiles.add(key(startX, startY));
-    this.tiles[startY][startX].variant = 'stone';
-    let grown = 1;
-
-    while (activeTips.length > 0 && grown < maxGrowth) {
-      const [x, y] = activeTips.shift()!;
-
-      const neighbors = getNeighbors(x, y);
-      if (neighbors.length === 0) continue;
-
-      // Choose one random direction to grow like a branch
-      const [nx, ny] = neighbors[Math.floor(Math.random() * neighbors.length)];
-
-      // Grow to new tile
-      stoneTiles.add(key(nx, ny));
-      this.tiles[ny][nx].variant = 'stone';
-      grown++;
-
-      // Continue growing from the new tip
-      activeTips.push([nx, ny]);
-
-      //Optionally: occasionally split the branch
-      if (Math.random() < 0.1 && neighbors.length > 1) {
-        const other = neighbors.find(([ox, oy]) => key(ox, oy) !== key(nx, ny));
-        if (other) activeTips.push(other as [number, number]);
-      }
-    }
   }
 
   public generateWall() {
