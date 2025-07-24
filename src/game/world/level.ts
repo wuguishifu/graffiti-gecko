@@ -10,6 +10,7 @@ import type { Player } from '../player/player';
 import { Tile } from '../tiles/tile';
 import { TileVariant } from '../tiles/types';
 import { Slime } from './generation/slime';
+import { Generator } from './generation/generator';
 
 const walkableTiles: TileVariant[] = ['grass', 'stone'];
 
@@ -49,20 +50,7 @@ export class Level {
     this.sprayCans = [];
     this.cops = [];
 
-    // Generate tiles based on difficulty level
-    for (let y = 0; y < this.height; y++) {
-      this.tiles[y] = [];
-      for (let x = 0; x < this.width; x++) {
-        this.tiles[y][x] = new Tile({
-          position: new Vector3(x, y, 0),
-          rotation: new Vector3(0, 0, 0),
-          scale: new Vector3(1, 1, 1),
-          variant: 'grass',
-          gl: this.gl
-        });
-      }
-    }
-
+    Generator.createBaseTiles(this.gl, this.width, this.height, this.tiles);
     Slime.generate(this.tiles, 'random');
   }
 
