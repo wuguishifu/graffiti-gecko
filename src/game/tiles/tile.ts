@@ -13,7 +13,7 @@ type TileProps = {
   scale?: Vector3;
   variant: TileVariant;
   gl: WebGLRenderingContext;
-}
+};
 
 export class Tile extends RenderObject {
   public variant: TileVariant;
@@ -64,11 +64,11 @@ export class Tile extends RenderObject {
     renderSimilarObjects({
       gl,
       info: programInfo,
-      objects: tiles.map(tile => ({ model: tile.model })),
+      objects: tiles.map((tile) => ({ model: tile.model })),
       mesh: firstTile.mesh(gl),
       camera,
       texture: firstTile.texture,
       useTexture: firstTile.isTextureReady,
-    })
+    });
   }
 }

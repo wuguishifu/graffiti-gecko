@@ -23,7 +23,11 @@ export class Level {
   private cops: Cop[] = [];
   private player: Player | null = null;
 
-  constructor(private gl: WebGLRenderingContext, private difficultyLevel = 1, private devOptions: Partial<DevSliceState>) {
+  constructor(
+    private gl: WebGLRenderingContext,
+    private difficultyLevel = 1,
+    private devOptions: Partial<DevSliceState>,
+  ) {
     this.gl = gl;
     this.difficultyLevel = difficultyLevel;
     this.generate();
@@ -55,7 +59,6 @@ export class Level {
     Slime.generate(this.tiles, this.difficultyLevel, 'random');
   }
 
-
   public getRandomStoneTile(): Vector3 | null {
     const stoneTiles: Tile[] = [];
 
@@ -68,49 +71,55 @@ export class Level {
       }
     }
 
-    if (stoneTiles.length === 0) return null;
+    if (stoneTiles.length === 0) {
+      return null;
+    }
 
     const index = Math.floor(Math.random() * stoneTiles.length);
     const tile = stoneTiles[index];
 
-    return Vector3.from(tile.position)
+    return Vector3.from(tile.position);
   }
-
 
   public getTiles(): Tile[][] {
     return this.tiles;
   }
 
   public render(gl: WebGLRenderingContext, programInfo: ProgramInfo, camera: Camera) {
-    const tileGroups = this.tiles.reduce<Record<TileVariant, Tile[]>>((acc, row) => {
-      row.forEach(tile => {
-        if (!tile) return
-        if (!acc[tile.variant]) {
-          acc[tile.variant] = [];
-        }
-        acc[tile.variant].push(tile);
-      });
+    const tileGroups = this.tiles.reduce<Record<TileVariant, Tile[]>>(
+      (acc, row) => {
+        row.forEach((tile) => {
+          if (!tile) {
+            return;
+          }
+          if (!acc[tile.variant]) {
+            acc[tile.variant] = [];
+          }
+          acc[tile.variant].push(tile);
+        });
 
-      return acc;
-    }, {
-      grass: [],
-      stone: [],
-      building: [],
-      sand: [],
-      vent: [],
-    });
+        return acc;
+      },
+      {
+        grass: [],
+        stone: [],
+        building: [],
+        sand: [],
+        vent: [],
+      },
+    );
 
     Object.values(tileGroups).forEach((tiles) => {
       Tile.renderVariantGroup(gl, programInfo, camera, tiles);
     });
 
     // Render spray cans
-    this.sprayCans.forEach(sprayCan => {
+    this.sprayCans.forEach((sprayCan) => {
       sprayCan.render(gl, programInfo, camera);
     });
 
     // Render cops
-    this.cops.forEach(cop => {
+    this.cops.forEach((cop) => {
       cop.render(gl, programInfo, camera);
     });
   }
@@ -158,9 +167,11 @@ export class Level {
       return sprayCan;
     });
 
-    store.dispatch(gameActions.setSprayCans(this.sprayCans.map(sprayCan => sprayCan.id)));
+    store.dispatch(gameActions.setSprayCans(this.sprayCans.map((sprayCan) => sprayCan.id)));
 
-    console.log(`Spawned ${this.sprayCans.length} spray cans at building-road intersections (Level ${this.difficultyLevel})`);
+    console.log(
+      `Spawned ${this.sprayCans.length} spray cans at building-road intersections (Level ${this.difficultyLevel})`,
+    );
   }
 
   private DFS(x: number, y: number, visited: Set<Tile>, edges: { x: number; y: number }[]) {
@@ -178,7 +189,7 @@ export class Level {
     // Check if this tile is a building-road edge
     if (tile.variant === 'stone') {
       const neighbors = this.getNeighborTiles(x, y);
-      const buildingNeighbors = neighbors.filter(tile => tile.variant === 'building');
+      const buildingNeighbors = neighbors.filter((t) => t.variant === 'building');
       for (const neighbor of buildingNeighbors) {
         // average position
         const avgX = (neighbor.position.x + x) / 2;
@@ -199,7 +210,7 @@ export class Level {
       { dx: -1, dy: 0 },
       { dx: 1, dy: 0 },
       { dx: 0, dy: -1 },
-      { dx: 0, dy: 1 }
+      { dx: 0, dy: 1 },
     ];
 
     for (const { dx, dy } of directions) {
@@ -223,15 +234,15 @@ export class Level {
 
     const minDistanceFromPlayer = 8;
     const validSpawnPoints: { x: number; y: number }[] = Array.from(accessibleTiles)
-      .filter(tile => {
+      .filter((tile) => {
         const dx = tile.position.x - player.position.x;
         const dy = tile.position.y - player.position.y;
         const squareDistance = dx * dx + dy * dy;
-        return squareDistance > minDistanceFromPlayer * minDistanceFromPlayer
+        return squareDistance > minDistanceFromPlayer * minDistanceFromPlayer;
       })
-      .map(tile => ({
+      .map((tile) => ({
         x: tile.position.x,
-        y: tile.position.y
+        y: tile.position.y,
       }));
 
     validSpawnPoints.sort(() => Math.random() - 0.5); // Shuffle positions
@@ -250,15 +261,15 @@ export class Level {
     }
 
     // Set other cops reference for collision avoidance
-    this.cops.forEach(cop => {
-      cop.setOtherCops(this.cops.filter(c => c !== cop));
+    this.cops.forEach((cop) => {
+      cop.setOtherCops(this.cops.filter((c) => c !== cop));
     });
 
     console.log(`Spawned ${this.cops.length} cops at stone locations (Level ${this.difficultyLevel})`);
   }
 
   public updateCops() {
-    this.cops.forEach(cop => {
+    this.cops.forEach((cop) => {
       cop.update();
     });
   }

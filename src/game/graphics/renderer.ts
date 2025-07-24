@@ -6,9 +6,9 @@ import { Mesh } from './mesh';
 import { Texture } from './texture';
 
 type ObjectModel = {
-  position: Vector3,
-  rotation: Vector3,
-  scale: Vector3
+  position: Vector3;
+  rotation: Vector3;
+  scale: Vector3;
 };
 
 type ObjectData = {
@@ -22,21 +22,21 @@ type ObjectData = {
 type RenderProps = {
   gl: WebGLRenderingContext;
   info: {
-    program: WebGLProgram,
-    attributes: { [name: string]: number },
-    uniforms: { [name: string]: WebGLUniformLocation }
-  }
+    program: WebGLProgram;
+    attributes: { [name: string]: number };
+    uniforms: { [name: string]: WebGLUniformLocation };
+  };
   object: ObjectData;
   camera: Camera;
-}
+};
 
 type RenderGroupProps = {
   gl: WebGLRenderingContext;
   info: {
-    program: WebGLProgram,
-    attributes: { [name: string]: number },
-    uniforms: { [name: string]: WebGLUniformLocation }
-  }
+    program: WebGLProgram;
+    attributes: { [name: string]: number };
+    uniforms: { [name: string]: WebGLUniformLocation };
+  };
   objects: {
     model: ObjectModel;
     alphaMultiplier?: number;
@@ -45,9 +45,14 @@ type RenderGroupProps = {
   texture?: Texture;
   useTexture?: boolean;
   camera: Camera;
-}
+};
 
-export function renderObject({ gl, object: { mesh, model, texture, useTexture = false, alphaMultiplier = 1.0 }, camera, info }: RenderProps) {
+export function renderObject({
+  gl,
+  object: { mesh, model, texture, useTexture = false, alphaMultiplier = 1.0 },
+  camera,
+  info,
+}: RenderProps) {
   const modelMatrix = mat4.create();
   mat4.translate(modelMatrix, modelMatrix, model.position.toReadonlyVec3());
   mat4.rotateX(modelMatrix, modelMatrix, model.rotation.x);
@@ -99,7 +104,7 @@ export function renderObject({ gl, object: { mesh, model, texture, useTexture = 
   gl.disableVertexAttribArray(info.attributes.aTextureCoord);
 
   gl.useProgram(null);
-};
+}
 
 export function renderSimilarObjects({ gl, info, objects, mesh, camera, texture, useTexture }: RenderGroupProps) {
   gl.useProgram(info.program);
@@ -145,7 +150,6 @@ export function renderSimilarObjects({ gl, info, objects, mesh, camera, texture,
     gl.uniformMatrix4fv(info.uniforms.vModel, false, modelMatrix);
     gl.uniform1f(info.uniforms.alphaMultiplier, alphaMultiplier);
 
-
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.ibo);
     gl.drawElements(gl.TRIANGLES, mesh.vertexCount, gl.UNSIGNED_SHORT, 0);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
@@ -156,4 +160,4 @@ export function renderSimilarObjects({ gl, info, objects, mesh, camera, texture,
   gl.disableVertexAttribArray(info.attributes.aTextureCoord);
 
   gl.useProgram(null);
-};
+}

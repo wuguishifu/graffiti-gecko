@@ -17,11 +17,8 @@ const rootReducer = combineReducers({
 const persistConfig: PersistConfig<RootState> = {
   key: 'root',
   storage: reduxLocalStorage,
-  whitelist: [
-    dataSlice.name,
-    devSlice.name,
-  ],
-  stateReconciler: autoMergeLevel2
+  whitelist: [dataSlice.name, devSlice.name],
+  stateReconciler: autoMergeLevel2,
 };
 
 const persistedReducer = persistReducer<RootState>(persistConfig, rootReducer);

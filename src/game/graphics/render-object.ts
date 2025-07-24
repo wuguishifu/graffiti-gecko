@@ -8,7 +8,7 @@ export class RenderObject {
   constructor(
     position: Vector3 = new Vector3(0, 0, 0),
     rotation: Vector3 = new Vector3(0, 0, 0),
-    scale: Vector3 = new Vector3(1, 1, 1)
+    scale: Vector3 = new Vector3(1, 1, 1),
   ) {
     this.position = position;
     this.rotation = rotation;
@@ -19,7 +19,7 @@ export class RenderObject {
     return {
       position: this.position,
       rotation: this.rotation,
-      scale: this.scale
+      scale: this.scale,
     };
   }
 }

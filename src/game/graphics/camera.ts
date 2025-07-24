@@ -11,7 +11,7 @@ export class Camera {
 
   public position: Vector3;
 
-  private fov: number = 45 * Math.PI / 180;
+  private fov: number = (45 * Math.PI) / 180;
   private aspect: number;
   private zNear = 0.1;
   private zFar = 100.0;
@@ -24,16 +24,17 @@ export class Camera {
   }
 
   update() {
-    this.position = new Vector3(
-      this.player.position.x,
-      this.player.position.y,
-      this.player.position.z + DISTANCE
-    );
+    this.position = new Vector3(this.player.position.x, this.player.position.y, this.player.position.z + DISTANCE);
   }
 
   viewMatrix() {
     const viewMatrix = mat4.create();
-    mat4.lookAt(viewMatrix, this.position.toReadonlyVec3(), this.player.position.toReadonlyVec3(), this.up.toReadonlyVec3());
+    mat4.lookAt(
+      viewMatrix,
+      this.position.toReadonlyVec3(),
+      this.player.position.toReadonlyVec3(),
+      this.up.toReadonlyVec3(),
+    );
     return viewMatrix;
   }
 

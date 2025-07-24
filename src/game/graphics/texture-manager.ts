@@ -38,7 +38,7 @@ export class TextureManager {
 
   public async preloadAllTileTextures(): Promise<void> {
     const loadPromises = Object.entries(tileVariantToTextureMap).map(([variant, path]) =>
-      this.loadTileTexture(variant as TileVariant, path)
+      this.loadTileTexture(variant as TileVariant, path),
     );
 
     await Promise.all(loadPromises);
@@ -56,7 +56,8 @@ export class TextureManager {
     }
 
     const texture = new Texture(this.gl);
-    const loadPromise = texture.loadFromImage(path)
+    const loadPromise = texture
+      .loadFromImage(path)
       .then(() => {
         this.tileTextures.set(variant, texture);
         console.log(`Tile texture loaded: ${variant}`);
@@ -77,7 +78,8 @@ export class TextureManager {
     }
 
     const texture = new Texture(this.gl);
-    const loadPromise = texture.loadFromImage(path)
+    const loadPromise = texture
+      .loadFromImage(path)
       .then(() => {
         this.entityTextures.set(variant, texture);
         console.log(`Entity texture loaded: ${variant}`);
@@ -133,4 +135,4 @@ export class TextureManager {
       TextureManager.instance = null;
     }
   }
-} 
+}

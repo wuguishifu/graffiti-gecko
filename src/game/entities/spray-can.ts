@@ -13,11 +13,7 @@ export class SprayCan extends RenderObject {
   public isCompleted = false;
 
   constructor(gl: WebGLRenderingContext, id: number) {
-    super(
-      new Vector3(0, 0, 0),
-      new Vector3(0, 0, 0),
-      new Vector3(1, 1, 1),
-    );
+    super(new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
 
     this.mesh = squareMesh(gl);
     this.id = id;

@@ -46,14 +46,12 @@ export const devSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addMatcher(
-      (action) =>
-        action.type.startsWith(devSlice.name + '/') &&
-        action.type !== devSlice.actions.reset.type,
+      (action) => action.type.startsWith(devSlice.name + '/') && action.type !== devSlice.actions.reset.type,
       (state) => {
-        state.isDirty = true
-      }
+        state.isDirty = true;
+      },
     );
-  }
+  },
 });
 
 export const devActions = devSlice.actions;

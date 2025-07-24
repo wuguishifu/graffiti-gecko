@@ -64,11 +64,17 @@ export class Game {
   }
 
   private startTimer() {
-    if (Game.timerRunning) return;
+    if (Game.timerRunning) {
+      return;
+    }
     Game.timerRunning = true;
-    if (Game.timerInterval !== null) return;
+    if (Game.timerInterval !== null) {
+      return;
+    }
     Game.timerInterval = window.setInterval(() => {
-      if (!Game.timerRunning) return;
+      if (!Game.timerRunning) {
+        return;
+      }
       const state = store.getState();
       const timeLeft = state.game.timeLeft;
       if (timeLeft > 0) {
@@ -88,7 +94,10 @@ export class Game {
     }
   }
 
-  constructor(canvas: HTMLCanvasElement, private devOptions: DevSliceState) {
+  constructor(
+    canvas: HTMLCanvasElement,
+    private devOptions: DevSliceState,
+  ) {
     store.dispatch(gameActions.setTimeLeft(devOptions.overrideTotalTime || 300));
 
     this.canvas = canvas;
@@ -184,11 +193,12 @@ export class Game {
     const playerPos = this.player.position;
     const detectionRadius = 1; // Distance within which player can interact with spray can
 
-    const nearestSprayCan = sprayCans.find(sprayCan => {
-      if (sprayCan.isCompleted) return false;
+    const nearestSprayCan = sprayCans.find((sprayCan) => {
+      if (sprayCan.isCompleted) {
+        return false;
+      }
       const distance = Math.sqrt(
-        Math.pow(playerPos.x - sprayCan.position.x, 2) +
-        Math.pow(playerPos.y - sprayCan.position.y, 2)
+        Math.pow(playerPos.x - sprayCan.position.x, 2) + Math.pow(playerPos.y - sprayCan.position.y, 2),
       );
       return distance <= detectionRadius;
     });
@@ -210,7 +220,7 @@ export class Game {
     const cops = this.level.getCops();
     const captureRadius = 1.0; // Distance within which cops can capture player
 
-    const nearbyCop = cops.find(cop => {
+    const nearbyCop = cops.find((cop) => {
       return cop.isNearPlayer(captureRadius);
     });
 
@@ -228,7 +238,7 @@ export class Game {
         store.dispatch(gameActions.setLives(this.player.getLives()));
 
         // Make all cops flee
-        cops.forEach(cop => {
+        cops.forEach((cop) => {
           cop.startFleeing();
         });
       }
@@ -237,7 +247,7 @@ export class Game {
 
   public completeSprayCan(id: number) {
     const sprayCans = this.level.getSprayCans();
-    const active = sprayCans.find(sprayCan => sprayCan.id === id);
+    const active = sprayCans.find((sprayCan) => sprayCan.id === id);
     if (active) {
       active.isCompleted = true;
     }
@@ -245,7 +255,7 @@ export class Game {
 
   private checkLevelCompletion() {
     const sprayCans = this.level.getSprayCans();
-    const allCompleted = sprayCans.length > 0 && sprayCans.every(sprayCan => sprayCan.isCompleted);
+    const allCompleted = sprayCans.length > 0 && sprayCans.every((sprayCan) => sprayCan.isCompleted);
 
     if (allCompleted) {
       console.log('Level completed! Generating next level...');

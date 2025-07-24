@@ -1,5 +1,3 @@
-const a: undefined | number = undefined;
-
 export class Texture {
   private texture: WebGLTexture | null = null;
   private gl: WebGLRenderingContext;
@@ -8,9 +6,7 @@ export class Texture {
     this.gl = gl;
   }
 
-  public async loadFromImage(imagePath: string): Promise<void> {
-    const b: number = a!;
-
+  public loadFromImage(imagePath: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const image = new Image();
       image.onload = () => {
@@ -57,4 +53,4 @@ export class Texture {
       this.texture = null;
     }
   }
-} 
+}
