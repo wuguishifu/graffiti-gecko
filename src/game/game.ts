@@ -11,6 +11,7 @@ import { Player } from './player/player';
 import fsSource from './shaders/fragment.glsl?raw';
 import vsSource from './shaders/vertex.glsl?raw';
 import { Level } from './world/level';
+import { Vector3 } from './math';
 
 export class Game {
   private canvas: HTMLCanvasElement;
@@ -260,9 +261,7 @@ export class Game {
       this.level = new Level(this.gl, newLevel);
 
       // Reset player position to center of new level
-      this.player.position.x = 10;
-      this.player.position.y = 10;
-      this.player.position.z = 0;
+      this.player.position = this.level.getRandomStoneTile() ?? new Vector3(0, 0, 0),
 
       // Update player's level reference
       this.player.setLevel(this.level);
