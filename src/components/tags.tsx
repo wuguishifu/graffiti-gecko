@@ -17,9 +17,6 @@ export function Tags() {
       </div>
       <div className='relative flex items-center h-12 w-96 border-3 border-white bg-[#665F4D] rounded-xl overflow-hidden'>
         <div className='absolute left-0 top-0 h-full bg-[#FFDB00]' style={{ width: `${progress * 100}%` }} />
-        {/* <div className='flex-1' />
-        <div className='flex-1 border-l-3 border-white h-full z-10' />
-        <div className='flex-1 border-l-3 border-white h-full z-10' /> */}
       </div>
       <img className='absolute -left-10 -mt-2 z-20 size-20' src='/assets/icons/can.png' />
       <div className='absolute flex items-center ml-2 bottom-0 right-0'>

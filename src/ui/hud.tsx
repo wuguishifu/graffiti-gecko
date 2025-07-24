@@ -12,7 +12,7 @@ export function Hud({ onOpenSprayArea }: HudProps) {
   const devMode = useAppSelector((state) => state.dev.isDirty);
 
   return (
-    <div className='absolute top-0 left-0 w-full h-full px-20 py-8'>
+    <div className='absolute top-0 left-0 w-full h-full px-20 py-8 overflow-x-hidden'>
       <div className='relative w-full h-full'>
         <div className='flex flex-row items-center justify-between select-none pointer-events-none'>
           <Tags />
