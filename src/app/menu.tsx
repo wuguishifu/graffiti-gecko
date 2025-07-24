@@ -17,16 +17,7 @@ export function MainMenu() {
         setShowSettings(false);
       }
     };
-    const unlockAudio = () => {
-      if (Howler.ctx && Howler.ctx.state === 'suspended') {
-        Howler.ctx.resume();
-      }
-      window.removeEventListener('click', unlockAudio);
-    };
-    window.addEventListener('click', unlockAudio, { once: true });
-
     
-
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
