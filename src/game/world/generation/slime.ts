@@ -1,4 +1,3 @@
-import { Vector3 } from '@/game/math';
 import { Tile } from '@/game/tiles/tile';
 
 export type RoadBendOrder = 'horizontal-vertical' | 'vertical-horizontal' | 'random';
@@ -74,31 +73,19 @@ export class Slime {
     return samples;
   }
 
-  public static generate(
-    tiles: Tile[][],
-    gl: WebGLRenderingContext,
-    roadBendOrder: RoadBendOrder = 'horizontal-vertical'
-  ) {
+  public static generate(tiles: Tile[][], roadBendOrder: RoadBendOrder = 'horizontal-vertical') {
     const center = {
       x: Math.floor(tiles.length / 2),
       y: Math.floor(tiles[0].length / 2)
     };
 
-    tiles[center.y][center.x] = new Tile({
-      position: new Vector3(center.x, center.y, 0),
-      variant: 'stone',
-      gl,
-    });
+    tiles[center.y][center.x].variant = 'stone'
 
     // Poisson disk sample for stone tiles (excluding center)
     const minDist = 5; // tweak for density
     const poissonPoints = this.poissonDiskSampleGrid(tiles[0].length, tiles.length, minDist);
     for (const { x, y } of poissonPoints) {
-      tiles[y][x] = new Tile({
-        position: new Vector3(x, y, 0),
-        variant: 'stone',
-        gl,
-      });
+      tiles[y][x].variant = 'stone';
     }
 
     // Collect all stone tile positions (including center)
@@ -174,10 +161,10 @@ export class Slime {
       } else {
         order = roadBendOrder;
       }
-      this.layRoad(from, to, order, tiles, gl);
+      this.layRoad(from, to, order, tiles);
     }
 
-    // --- (A) Connect each stone tile to its nearest unconnected neighbor ---
+    // --- Connect each stone tile to its nearest unconnected neighbor ---
     for (let i = 0; i < stonePositions.length; i++) {
       let minDist = Infinity;
       let nearestIdx = -1;
@@ -202,8 +189,56 @@ export class Slime {
         } else {
           order = roadBendOrder;
         }
-        this.layRoad(stonePositions[i], stonePositions[nearestIdx], order, tiles, gl);
+        this.layRoad(stonePositions[i], stonePositions[nearestIdx], order, tiles);
         edgeSet.add(key);
+      }
+    }
+
+    // --- Generate walls around roads ---
+    this.generateWall(tiles);
+
+    // --- Replace small grass islands with building vent tiles ---
+    this.fillIslands(tiles);
+  }
+
+  private static fillIslands(tiles: Tile[][]) {
+    const width = tiles[0].length;
+    const height = tiles.length;
+    const visited: boolean[][] = Array.from({ length: height }, () => Array(width).fill(false));
+    const grassIslands: { tiles: Set<Tile> }[] = [];
+
+    function dfsGrassIsland(x: number, y: number, island: Set<Tile>) {
+      if (
+        x < 0 || x >= width || y < 0 || y >= height ||
+        visited[y][x] || tiles[y][x].variant !== 'grass'
+      ) {
+        return;
+      }
+      visited[y][x] = true;
+      island.add(tiles[y][x]);
+      dfsGrassIsland(x + 1, y, island);
+      dfsGrassIsland(x - 1, y, island);
+      dfsGrassIsland(x, y + 1, island);
+      dfsGrassIsland(x, y - 1, island);
+    }
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        if (!visited[y][x] && tiles[y][x].variant === 'grass') {
+          const island: Set<Tile> = new Set();
+          dfsGrassIsland(x, y, island);
+          if (island.size > 0) {
+            grassIslands.push({ tiles: island });
+          }
+        }
+      }
+    }
+
+    for (const island of grassIslands) {
+      if (island.tiles.size <= 4) {
+        for (const tile of island.tiles) {
+          tile.variant = 'vent';
+        }
       }
     }
   }
@@ -214,7 +249,6 @@ export class Slime {
     to: { x: number; y: number },
     order: 'horizontal-vertical' | 'vertical-horizontal',
     tiles: Tile[][],
-    gl: WebGLRenderingContext,
   ) {
     let x = from.x;
     let y = from.y;
@@ -223,22 +257,14 @@ export class Slime {
       while (x !== to.x) {
         x += x < to.x ? 1 : -1;
         if (tiles[y][x].variant !== 'stone') {
-          tiles[y][x] = new Tile({
-            position: new Vector3(x, y, 0),
-            variant: 'stone',
-            gl,
-          });
+          tiles[y][x].variant = 'stone';
         }
       }
       // Then vertically
       while (y !== to.y) {
         y += y < to.y ? 1 : -1;
         if (tiles[y][x].variant !== 'stone') {
-          tiles[y][x] = new Tile({
-            position: new Vector3(x, y, 0),
-            variant: 'stone',
-            gl,
-          });
+          tiles[y][x].variant = 'stone';
         }
       }
     } else {
@@ -246,24 +272,65 @@ export class Slime {
       while (y !== to.y) {
         y += y < to.y ? 1 : -1;
         if (tiles[y][x].variant !== 'stone') {
-          tiles[y][x] = new Tile({
-            position: new Vector3(x, y, 0),
-            variant: 'stone',
-            gl,
-          });
+          tiles[y][x].variant = 'stone';
         }
       }
       // Then horizontally
       while (x !== to.x) {
         x += x < to.x ? 1 : -1;
         if (tiles[y][x].variant !== 'stone') {
-          tiles[y][x] = new Tile({
-            position: new Vector3(x, y, 0),
-            variant: 'stone',
-            gl,
-          });
+          tiles[y][x].variant = 'stone';
         }
       }
+    }
+  }
+
+  public static generateWall(tiles: Tile[][]) {
+    const width = tiles[0].length;
+    const height = tiles.length;
+
+    // 8 directions: orthogonal + diagonal
+    const directions = [
+      [0, 1],    // down
+      [1, 0],    // right
+      [0, -1],   // up
+      [-1, 0],   // left
+      [1, 1],    // bottom-right
+      [1, -1],   // top-right
+      [-1, 1],   // bottom-left
+      [-1, -1]   // top-left
+    ];
+
+    const perimeterSet = new Set<string>();
+
+    const key = (x: number, y: number) => `${x},${y}`;
+    const inBounds = (x: number, y: number) =>
+      x >= 0 && x < width && y >= 0 && y < height;
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const tile = tiles[y]?.[x];
+        if (tile?.variant === 'stone') {
+          for (const [dx, dy] of directions) {
+            const nx = x + dx;
+            const ny = y + dy;
+            if (inBounds(nx, ny)) {
+              const neighbor = tiles[ny]?.[nx];
+              if (!neighbor || neighbor.variant !== 'stone') {
+                perimeterSet.add(key(nx, ny));
+              }
+            }
+          }
+        }
+      }
+    }
+
+    for (const pos of perimeterSet) {
+      const [xStr, yStr] = pos.split(',');
+      const x = parseInt(xStr, 10);
+      const y = parseInt(yStr, 10);
+      if (!tiles[y]) tiles[y] = [];
+      tiles[y][x].variant = 'building';
     }
   }
 }

@@ -29,7 +29,7 @@ export function Hud({ onOpenSprayArea }: HudProps) {
           </button>
         )}
         {devMode && (
-          <div className='absolute top-0 w-full flex justify-center'>
+          <div className='absolute top-0 w-full flex justify-center pointer-events-none select-none'>
             <span className='!text-red-500 font-bold'>dev mode enabled - score will not be saved</span>
           </div>
         )}

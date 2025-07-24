@@ -7,12 +7,11 @@ import type { Camera } from '../graphics/camera';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
 import type { Player } from '../player/player';
-import { Tile, TileVariant } from '../tiles/tile';
+import { Tile } from '../tiles/tile';
+import { TileVariant } from '../tiles/types';
 import { Slime } from './generation/slime';
 
-type TileType = 'grass' | 'stone' | 'building';
-
-const walkableTiles: TileType[] = ['grass', 'stone'];
+const walkableTiles: TileVariant[] = ['grass', 'stone'];
 
 export class Level {
   private tiles: Tile[][] = [];
@@ -64,64 +63,9 @@ export class Level {
       }
     }
 
-    // TODO: Allow roadBendOrder to be set from outside
-    Slime.generate(this.tiles, this.gl, 'random');
-    this.generateWall()
+    Slime.generate(this.tiles, 'random');
   }
 
-  public generateWall() {
-    // 8 directions: orthogonal + diagonal
-    const directions = [
-      [0, 1],    // down
-      [1, 0],    // right
-      [0, -1],   // up
-      [-1, 0],   // left
-      [1, 1],    // bottom-right
-      [1, -1],   // top-right
-      [-1, 1],   // bottom-left
-      [-1, -1]   // top-left
-    ];
-
-    const perimeterSet = new Set<string>();
-
-    const key = (x: number, y: number) => `${x},${y}`;
-    const inBounds = (x: number, y: number) =>
-      x >= 0 && x < this.width && y >= 0 && y < this.height;
-
-    for (let y = 0; y < this.height; y++) {
-      for (let x = 0; x < this.width; x++) {
-        const tile = this.tiles[y]?.[x];
-        if (tile?.variant === 'stone') {
-          for (const [dx, dy] of directions) {
-            const nx = x + dx;
-            const ny = y + dy;
-            if (inBounds(nx, ny)) {
-              const neighbor = this.tiles[ny]?.[nx];
-              if (!neighbor || neighbor.variant !== 'stone') {
-                perimeterSet.add(key(nx, ny));
-              }
-            }
-          }
-        }
-      }
-    }
-
-    for (const pos of perimeterSet) {
-      const [xStr, yStr] = pos.split(',');
-      const x = parseInt(xStr, 10);
-      const y = parseInt(yStr, 10);
-
-      if (!this.tiles[y]) this.tiles[y] = [];
-
-      this.tiles[y][x] = new Tile({
-        position: new Vector3(x, y, 0),
-        rotation: new Vector3(0, 0, 0),
-        scale: new Vector3(1, 1, 1),
-        variant: 'building',
-        gl: this.gl
-      });
-    }
-  }
 
   public getRandomStoneTile(): Vector3 | null {
     const stoneTiles: Tile[] = [];
@@ -162,7 +106,9 @@ export class Level {
     }, {
       grass: [],
       stone: [],
-      building: []
+      building: [],
+      sand: [],
+      vent: [],
     });
 
     Object.values(tileGroups).forEach((tiles) => {

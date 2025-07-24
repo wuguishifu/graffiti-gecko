@@ -1,12 +1,14 @@
+import { TileVariant } from '../tiles/types';
 import { Texture } from './texture';
 
-type TileVariant = 'grass' | 'stone' | 'building';
 type EntityVariant = 'gecko' | 'spray-can' | 'cop';
 
 const tileVariantToTextureMap: Record<TileVariant, string> = {
   grass: '/assets/tiles/grass.jpg',
   stone: '/assets/tiles/stone.jpg',
   building: '/assets/tiles/building.jpg',
+  sand: '/assets/tiles/sand.jpg',
+  vent: '/assets/tiles/vent.jpg',
 };
 
 const entityVariantToTextureMap: Record<EntityVariant, string> = {
