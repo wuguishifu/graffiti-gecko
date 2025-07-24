@@ -34,7 +34,7 @@ export function SettingsMenu({ onHide }: { onHide: () => void }) {
               <button
                 tabIndex={-1}
                 key={color}
-                className={`size-[54px] rounded-full border-3 ${selectedColor === color ? 'border-white' : 'border-black'} select-none`}
+                className={`size-[54px] rounded-full border-3 ${selectedColor === color ? 'border-white' : 'border-black'} select-none cursor-pointer`}
                 style={{ backgroundColor: color }}
                 onClick={changeColorFn(color)}
               />
