@@ -91,7 +91,7 @@ export class Level {
       });
 
       return acc;
-    } , {
+    }, {
       grass: [],
       stone: [],
       building: [],
