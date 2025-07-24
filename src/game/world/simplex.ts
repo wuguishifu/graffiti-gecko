@@ -121,7 +121,7 @@ export class SimplexNoise {
   }
 
   getNoise2D(x: number, y: number) {
-    return this.octaves.reduce((sum, oct, i, arr) => {
+    return this.octaves.reduce((sum, oct, i) => {
       return sum + oct.noise2D(x / this.frequencies[i], y / this.frequencies[i]) * this.amplitudes[i];
     }, 0);
   }
