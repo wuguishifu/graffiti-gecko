@@ -12,7 +12,7 @@ import { TileVariant } from '../tiles/types';
 import { Slime } from './generation/slime';
 import { Generator } from './generation/generator';
 
-const walkableTiles: TileVariant[] = ['grass', 'stone'];
+const walkableTiles: TileVariant[] = ['grass', 'stone', 'sand'];
 
 export class Level {
   private tiles: Tile[][] = [];
