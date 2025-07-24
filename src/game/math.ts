@@ -61,6 +61,10 @@ export class Vector3 {
     this.z = z;
   }
 
+static from(v: Vector3) {
+  return new Vector3(v.x, v.y, v.z);
+}
+
   toReadonlyVec3() {
     return Object.freeze([this.x, this.y, this.z]) as ReadonlyVec3;
   }

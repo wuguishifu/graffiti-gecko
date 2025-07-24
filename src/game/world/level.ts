@@ -76,8 +76,134 @@ export class Level {
     }
 
     // Spawn spray cans in the generated level
+    this.growStone(15, 15, 300); // Start at (15,15), grow up to 300 tiles
+    this.generateWall()
     this.spawnSprayCans();
   }
+
+
+    public growStone(startX: number, startY: number, maxGrowth: number) {
+    const stoneTiles = new Set<string>();
+    const activeTips: [number, number][] = [[startX, startY]]; // branch tips
+
+    const key = (x: number, y: number) => `${x},${y}`;
+
+    const inBounds = (x: number, y: number) =>
+      x >= 0 && x < this.width && y >= 0 && y < this.height;
+
+    const getNeighbors = (x: number, y: number) => {
+      return [
+        [x + 1, y],
+        [x - 1, y],
+        [x, y + 1],
+        [x, y - 1]
+      ].filter(([nx, ny]) => inBounds(nx, ny) && !stoneTiles.has(key(nx, ny)));
+    };
+
+    // Start with first tile
+    stoneTiles.add(key(startX, startY));
+    this.tiles[startY][startX].variant = 'stone';
+    let grown = 1;
+
+    while (activeTips.length > 0 && grown < maxGrowth) {
+      const [x, y] = activeTips.shift()!;
+
+      const neighbors = getNeighbors(x, y);
+      if (neighbors.length === 0) continue;
+
+      // Choose one random direction to grow like a branch
+      const [nx, ny] = neighbors[Math.floor(Math.random() * neighbors.length)];
+
+      // Grow to new tile
+      stoneTiles.add(key(nx, ny));
+      this.tiles[ny][nx].variant = 'stone';
+      grown++;
+
+      // Continue growing from the new tip
+      activeTips.push([nx, ny]);
+
+      //Optionally: occasionally split the branch
+      if (Math.random() < 0.1 && neighbors.length > 1) {
+        const other = neighbors.find(([ox, oy]) => key(ox, oy) !== key(nx, ny));
+        if (other) activeTips.push(other as [number, number]);
+      }
+    }
+  }
+
+    public generateWall() {
+    // 8 directions: orthogonal + diagonal
+    const directions = [
+      [0, 1],    // down
+      [1, 0],    // right
+      [0, -1],   // up
+      [-1, 0],   // left
+      [1, 1],    // bottom-right
+      [1, -1],   // top-right
+      [-1, 1],   // bottom-left
+      [-1, -1]   // top-left
+    ];
+
+    const perimeterSet = new Set<string>();
+
+    const key = (x: number, y: number) => `${x},${y}`;
+    const inBounds = (x: number, y: number) =>
+      x >= 0 && x < this.width && y >= 0 && y < this.height;
+
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        const tile = this.tiles[y]?.[x];
+        if (tile?.variant === 'stone') {
+          for (const [dx, dy] of directions) {
+            const nx = x + dx;
+            const ny = y + dy;
+            if (inBounds(nx, ny)) {
+              const neighbor = this.tiles[ny]?.[nx];
+              if (!neighbor || neighbor.variant !== 'stone') {
+                perimeterSet.add(key(nx, ny));
+              }
+            }
+          }
+        }
+      }
+    }
+
+    for (const pos of perimeterSet) {
+      const [xStr, yStr] = pos.split(',');
+      const x = parseInt(xStr, 10);
+      const y = parseInt(yStr, 10);
+
+      if (!this.tiles[y]) this.tiles[y] = [];
+
+      this.tiles[y][x] = new Tile({
+        position: new Vector3(x, y, 0),
+        rotation: new Vector3(0, 0, 0),
+        scale: new Vector3(1, 1, 1),
+        variant: 'building',
+        gl: this.gl
+      });
+    }
+  }
+
+  public getRandomStoneTile(): Vector3 | null {
+    const stoneTiles: Tile[] = [];
+
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        const tile = this.tiles[y]?.[x];
+        if (tile?.variant === 'stone') {
+          stoneTiles.push(tile);
+        }
+      }
+    }
+
+    if (stoneTiles.length === 0) return null;
+
+    const index = Math.floor(Math.random() * stoneTiles.length);
+    const tile = stoneTiles[index];
+
+    return Vector3.from(tile.position)
+  }
+
 
   public getTiles(): Tile[][] {
     return this.tiles;
@@ -86,6 +212,7 @@ export class Level {
   public render(gl: WebGLRenderingContext, programInfo: ProgramInfo, camera: Camera) {
     const tileGroups = this.tiles.reduce<Record<TileVariant, Tile[]>>((acc, row) => {
       row.forEach(tile => {
+        if (!tile) return
         if (!acc[tile.variant]) {
           acc[tile.variant] = [];
         }

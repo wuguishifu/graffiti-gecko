@@ -36,7 +36,7 @@ export class Player extends RenderObject {
 
   constructor(gl: WebGLRenderingContext, level: Level) {
     super(
-      new Vector3(0, 0, 0),
+      level.getRandomStoneTile() ?? new Vector3(0, 0, 0),
       new Vector3(0, 0, 0),
       new Vector3(1, 1, 1),
     );
