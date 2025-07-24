@@ -177,12 +177,15 @@ export class Slime {
       this.layRoad(from, to, order, tiles, gl);
     }
 
-    // --- (A) Connect each stone tile to its nearest neighbor if not already connected ---
+    // --- (A) Connect each stone tile to its nearest unconnected neighbor ---
     for (let i = 0; i < stonePositions.length; i++) {
       let minDist = Infinity;
       let nearestIdx = -1;
       for (let j = 0; j < stonePositions.length; j++) {
         if (i === j) continue;
+        // Always use a consistent key order
+        const key = i < j ? `${i},${j}` : `${j},${i}`;
+        if (edgeSet.has(key)) continue; // skip already connected
         const dx = stonePositions[i].x - stonePositions[j].x;
         const dy = stonePositions[i].y - stonePositions[j].y;
         const dist = dx * dx + dy * dy;
@@ -191,9 +194,8 @@ export class Slime {
           nearestIdx = j;
         }
       }
-      // Always use a consistent key order
-      const key = i < nearestIdx ? `${i},${nearestIdx}` : `${nearestIdx},${i}`;
-      if (nearestIdx !== -1 && !edgeSet.has(key)) {
+      if (nearestIdx !== -1) {
+        const key = i < nearestIdx ? `${i},${nearestIdx}` : `${nearestIdx},${i}`;
         let order: 'horizontal-vertical' | 'vertical-horizontal';
         if (roadBendOrder === 'random') {
           order = Math.random() < 0.5 ? 'horizontal-vertical' : 'vertical-horizontal';
