@@ -57,14 +57,19 @@ export class Tile extends RenderObject {
   }
 
   public static renderVariantGroup(gl: WebGLRenderingContext, programInfo: ProgramInfo, camera: Camera, tiles: Tile[]) {
+    const firstTile = tiles[0];
+    if (!firstTile) {
+      return;
+    }
+
     renderSimilarObjects({
       gl,
       info: programInfo,
       objects: tiles.map(tile => ({ model: tile.model })),
-      mesh: tiles[0].mesh(gl),
+      mesh: firstTile.mesh(gl),
       camera,
-      texture: tiles[0].texture,
-      useTexture: tiles[0].isTextureReady,
+      texture: firstTile.texture,
+      useTexture: firstTile.isTextureReady,
     })
   }
 }
