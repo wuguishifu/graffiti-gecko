@@ -63,8 +63,6 @@ export class Game {
     this.player.onKeyUp(event);
   }
 
-  private devOptions: DevSliceState;
-
   private startTimer() {
     if (Game.timerRunning) return;
     Game.timerRunning = true;
@@ -90,9 +88,7 @@ export class Game {
     }
   }
 
-  constructor(canvas: HTMLCanvasElement, devOptions: DevSliceState) {
-    this.devOptions = devOptions;
-
+  constructor(canvas: HTMLCanvasElement, private devOptions: DevSliceState) {
     store.dispatch(gameActions.setTimeLeft(devOptions.overrideTotalTime || 300));
 
     this.canvas = canvas;
@@ -125,7 +121,7 @@ export class Game {
 
     // Get current level from store
     const currentLevel = store.getState().game.currentLevel;
-    this.level = new Level(this.gl, currentLevel);
+    this.level = new Level(this.gl, currentLevel, this.devOptions);
 
     this.boundKeyDown = this.onKeyDown.bind(this);
     this.boundKeyUp = this.onKeyUp.bind(this);
@@ -182,6 +178,7 @@ export class Game {
   }
 
   private lastSprayCanCheckValue = false;
+  private lastSprayCanId = -1;
   private checkPlayerNearSprayCan() {
     const sprayCans = this.level.getSprayCans();
     const playerPos = this.player.position;
@@ -200,10 +197,11 @@ export class Game {
     if (isNearSprayCan !== this.lastSprayCanCheckValue) {
       store.dispatch(gameActions.setNearSprayCan(isNearSprayCan));
       this.lastSprayCanCheckValue = isNearSprayCan;
+    }
 
-      if (isNearSprayCan) {
-        store.dispatch(gameActions.setActiveSprayCanId(nearestSprayCan.id));
-      }
+    if (isNearSprayCan && nearestSprayCan && nearestSprayCan.id !== this.lastSprayCanId) {
+      this.lastSprayCanId = nearestSprayCan.id;
+      store.dispatch(gameActions.setActiveSprayCanId(this.lastSprayCanId));
     }
   }
 
@@ -259,7 +257,7 @@ export class Game {
 
       // Generate new level with increased difficulty
       this.level.destroy();
-      this.level = new Level(this.gl, newLevel);
+      this.level = new Level(this.gl, newLevel, this.devOptions);
 
       this.player.position = this.level.getRandomStoneTile() ?? new Vector3(0, 0, 0);
       this.player.setLevel(this.level);

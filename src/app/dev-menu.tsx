@@ -50,6 +50,13 @@ export function DevMenu() {
             onCheckedChange={() => dispatch(devActions.toggleUnlimitedStamina())}
           />
         </Label>
+        <Label className='cursor-pointer'>
+          <h2 className='text-xl'>Many Spray Cans</h2>
+          <Switch
+            checked={devState.manySprayCans}
+            onCheckedChange={() => dispatch(devActions.toggleManySprayCans())}
+          />
+        </Label>
         <Label className='flex'>
           <h2 className='text-xl flex-1'>Override Timer</h2>
           <Input

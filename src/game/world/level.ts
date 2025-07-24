@@ -1,3 +1,4 @@
+import { DevSliceState } from '@/state/dev-slice';
 import { gameActions } from '../../state/game-slice';
 import { store } from '../../state/store';
 import { Cop } from '../entities/cop';
@@ -22,7 +23,7 @@ export class Level {
   private player: Player | null = null;
   private difficultyLevel: number = 1;
 
-  constructor(gl: WebGLRenderingContext, difficultyLevel: number = 1) {
+  constructor(gl: WebGLRenderingContext, difficultyLevel: number = 1, private devOptions: Partial<DevSliceState>) {
     this.gl = gl;
     this.difficultyLevel = difficultyLevel;
     this.generate();
@@ -259,7 +260,9 @@ export class Level {
 
     const baseSprayCans = Math.floor(Math.random() * 2) + 3; // 3-4 base spray cans
     const difficultyBonus = Math.min(this.difficultyLevel - 1, 5); // Cap at +5 for balance
-    const numSprayCans = baseSprayCans + difficultyBonus;
+    const numSprayCans = this.devOptions.manySprayCans
+      ? randomizedAccessibleWalls.length
+      : Math.min(baseSprayCans + difficultyBonus, randomizedAccessibleWalls.length);
 
     this.sprayCans = Array.from({ length: Math.min(numSprayCans, randomizedAccessibleWalls.length) }, (_, i) => {
       const pos = randomizedAccessibleWalls[i];

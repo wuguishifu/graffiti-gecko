@@ -5,6 +5,7 @@ export type DevSliceState = {
   unlimitedStamina: boolean;
   overrideTotalTime: number;
   godMode: boolean;
+  manySprayCans: boolean;
   isDirty: boolean;
 };
 
@@ -13,6 +14,7 @@ const initialState: DevSliceState = {
   unlimitedStamina: false,
   overrideTotalTime: 0,
   godMode: false,
+  manySprayCans: false,
   isDirty: false,
 };
 
@@ -31,6 +33,9 @@ export const devSlice = createSlice({
     },
     toggleGodMode: (state) => {
       state.godMode = !state.godMode;
+    },
+    toggleManySprayCans: (state) => {
+      state.manySprayCans = !state.manySprayCans;
     },
     reset: () => initialState,
   },

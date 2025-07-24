@@ -33,9 +33,8 @@ export class Player extends RenderObject {
   private lastEnergyPercent: number = 100;
   private energyUpdateThrottle: number = 6; // only update Redux every 6 frames
   private energyUpdateFrame: number = 0;
-  private devOptions: Partial<DevSliceState>;
 
-  constructor(gl: WebGLRenderingContext, level: Level, devOptions: Partial<DevSliceState>) {
+  constructor(gl: WebGLRenderingContext, level: Level, private devOptions: Partial<DevSliceState>) {
     super(
       level.getRandomStoneTile() ?? new Vector3(0, 0, 0),
       new Vector3(0, 0, 0),
