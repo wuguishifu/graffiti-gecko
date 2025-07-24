@@ -164,6 +164,7 @@ export class Slime {
 
     // --- Lay roads for all edges in MST and extra edges ---
     const allEdges = [...mstEdges, ...extraEdges];
+    const edgeSet = new Set(allEdges.map(e => `${e.a},${e.b}`));
     for (const edge of allEdges) {
       const from = stonePositions[edge.a];
       const to = stonePositions[edge.b];
@@ -174,6 +175,34 @@ export class Slime {
         order = roadBendOrder;
       }
       this.layRoad(from, to, order, tiles, gl);
+    }
+
+    // --- (A) Connect each stone tile to its nearest neighbor if not already connected ---
+    for (let i = 0; i < stonePositions.length; i++) {
+      let minDist = Infinity;
+      let nearestIdx = -1;
+      for (let j = 0; j < stonePositions.length; j++) {
+        if (i === j) continue;
+        const dx = stonePositions[i].x - stonePositions[j].x;
+        const dy = stonePositions[i].y - stonePositions[j].y;
+        const dist = dx * dx + dy * dy;
+        if (dist < minDist) {
+          minDist = dist;
+          nearestIdx = j;
+        }
+      }
+      // Always use a consistent key order
+      const key = i < nearestIdx ? `${i},${nearestIdx}` : `${nearestIdx},${i}`;
+      if (nearestIdx !== -1 && !edgeSet.has(key)) {
+        let order: 'horizontal-vertical' | 'vertical-horizontal';
+        if (roadBendOrder === 'random') {
+          order = Math.random() < 0.5 ? 'horizontal-vertical' : 'vertical-horizontal';
+        } else {
+          order = roadBendOrder;
+        }
+        this.layRoad(stonePositions[i], stonePositions[nearestIdx], order, tiles, gl);
+        edgeSet.add(key);
+      }
     }
   }
 
