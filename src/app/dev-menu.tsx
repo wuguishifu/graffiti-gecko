@@ -57,6 +57,13 @@ export function DevMenu() {
             onCheckedChange={() => dispatch(devActions.toggleManySprayCans())}
           />
         </Label>
+        <Label className='cursor-pointer'>
+          <h2 className='text-xl'>One Percent Fill</h2>
+          <Switch
+            checked={devState.onePercentFill}
+            onCheckedChange={() => dispatch(devActions.toggleOnePercentFill())}
+          />
+        </Label>
         <Label className='flex'>
           <h2 className='text-xl flex-1'>Override Timer</h2>
           <Input

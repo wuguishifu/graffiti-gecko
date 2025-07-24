@@ -6,6 +6,7 @@ export type DevSliceState = {
   overrideTotalTime: number;
   godMode: boolean;
   manySprayCans: boolean;
+  onePercentFill: boolean;
   isDirty: boolean;
 };
 
@@ -15,6 +16,7 @@ const initialState: DevSliceState = {
   overrideTotalTime: 0,
   godMode: false,
   manySprayCans: false,
+  onePercentFill: false,
   isDirty: false,
 };
 
@@ -36,6 +38,9 @@ export const devSlice = createSlice({
     },
     toggleManySprayCans: (state) => {
       state.manySprayCans = !state.manySprayCans;
+    },
+    toggleOnePercentFill: (state) => {
+      state.onePercentFill = !state.onePercentFill;
     },
     reset: () => initialState,
   },

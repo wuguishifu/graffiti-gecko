@@ -3,6 +3,7 @@ import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 're
 import { useGame } from '../state/game-context';
 import { gameActions } from '../state/game-slice';
 import { useAppDispatch, useAppSelector } from '../state/use-app-state';
+import { store } from '@/state/store';
 
 export type SprayAreaRef = {
   reset: () => void;
@@ -158,7 +159,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     const overlapPercentage = tagPixels > 0 ? (overlappingPixels / tagPixels) * 100 : 0;
     setOverlapPercentage(Math.round(overlapPercentage));
 
-    if (overlapPercentage >= 90) {
+    if (overlapPercentage >= (store.getState().dev.onePercentFill ? 1 : 90)) {
       onSprayComplete();
     }
   };

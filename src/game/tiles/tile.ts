@@ -5,13 +5,12 @@ import { renderObject, renderSimilarObjects } from '../graphics/renderer';
 import { TextureManager } from '../graphics/texture-manager';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
-
-export type TileVariant = 'grass' | 'stone' | 'building';
+import { TileVariant } from './types';
 
 type TileProps = {
   position: Vector3;
-  rotation: Vector3;
-  scale: Vector3;
+  rotation?: Vector3;
+  scale?: Vector3;
   variant: TileVariant;
   gl: WebGLRenderingContext;
 }
