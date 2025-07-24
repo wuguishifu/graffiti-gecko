@@ -301,7 +301,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
   }, []);
 
   return (
-    <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center z-1000'>
+    <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center z-1000 bg-black'>
       <img
         className='absolute top-0 left-0 w-full h-full select-none pointer-events-none'
         src='/assets/backgrounds/brick.webp'
