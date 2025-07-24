@@ -1,3 +1,6 @@
+import { useState } from 'react';
+
+import { SettingsMenu } from './settings-menu';
 import { gameActions } from '../state/game-slice';
 import { useAppDispatch, useAppSelector } from '../state/use-app-state';
 import { secondsToTimeString } from '../util/time-utils';
@@ -5,6 +8,8 @@ import { secondsToTimeString } from '../util/time-utils';
 import { Timer } from '@/components/timer';
 
 export function PauseMenu() {
+  const [settingsVisible, setSettingsVisible] = useState(false);
+
   const currentLevel = useAppSelector((state) => state.game.currentLevel);
   const timeLeft = useAppSelector((state) => state.game.timeLeft);
   const tagsCompleted = useAppSelector((state) => state.game.totalSprayCansCompleted);
@@ -43,10 +48,17 @@ export function PauseMenu() {
         >
           <img src="/assets/copy/resume.svg" />
         </button>
+        <button
+          className="hover:scale-110 transition-transform cursor-pointer"
+          onClick={() => setSettingsVisible(true)}
+        >
+          <img src="/assets/copy/pause-menu-settings.svg" />
+        </button>
         <a href="/" className="hover:scale-110 transition-transform">
           <img src="/assets/copy/exit-to-main-menu.svg" />
         </a>
       </div>
+      {settingsVisible && <SettingsMenu onHide={() => setSettingsVisible(false)} />}
     </div>
   );
 }
