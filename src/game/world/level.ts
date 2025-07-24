@@ -6,7 +6,7 @@ import type { Camera } from '../graphics/camera';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
 import type { Player } from '../player/player';
-import { Tile } from '../tiles/tile';
+import { Tile, TileVariant } from '../tiles/tile';
 
 type TileType = 'grass' | 'stone' | 'building';
 
@@ -84,10 +84,23 @@ export class Level {
   }
 
   public render(gl: WebGLRenderingContext, programInfo: ProgramInfo, camera: Camera) {
-    this.tiles.forEach(row => {
+    const tileGroups = this.tiles.reduce<Record<TileVariant, Tile[]>>((acc, row) => {
       row.forEach(tile => {
-        tile.render(gl, programInfo, camera);
+        if (!acc[tile.variant]) {
+          acc[tile.variant] = [];
+        }
+        acc[tile.variant].push(tile);
       });
+
+      return acc;
+    }, {
+      grass: [],
+      stone: [],
+      building: []
+    });
+
+    Object.values(tileGroups).forEach((tiles) => {
+      Tile.renderVariantGroup(gl, programInfo, camera, tiles);
     });
 
     // Render spray cans
