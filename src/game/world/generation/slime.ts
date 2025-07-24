@@ -73,7 +73,7 @@ export class Slime {
     return samples;
   }
 
-  public static generate(tiles: Tile[][], roadBendOrder: RoadBendOrder = 'horizontal-vertical') {
+  public static generate(tiles: Tile[][], level: number = 0, roadBendOrder: RoadBendOrder = 'horizontal-vertical') {
     const center = {
       x: Math.floor(tiles.length / 2),
       y: Math.floor(tiles[0].length / 2)
@@ -82,8 +82,9 @@ export class Slime {
     tiles[center.y][center.x].variant = 'stone'
 
     // Poisson disk sample for stone tiles (excluding center)
-    const minDist = 5; // tweak for density
-    const poissonPoints = this.poissonDiskSampleGrid(tiles[0].length, tiles.length, minDist);
+
+    const minDistance = Math.max(5, 10 - Math.random() * level);
+    const poissonPoints = this.poissonDiskSampleGrid(tiles[0].length, tiles.length, minDistance);
     for (const { x, y } of poissonPoints) {
       tiles[y][x].variant = 'stone';
     }

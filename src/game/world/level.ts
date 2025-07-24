@@ -51,7 +51,7 @@ export class Level {
     this.cops = [];
 
     Generator.createBaseTiles(this.gl, this.width, this.height, this.tiles);
-    Slime.generate(this.tiles, 'random');
+    Slime.generate(this.tiles, this.difficultyLevel, 'random');
   }
 
 
