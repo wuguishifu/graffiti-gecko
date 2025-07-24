@@ -1,13 +1,15 @@
-import { Lives } from '@/components/lives';
-import { store } from '@/state/store';
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+
 import { useGame } from '../state/game-context';
 import { gameActions } from '../state/game-slice';
 import { useAppDispatch, useAppSelector } from '../state/use-app-state';
 
+import { Lives } from '@/components/lives';
+import { store } from '@/state/store';
+
 export type SprayAreaRef = {
   reset: () => void;
-}
+};
 
 const tagImages = [
   '/assets/tags/b.png',
@@ -28,7 +30,7 @@ const selectRandomTagImage = () => {
   return tagImages[randomIndex];
 };
 
-type TagImages = typeof tagImages[number];
+type TagImages = (typeof tagImages)[number];
 
 export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -56,10 +58,14 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      return;
+    }
 
     // Set canvas size to match container
     const resizeCanvas = () => {
@@ -92,16 +98,22 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
   // Load and process the tag image
   useEffect(() => {
     const tagCanvas = tagCanvasRef.current;
-    if (!tagCanvas) return;
+    if (!tagCanvas) {
+      return;
+    }
 
     const tagCtx = tagCanvas.getContext('2d');
-    if (!tagCtx) return;
+    if (!tagCtx) {
+      return;
+    }
 
     const tagImg = new Image();
     tagImg.onload = () => {
       // Set tag canvas size to match the main canvas
       const mainCanvas = canvasRef.current;
-      if (!mainCanvas) return;
+      if (!mainCanvas) {
+        return;
+      }
 
       const rect = mainCanvas.getBoundingClientRect();
       tagCanvas.width = rect.width;
@@ -112,10 +124,10 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
       // Calculate tag position to center it and make it half height
       const tagAspectRatio = tagImg.width / tagImg.height;
-      const tagHeight = rect.height * 2 / 3;
+      const tagHeight = (rect.height * 2) / 3;
       const tagWidth = tagHeight * tagAspectRatio;
       const tagX = (rect.width - tagWidth) / 2;
-      const tagY = (rect.height - tagHeight) * 2.2 / 3;
+      const tagY = ((rect.height - tagHeight) * 2.2) / 3;
 
       // Draw the tag image
       tagCtx.drawImage(tagImg, tagX, tagY, tagWidth, tagHeight);
@@ -126,11 +138,15 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
   const calculateOverlap = () => {
     const canvas = canvasRef.current;
     const tagCanvas = tagCanvasRef.current;
-    if (!canvas || !tagCanvas) return;
+    if (!canvas || !tagCanvas) {
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
     const tagCtx = tagCanvas.getContext('2d');
-    if (!ctx || !tagCtx) return;
+    if (!ctx || !tagCtx) {
+      return;
+    }
 
     // Get image data from both canvases
     const paintedData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -156,10 +172,10 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     }
 
     // Calculate overlap percentage
-    const overlapPercentage = tagPixels > 0 ? (overlappingPixels / tagPixels) * 100 : 0;
-    setOverlapPercentage(Math.round(overlapPercentage));
+    const calculatedOverlapPercent = tagPixels > 0 ? (overlappingPixels / tagPixels) * 100 : 0;
+    setOverlapPercentage(Math.round(calculatedOverlapPercent));
 
-    if (overlapPercentage >= (store.getState().dev.onePercentFill ? 1 : 90)) {
+    if (calculatedOverlapPercent >= (store.getState().dev.onePercentFill ? 1 : 90)) {
       onSprayComplete();
     }
   };
@@ -179,10 +195,14 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
   const resetCanvas = () => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      return;
+    }
 
     // Clear the entire canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -201,19 +221,27 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
   };
 
   const stopPainting = (e?: React.MouseEvent | React.TouchEvent) => {
-    if (e) e.preventDefault();
+    if (e) {
+      e.preventDefault();
+    }
     setIsPainting(false);
   };
 
   const paint = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault(); // Prevent default to avoid conflicts
-    if (!isPainting) return;
+    if (!isPainting) {
+      return;
+    }
 
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) {
+      return;
+    }
 
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      return;
+    }
 
     const rect = canvas.getBoundingClientRect();
     let clientX: number;
@@ -303,49 +331,48 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
   }, []);
 
   return (
-    <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center z-1000 bg-black'>
+    <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-1000 bg-black">
       <img
-        className='absolute top-0 left-0 w-full h-full select-none pointer-events-none'
-        src='/assets/backgrounds/brick.webp'
+        className="absolute top-0 left-0 w-full h-full select-none pointer-events-none"
+        src="/assets/backgrounds/brick.webp"
       />
 
       {/* Hidden canvas for tag processing */}
-      <canvas
-        className='absolute pointer-events-none select-none'
-        ref={tagCanvasRef}
-      />
+      <canvas className="absolute pointer-events-none select-none" ref={tagCanvasRef} />
 
-      <div className='relative w-full aspect-[2.5] pointer-events-none select-none'>
+      <div className="relative w-full aspect-[2.5] pointer-events-none select-none">
         {/* Progress bar */}
-        <div className='relative w-[450px] h-[32px] overflow-hidden top-8 left-8'>
+        <div className="relative w-[450px] h-[32px] overflow-hidden top-8 left-8">
           {/* Parallelogram background */}
           <div
-            className='absolute inset-0 bg-black'
+            className="absolute inset-0 bg-black"
             style={{ clipPath: 'polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%)' }}
           />
           {/* Parallelogram fill */}
           <div
-            className='absolute inset-0 bg-[#FFDE00] transition-all duration-300 ease-out'
-            style={{ clipPath: `polygon(10% 0%, ${10 + (overlapPercentage * 0.8)}% 0%, ${overlapPercentage * 0.8}% 100%, 0% 100%)` }}
+            className="absolute inset-0 bg-[#FFDE00] transition-all duration-300 ease-out"
+            style={{
+              clipPath: `polygon(10% 0%, ${10 + overlapPercentage * 0.8}% 0%, ${overlapPercentage * 0.8}% 100%, 0% 100%)`,
+            }}
           />
           {/* 85% marker line */}
           <div
-            className='absolute top-0 bottom-0 w-[3px] bg-[#FFDE00]'
-            style={{ left: `${10 + (90 * 0.8) - 5.1}%`, transform: 'skewX(-54.583deg)', }}
+            className="absolute top-0 bottom-0 w-[3px] bg-[#FFDE00]"
+            style={{ left: `${10 + 90 * 0.8 - 5.1}%`, transform: 'skewX(-54.583deg)' }}
           />
         </div>
-        <img src='/assets/copy/fill-to-complete.svg' className='absolute top-18 left-32' />
-        <div className='absolute top-8 left-0 w-full flex justify-center'>
-          <img src='/assets/copy/tag-it.svg' />
+        <img src="/assets/copy/fill-to-complete.svg" className="absolute top-18 left-32" />
+        <div className="absolute top-8 left-0 w-full flex justify-center">
+          <img src="/assets/copy/tag-it.svg" />
         </div>
-        <div className='absolute -top-8 right-20'>
+        <div className="absolute -top-8 right-20">
           <Lives />
         </div>
       </div>
 
       <canvas
         ref={canvasRef}
-        className='absolute top-0 left-0 w-full h-full cursor-crosshair'
+        className="absolute top-0 left-0 w-full h-full cursor-crosshair"
         onMouseDown={startPainting}
         onMouseUp={stopPainting}
         onMouseLeave={stopPainting}
@@ -358,14 +385,16 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
       {/* Spray complete splash */}
       {sprayComplete && (
-        <div className='absolute top-0 left-0 w-full h-full flex items-center justify-center pointer-events-none select-none z-0'>
+        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center pointer-events-none select-none z-0">
           <img
-            className='absolute h-3/4 select-none pointer-events-none scale-bounce -z-10'
-            src='/assets/tags/spray-bg.webp'
+            className="absolute h-3/4 select-none pointer-events-none scale-bounce -z-10"
+            src="/assets/tags/spray-bg.webp"
           />
-          <img src='/assets/copy/tag-complete.svg' className='w-1/4 scale-bounce' />
+          <img src="/assets/copy/tag-complete.svg" className="w-1/4 scale-bounce" />
         </div>
       )}
     </div>
   );
 });
+
+SprayArea.displayName = 'SprayArea';

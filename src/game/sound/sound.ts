@@ -1,5 +1,6 @@
-import { store } from '@/state/store';
 import { Howl } from 'howler';
+
+import { store } from '@/state/store';
 
 const Sounds = {
   click: new Howl({ src: ['/assets/sounds/menu/button.mp3'], volume: 0.3 }),

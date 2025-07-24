@@ -27,23 +27,15 @@ export function Timer({
   const y2 = center + wedgeRadius * Math.sin(endAngle);
   const largeArcFlag = percentElapsed > 0.5 ? 1 : 0;
 
-  const wedgePath = percentElapsed > 0 ?
-    `M ${center} ${center} L ${x1} ${y1} A ${wedgeRadius} ${wedgeRadius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`
-    : '';
+  const wedgePath =
+    percentElapsed > 0
+      ? `M ${center} ${center} L ${x1} ${y1} A ${wedgeRadius} ${wedgeRadius} 0 ${largeArcFlag} 1 ${x2} ${y2} Z`
+      : '';
 
   return (
     <svg width={size} height={size}>
-      <circle
-        cx={center}
-        cy={center}
-        r={radius}
-        fill="white"
-        stroke="black"
-        strokeWidth={strokeWidth}
-      />
-      {percentElapsed > 0 && (
-        <path d={wedgePath} fill="black" />
-      )}
+      <circle cx={center} cy={center} r={radius} fill="white" stroke="black" strokeWidth={strokeWidth} />
+      {percentElapsed > 0 && <path d={wedgePath} fill="black" />}
       <circle
         cx={center}
         cy={center}

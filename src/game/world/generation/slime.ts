@@ -4,21 +4,26 @@ export type RoadBendOrder = 'horizontal-vertical' | 'vertical-horizontal' | 'ran
 
 export class Slime {
   // Helper: Poisson disk sampling for grid
-  private static poissonDiskSampleGrid(width: number, height: number, minDist: number, maxTries = 30): { x: number, y: number }[] {
+  private static poissonDiskSampleGrid(
+    width: number,
+    height: number,
+    minDist: number,
+    maxTries = 30,
+  ): { x: number; y: number }[] {
     // Use Bridson's algorithm, adapted for integer grid
     const cellSize = minDist / Math.SQRT2;
     const gridW = Math.ceil(width / cellSize);
     const gridH = Math.ceil(height / cellSize);
-    const grid: (null | { x: number, y: number })[][] = Array.from({ length: gridH }, () => Array(gridW).fill(null));
-    const samples: { x: number, y: number }[] = [];
-    const active: { x: number, y: number }[] = [];
+    const grid: (null | { x: number; y: number })[][] = Array.from({ length: gridH }, () => Array(gridW).fill(null));
+    const samples: { x: number; y: number }[] = [];
+    const active: { x: number; y: number }[] = [];
 
     // Start from a random point (not center)
     let first;
     do {
       first = {
         x: Math.floor(Math.random() * width),
-        y: Math.floor(Math.random() * height)
+        y: Math.floor(Math.random() * height),
       };
     } while (first.x === Math.floor(width / 2) && first.y === Math.floor(height / 2));
     samples.push(first);
@@ -35,7 +40,10 @@ export class Slime {
         const nx = Math.round(point.x + Math.cos(angle) * radius);
         const ny = Math.round(point.y + Math.sin(angle) * radius);
         if (
-          nx >= 0 && nx < width && ny >= 0 && ny < height &&
+          nx >= 0 &&
+          nx < width &&
+          ny >= 0 &&
+          ny < height &&
           !(nx === Math.floor(width / 2) && ny === Math.floor(height / 2))
         ) {
           // Check minDist to all neighbors in grid
@@ -54,7 +62,9 @@ export class Slime {
                 }
               }
             }
-            if (!ok) break;
+            if (!ok) {
+              break;
+            }
           }
           if (ok) {
             const newPoint = { x: nx, y: ny };
@@ -73,13 +83,13 @@ export class Slime {
     return samples;
   }
 
-  public static generate(tiles: Tile[][], level: number = 0, roadBendOrder: RoadBendOrder = 'horizontal-vertical') {
+  public static generate(tiles: Tile[][], level = 0, roadBendOrder: RoadBendOrder = 'horizontal-vertical') {
     const center = {
       x: Math.floor(tiles.length / 2),
-      y: Math.floor(tiles[0].length / 2)
+      y: Math.floor(tiles[0].length / 2),
     };
 
-    tiles[center.y][center.x].variant = 'stone'
+    tiles[center.y][center.x].variant = 'stone';
 
     // Poisson disk sample for stone tiles (excluding center)
 
@@ -93,10 +103,7 @@ export class Slime {
     const stonePositions: { x: number; y: number }[] = [center];
     for (let y = 0; y < tiles.length; y++) {
       for (let x = 0; x < tiles[0].length; x++) {
-        if (
-          tiles[y][x]?.variant === 'stone' &&
-          !(x === center.x && y === center.y)
-        ) {
+        if (tiles[y][x]?.variant === 'stone' && !(x === center.x && y === center.y)) {
           stonePositions.push({ x, y });
         }
       }
@@ -117,9 +124,13 @@ export class Slime {
     edges.sort((e1, e2) => e1.dist - e2.dist);
 
     // Disjoint set for Kruskal's
-    const parent = Array(stonePositions.length).fill(0).map((_, i) => i);
+    const parent = Array(stonePositions.length)
+      .fill(0)
+      .map((_, i) => i);
     function find(u: number): number {
-      if (parent[u] !== u) parent[u] = find(parent[u]);
+      if (parent[u] !== u) {
+        parent[u] = find(parent[u]);
+      }
       return parent[u];
     }
     function union(u: number, v: number) {
@@ -138,7 +149,7 @@ export class Slime {
     const extraEdges: Edge[] = [];
     const numExtra = Math.max(2, Math.floor(stonePositions.length * 0.15));
     let added = 0;
-    const used = new Set(mstEdges.map(e => `${e.a},${e.b}`));
+    const used = new Set(mstEdges.map((e) => `${e.a},${e.b}`));
     while (added < numExtra) {
       const idx = Math.floor(Math.random() * edges.length);
       const edge = edges[idx];
@@ -152,7 +163,7 @@ export class Slime {
 
     // --- Lay roads for all edges in MST and extra edges ---
     const allEdges = [...mstEdges, ...extraEdges];
-    const edgeSet = new Set(allEdges.map(e => `${e.a},${e.b}`));
+    const edgeSet = new Set(allEdges.map((e) => `${e.a},${e.b}`));
     for (const edge of allEdges) {
       const from = stonePositions[edge.a];
       const to = stonePositions[edge.b];
@@ -170,10 +181,14 @@ export class Slime {
       let minDist = Infinity;
       let nearestIdx = -1;
       for (let j = 0; j < stonePositions.length; j++) {
-        if (i === j) continue;
+        if (i === j) {
+          continue;
+        }
         // Always use a consistent key order
         const key = i < j ? `${i},${j}` : `${j},${i}`;
-        if (edgeSet.has(key)) continue; // skip already connected
+        if (edgeSet.has(key)) {
+          continue;
+        } // skip already connected
         const dx = stonePositions[i].x - stonePositions[j].x;
         const dy = stonePositions[i].y - stonePositions[j].y;
         const dist = dx * dx + dy * dy;
@@ -209,10 +224,7 @@ export class Slime {
     const grassIslands: { tiles: Set<Tile> }[] = [];
 
     function dfsGrassIsland(x: number, y: number, island: Set<Tile>) {
-      if (
-        x < 0 || x >= width || y < 0 || y >= height ||
-        visited[y][x] || tiles[y][x].variant !== 'grass'
-      ) {
+      if (x < 0 || x >= width || y < 0 || y >= height || visited[y][x] || tiles[y][x].variant !== 'grass') {
         return;
       }
       visited[y][x] = true;
@@ -226,7 +238,7 @@ export class Slime {
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
         if (!visited[y][x] && tiles[y][x].variant === 'grass') {
-          const island: Set<Tile> = new Set();
+          const island = new Set<Tile>();
           dfsGrassIsland(x, y, island);
           if (island.size > 0) {
             grassIslands.push({ tiles: island });
@@ -292,21 +304,20 @@ export class Slime {
 
     // 8 directions: orthogonal + diagonal
     const directions = [
-      [0, 1],    // down
-      [1, 0],    // right
-      [0, -1],   // up
-      [-1, 0],   // left
-      [1, 1],    // bottom-right
-      [1, -1],   // top-right
-      [-1, 1],   // bottom-left
-      [-1, -1]   // top-left
+      [0, 1], // down
+      [1, 0], // right
+      [0, -1], // up
+      [-1, 0], // left
+      [1, 1], // bottom-right
+      [1, -1], // top-right
+      [-1, 1], // bottom-left
+      [-1, -1], // top-left
     ];
 
     const perimeterSet = new Set<string>();
 
     const key = (x: number, y: number) => `${x},${y}`;
-    const inBounds = (x: number, y: number) =>
-      x >= 0 && x < width && y >= 0 && y < height;
+    const inBounds = (x: number, y: number) => x >= 0 && x < width && y >= 0 && y < height;
 
     for (let y = 0; y < height; y++) {
       for (let x = 0; x < width; x++) {
@@ -330,7 +341,9 @@ export class Slime {
       const [xStr, yStr] = pos.split(',');
       const x = parseInt(xStr, 10);
       const y = parseInt(yStr, 10);
-      if (!tiles[y]) tiles[y] = [];
+      if (!tiles[y]) {
+        tiles[y] = [];
+      }
       tiles[y][x].variant = 'building';
     }
   }

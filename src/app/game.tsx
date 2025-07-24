@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
+
 import { Game } from '../game/game';
 import { SprayArea, type SprayAreaRef } from '../spray/spray-area';
 import { GameProvider } from '../state/game-context';
@@ -32,7 +33,7 @@ export function GamePage() {
         gameInstance.current.destroy();
         gameInstance.current = null;
       }
-    }
+    };
   }, []);
 
   const onOpenSprayArea = useCallback(() => {
@@ -57,7 +58,7 @@ export function GamePage() {
         sprayAreaRef.current?.reset();
         onOpenSprayArea();
       }
-    }
+    };
 
     window.addEventListener('keydown', onKeyDown);
     return () => {
@@ -81,8 +82,7 @@ export function GamePage() {
             Your browser does not support the HTML5 canvas element.
           </canvas>
         </div>
-        <div className='absolute top-0 left-0 w-full h-full px-20 py-16'>
-        </div>
+        <div className="absolute top-0 left-0 w-full h-full px-20 py-16"></div>
         <Hud onOpenSprayArea={onOpenSprayArea} />
         {sprayAreaVisible && <SprayArea ref={sprayAreaRef} />}
         {pauseMenuVisible && <PauseMenu />}

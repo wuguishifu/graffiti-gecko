@@ -6,7 +6,7 @@ export class Texture {
     this.gl = gl;
   }
 
-  public async loadFromImage(imagePath: string): Promise<void> {
+  public loadFromImage(imagePath: string): Promise<void> {
     return new Promise((resolve, reject) => {
       const image = new Image();
       image.onload = () => {
@@ -36,7 +36,7 @@ export class Texture {
     this.gl.bindTexture(this.gl.TEXTURE_2D, null);
   }
 
-  public bind(textureUnit: number = 0): void {
+  public bind(textureUnit = 0): void {
     if (this.texture) {
       this.gl.activeTexture(this.gl.TEXTURE0 + textureUnit);
       this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
@@ -53,4 +53,4 @@ export class Texture {
       this.texture = null;
     }
   }
-} 
+}

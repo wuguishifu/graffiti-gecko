@@ -1,5 +1,5 @@
-import { TileVariant } from '../tiles/types';
 import { Texture } from './texture';
+import { TileVariant } from '../tiles/types';
 
 type EntityVariant = 'gecko' | 'spray-can' | 'cop';
 
@@ -19,10 +19,10 @@ const entityVariantToTextureMap: Record<EntityVariant, string> = {
 
 export class TextureManager {
   private static instance: TextureManager | null;
-  private tileTextures: Map<TileVariant, Texture> = new Map();
-  private entityTextures: Map<EntityVariant, Texture> = new Map();
-  private tileLoadingPromises: Map<TileVariant, Promise<void>> = new Map();
-  private entityLoadingPromises: Map<EntityVariant, Promise<void>> = new Map();
+  private tileTextures = new Map<TileVariant, Texture>();
+  private entityTextures = new Map<EntityVariant, Texture>();
+  private tileLoadingPromises = new Map<TileVariant, Promise<void>>();
+  private entityLoadingPromises = new Map<EntityVariant, Promise<void>>();
   private gl: WebGLRenderingContext;
 
   private constructor(gl: WebGLRenderingContext) {
@@ -38,7 +38,7 @@ export class TextureManager {
 
   public async preloadAllTileTextures(): Promise<void> {
     const loadPromises = Object.entries(tileVariantToTextureMap).map(([variant, path]) =>
-      this.loadTileTexture(variant as TileVariant, path)
+      this.loadTileTexture(variant as TileVariant, path),
     );
 
     await Promise.all(loadPromises);
@@ -49,13 +49,15 @@ export class TextureManager {
     await this.loadEntityTexture(variant, entityVariantToTextureMap[variant]);
   }
 
-  private async loadTileTexture(variant: TileVariant, path: string): Promise<void> {
-    if (this.tileLoadingPromises.has(variant)) {
-      return this.tileLoadingPromises.get(variant)!;
+  private loadTileTexture(variant: TileVariant, path: string): Promise<void> {
+    const promise = this.tileLoadingPromises.get(variant);
+    if (promise) {
+      return promise;
     }
 
     const texture = new Texture(this.gl);
-    const loadPromise = texture.loadFromImage(path)
+    const loadPromise = texture
+      .loadFromImage(path)
       .then(() => {
         this.tileTextures.set(variant, texture);
         console.log(`Tile texture loaded: ${variant}`);
@@ -69,13 +71,15 @@ export class TextureManager {
     return loadPromise;
   }
 
-  private async loadEntityTexture(variant: EntityVariant, path: string): Promise<void> {
-    if (this.entityLoadingPromises.has(variant)) {
-      return this.entityLoadingPromises.get(variant)!;
+  private loadEntityTexture(variant: EntityVariant, path: string): Promise<void> {
+    const promise = this.entityLoadingPromises.get(variant);
+    if (promise) {
+      return promise;
     }
 
     const texture = new Texture(this.gl);
-    const loadPromise = texture.loadFromImage(path)
+    const loadPromise = texture
+      .loadFromImage(path)
       .then(() => {
         this.entityTextures.set(variant, texture);
         console.log(`Entity texture loaded: ${variant}`);
@@ -131,4 +135,4 @@ export class TextureManager {
       TextureManager.instance = null;
     }
   }
-} 
+}

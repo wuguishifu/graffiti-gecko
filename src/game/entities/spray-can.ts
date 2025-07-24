@@ -1,5 +1,5 @@
 import type { Camera } from '../graphics/camera';
-import { squareMesh, type Mesh } from '../graphics/mesh';
+import { type Mesh, squareMesh } from '../graphics/mesh';
 import { RenderObject } from '../graphics/render-object';
 import { renderObject } from '../graphics/renderer';
 import { TextureManager } from '../graphics/texture-manager';
@@ -10,14 +10,10 @@ export class SprayCan extends RenderObject {
   private mesh: Mesh;
   private textureManager: TextureManager;
   public id: number;
-  public isCompleted: boolean = false;
+  public isCompleted = false;
 
   constructor(gl: WebGLRenderingContext, id: number) {
-    super(
-      new Vector3(0, 0, 0),
-      new Vector3(0, 0, 0),
-      new Vector3(1, 1, 1),
-    );
+    super(new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
 
     this.mesh = squareMesh(gl);
     this.id = id;

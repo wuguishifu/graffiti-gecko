@@ -32,7 +32,7 @@ const initialState: GameSliceState = {
   timeLeft: 60 * 5,
   energyPercent: 100,
   soundOn: false,
-}
+};
 
 export const gameSlice = createSlice({
   name: 'game',

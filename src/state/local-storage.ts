@@ -11,5 +11,5 @@ export const reduxLocalStorage: Storage = {
   removeItem: (key: string) => {
     localStorage.removeItem(key);
     return Promise.resolve();
-  }
-}
+  },
+};

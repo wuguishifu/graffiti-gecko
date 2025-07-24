@@ -1,5 +1,5 @@
 import type { Camera } from '../graphics/camera';
-import { squareMesh, type Mesh } from '../graphics/mesh';
+import { type Mesh, squareMesh } from '../graphics/mesh';
 import { RenderObject } from '../graphics/render-object';
 import { renderObject } from '../graphics/renderer';
 import { TextureManager } from '../graphics/texture-manager';
@@ -22,24 +22,28 @@ export class Cop extends RenderObject {
   private textureManager: TextureManager;
   private level: Level;
   private player: Player;
-  private speed: number = 0.05;
-  private chaseRadius: number = 100;
+  private speed = 0.05;
+  private chaseRadius = 100;
   private id: number;
   private path: { x: number; y: number }[] = [];
-  private pathUpdateTimer: number = 0;
-  private pathUpdateInterval: number = 60; // Update path every 60 frames (1 second at 60fps)
+  private pathUpdateTimer = 0;
+  private pathUpdateInterval = 60; // Update path every 60 frames (1 second at 60fps)
   private otherCops: Cop[] = [];
-  private isFleeing: boolean = false;
-  private fleeTimer: number = 0;
-  private fleeDuration: number = 60; // 1 second at 60fps
+  private isFleeing = false;
+  private fleeTimer = 0;
+  private fleeDuration = 60; // 1 second at 60fps
   private fleeTarget: { x: number; y: number } | null = null;
 
-  constructor(gl: WebGLRenderingContext, level: Level, player: Player, id: number, x: number, y: number, difficultyLevel: number = 1) {
-    super(
-      new Vector3(x, y, 0),
-      new Vector3(0, 0, 0),
-      new Vector3(1, 1, 1),
-    );
+  constructor(
+    gl: WebGLRenderingContext,
+    level: Level,
+    player: Player,
+    id: number,
+    x: number,
+    y: number,
+    difficultyLevel = 1,
+  ) {
+    super(new Vector3(x, y, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
 
     this.mesh = squareMesh(gl);
     this.textureManager = TextureManager.getInstance(gl);
@@ -113,7 +117,8 @@ export class Cop extends RenderObject {
     }
 
     // Update flee target periodically
-    if (this.fleeTimer % 30 === 0) { // Every 0.5 seconds
+    if (this.fleeTimer % 30 === 0) {
+      // Every 0.5 seconds
       this.findFleeTarget();
     }
 
@@ -139,14 +144,14 @@ export class Cop extends RenderObject {
       const fleeDistance = 10;
       this.fleeTarget = {
         x: currentX + Math.cos(angle) * fleeDistance,
-        y: currentY + Math.sin(angle) * fleeDistance
+        y: currentY + Math.sin(angle) * fleeDistance,
       };
     } else {
       // Move away from player
       const fleeDistance = 15;
       this.fleeTarget = {
         x: currentX + (dx / distance) * fleeDistance,
-        y: currentY + (dy / distance) * fleeDistance
+        y: currentY + (dy / distance) * fleeDistance,
       };
     }
 
@@ -187,7 +192,9 @@ export class Cop extends RenderObject {
   }
 
   private moveTowardsFleeTarget() {
-    if (!this.fleeTarget) return;
+    if (!this.fleeTarget) {
+      return;
+    }
 
     const dx = this.fleeTarget.x - this.position.x;
     const dy = this.fleeTarget.y - this.position.y;
@@ -209,11 +216,7 @@ export class Cop extends RenderObject {
     const finalVy = vy + avoidance.y;
 
     // Calculate new position
-    const newPosition = new Vector3(
-      this.position.x + finalVx,
-      this.position.y + finalVy,
-      this.position.z
-    );
+    const newPosition = new Vector3(this.position.x + finalVx, this.position.y + finalVy, this.position.z);
 
     // Check if new position is walkable
     const newX = Math.round(newPosition.x);
@@ -226,11 +229,7 @@ export class Cop extends RenderObject {
       this.rotation.z = -Math.atan2(finalVx, finalVy);
     } else {
       // Try moving only on X axis
-      const xOnlyPosition = new Vector3(
-        this.position.x + finalVx,
-        this.position.y,
-        this.position.z
-      );
+      const xOnlyPosition = new Vector3(this.position.x + finalVx, this.position.y, this.position.z);
       const xOnlyX = Math.round(xOnlyPosition.x);
       const xOnlyY = Math.round(xOnlyPosition.y);
 
@@ -241,11 +240,7 @@ export class Cop extends RenderObject {
         this.rotation.z = -Math.atan2(finalVx, 0);
       } else {
         // Try moving only on Y axis
-        const yOnlyPosition = new Vector3(
-          this.position.x,
-          this.position.y + finalVy,
-          this.position.z
-        );
+        const yOnlyPosition = new Vector3(this.position.x, this.position.y + finalVy, this.position.z);
         const yOnlyX = Math.round(yOnlyPosition.x);
         const yOnlyY = Math.round(yOnlyPosition.y);
 
@@ -266,12 +261,13 @@ export class Cop extends RenderObject {
   }
 
   private hasReachedCurrentTarget(): boolean {
-    if (this.path.length === 0) return true;
+    if (this.path.length === 0) {
+      return true;
+    }
 
     const currentTarget = this.path[0];
     const distance = Math.sqrt(
-      Math.pow(this.position.x - currentTarget.x, 2) +
-      Math.pow(this.position.y - currentTarget.y, 2)
+      Math.pow(this.position.x - currentTarget.x, 2) + Math.pow(this.position.y - currentTarget.y, 2),
     );
 
     return distance < 0.5; // Close enough to consider reached
@@ -288,7 +284,7 @@ export class Cop extends RenderObject {
 
   private findPath(startX: number, startY: number, goalX: number, goalY: number): { x: number; y: number }[] {
     const openSet: PathNode[] = [];
-    const closedSet: Set<string> = new Set();
+    const closedSet = new Set<string>();
 
     const startNode: PathNode = {
       x: startX,
@@ -296,7 +292,7 @@ export class Cop extends RenderObject {
       g: 0,
       h: this.heuristic(startX, startY, goalX, goalY),
       f: 0,
-      parent: null
+      parent: null,
     };
     startNode.f = startNode.g + startNode.h;
 
@@ -327,11 +323,13 @@ export class Cop extends RenderObject {
       for (const neighbor of neighbors) {
         const neighborKey = `${neighbor.x},${neighbor.y}`;
 
-        if (closedSet.has(neighborKey)) continue;
+        if (closedSet.has(neighborKey)) {
+          continue;
+        }
 
         const tentativeG = currentNode.g + 1;
 
-        let neighborNode = openSet.find(node => node.x === neighbor.x && node.y === neighbor.y);
+        let neighborNode = openSet.find((node) => node.x === neighbor.x && node.y === neighbor.y);
 
         if (!neighborNode) {
           neighborNode = {
@@ -340,7 +338,7 @@ export class Cop extends RenderObject {
             g: tentativeG,
             h: this.heuristic(neighbor.x, neighbor.y, goalX, goalY),
             f: 0,
-            parent: currentNode
+            parent: currentNode,
           };
           neighborNode.f = neighborNode.g + neighborNode.h;
           openSet.push(neighborNode);
@@ -362,7 +360,7 @@ export class Cop extends RenderObject {
       { dx: -1, dy: 0 },
       { dx: 1, dy: 0 },
       { dx: 0, dy: -1 },
-      { dx: 0, dy: 1 }
+      { dx: 0, dy: 1 },
     ];
 
     for (const { dx, dy } of directions) {
@@ -395,7 +393,9 @@ export class Cop extends RenderObject {
   }
 
   private followPath() {
-    if (this.path.length === 0) return;
+    if (this.path.length === 0) {
+      return;
+    }
 
     const target = this.path[0];
     const dx = target.x - this.position.x;
@@ -418,11 +418,7 @@ export class Cop extends RenderObject {
     const finalVy = vy + avoidance.y;
 
     // Calculate new position
-    const newPosition = new Vector3(
-      this.position.x + finalVx,
-      this.position.y + finalVy,
-      this.position.z
-    );
+    const newPosition = new Vector3(this.position.x + finalVx, this.position.y + finalVy, this.position.z);
 
     // Check if new position is walkable
     const newX = Math.round(newPosition.x);
@@ -435,11 +431,7 @@ export class Cop extends RenderObject {
       this.rotation.z = -Math.atan2(finalVx, finalVy);
     } else {
       // Try moving only on X axis
-      const xOnlyPosition = new Vector3(
-        this.position.x + finalVx,
-        this.position.y,
-        this.position.z
-      );
+      const xOnlyPosition = new Vector3(this.position.x + finalVx, this.position.y, this.position.z);
       const xOnlyX = Math.round(xOnlyPosition.x);
       const xOnlyY = Math.round(xOnlyPosition.y);
 
@@ -450,11 +442,7 @@ export class Cop extends RenderObject {
         this.rotation.z = -Math.atan2(finalVx, 0);
       } else {
         // Try moving only on Y axis
-        const yOnlyPosition = new Vector3(
-          this.position.x,
-          this.position.y + finalVy,
-          this.position.z
-        );
+        const yOnlyPosition = new Vector3(this.position.x, this.position.y + finalVy, this.position.z);
         const yOnlyX = Math.round(yOnlyPosition.x);
         const yOnlyY = Math.round(yOnlyPosition.y);
 
@@ -493,7 +481,7 @@ export class Cop extends RenderObject {
     return this.id;
   }
 
-  public isNearPlayer(radius: number = 1.5): boolean {
+  public isNearPlayer(radius = 1.5): boolean {
     return this.getDistanceToPlayer() <= radius;
   }
 }

@@ -1,14 +1,15 @@
-import { DevSliceState } from '@/state/dev-slice';
 import { gameActions } from '../../state/game-slice';
 import { store } from '../../state/store';
 import type { Camera } from '../graphics/camera';
-import { squareMesh, type Mesh } from '../graphics/mesh';
+import { type Mesh, squareMesh } from '../graphics/mesh';
 import { RenderObject } from '../graphics/render-object';
 import { renderObject } from '../graphics/renderer';
 import { TextureManager } from '../graphics/texture-manager';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
 import type { Level } from '../world/level';
+
+import { DevSliceState } from '@/state/dev-slice';
 
 const PLAYER_LIVES = 3;
 
@@ -18,28 +19,28 @@ export class Player extends RenderObject {
   private level: Level;
   private gl: WebGLRenderingContext;
   private lives: number = PLAYER_LIVES;
-  private invincibilityTimer: number = 0;
-  private invincibilityDuration: number = 60; // 1 second at 60fps
-  private isInvincible: boolean = false;
-  private flashTimer: number = 0;
-  private flashInterval: number = 10; // Flash every 10 frames
-  private totalDistanceTraveled: number = 0;
+  private invincibilityTimer = 0;
+  private invincibilityDuration = 60; // 1 second at 60fps
+  private isInvincible = false;
+  private flashTimer = 0;
+  private flashInterval = 10; // Flash every 10 frames
+  private totalDistanceTraveled = 0;
   private lastPosition: Vector3;
-  private stamina: number = 100; // 0-100 percent
-  private staminaDepleteRate: number = 0.7; // percent per frame while sprinting
-  private staminaRegenRate: number = 0.3; // percent per frame while recovering
-  private staminaRegenDelay: number = 60; // frames to wait after hitting 0 (1s at 60fps)
-  private staminaRegenDelayTimer: number = 0;
-  private lastEnergyPercent: number = 100;
-  private energyUpdateThrottle: number = 6; // only update Redux every 6 frames
-  private energyUpdateFrame: number = 0;
+  private stamina = 100; // 0-100 percent
+  private staminaDepleteRate = 0.7; // percent per frame while sprinting
+  private staminaRegenRate = 0.3; // percent per frame while recovering
+  private staminaRegenDelay = 60; // frames to wait after hitting 0 (1s at 60fps)
+  private staminaRegenDelayTimer = 0;
+  private lastEnergyPercent = 100;
+  private energyUpdateThrottle = 6; // only update Redux every 6 frames
+  private energyUpdateFrame = 0;
 
-  constructor(gl: WebGLRenderingContext, level: Level, private devOptions: Partial<DevSliceState>) {
-    super(
-      level.getRandomStoneTile() ?? new Vector3(0, 0, 0),
-      new Vector3(0, 0, 0),
-      new Vector3(1, 1, 1),
-    );
+  constructor(
+    gl: WebGLRenderingContext,
+    level: Level,
+    private devOptions: Partial<DevSliceState>,
+  ) {
+    super(level.getRandomStoneTile() ?? new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
 
     this.devOptions = devOptions;
 
@@ -114,34 +115,49 @@ export class Player extends RenderObject {
     } else if (!canSprint && this.stamina < 100) {
       // Only regen if not sprinting and delay is over
       this.stamina += this.staminaRegenRate;
-      if (this.stamina > 100) this.stamina = 100;
+      if (this.stamina > 100) {
+        this.stamina = 100;
+      }
     }
 
     // Clamp stamina
-    if (this.stamina < 0) this.stamina = 0;
-    if (this.stamina > 100) this.stamina = 100;
+    if (this.stamina < 0) {
+      this.stamina = 0;
+    }
+    if (this.stamina > 100) {
+      this.stamina = 100;
+    }
 
     // Throttle Redux updates for energyPercent
     this.energyUpdateFrame = (this.energyUpdateFrame + 1) % this.energyUpdateThrottle;
     const roundedEnergy = Math.round(this.stamina);
-    if ((roundedEnergy !== this.lastEnergyPercent && this.energyUpdateFrame === 0) || this.lastEnergyPercent !== roundedEnergy && (roundedEnergy === 0 || roundedEnergy === 100)) {
+    if (
+      (roundedEnergy !== this.lastEnergyPercent && this.energyUpdateFrame === 0) ||
+      (this.lastEnergyPercent !== roundedEnergy && (roundedEnergy === 0 || roundedEnergy === 100))
+    ) {
       store.dispatch(gameActions.setEnergyPercent(roundedEnergy));
       this.lastEnergyPercent = roundedEnergy;
     }
 
-    if (this.keysDown.has('w')) vy += ax;
-    if (this.keysDown.has('s')) vy -= ax;
-    if (this.keysDown.has('a')) vx -= ax;
-    if (this.keysDown.has('d')) vx += ax;
+    if (this.keysDown.has('w')) {
+      vy += ax;
+    }
+    if (this.keysDown.has('s')) {
+      vy -= ax;
+    }
+    if (this.keysDown.has('a')) {
+      vx -= ax;
+    }
+    if (this.keysDown.has('d')) {
+      vx += ax;
+    }
 
-    if (vx === 0 && vy === 0) return;
+    if (vx === 0 && vy === 0) {
+      return;
+    }
 
     // Calculate new position
-    const newPosition = new Vector3(
-      this.position.x + vx,
-      this.position.y + vy,
-      this.position.z
-    );
+    const newPosition = new Vector3(this.position.x + vx, this.position.y + vy, this.position.z);
 
     // Check if new position is walkable
     const newX = Math.round(newPosition.x);
@@ -150,8 +166,7 @@ export class Player extends RenderObject {
     if (this.level.isWalkable(newX, newY)) {
       // Calculate distance traveled
       const distance = Math.sqrt(
-        Math.pow(newPosition.x - this.lastPosition.x, 2) +
-        Math.pow(newPosition.y - this.lastPosition.y, 2)
+        Math.pow(newPosition.x - this.lastPosition.x, 2) + Math.pow(newPosition.y - this.lastPosition.y, 2),
       );
       this.totalDistanceTraveled += distance;
 
@@ -166,19 +181,14 @@ export class Player extends RenderObject {
       this.lastPosition.z = this.position.z;
     } else {
       // Try moving only on X axis
-      const xOnlyPosition = new Vector3(
-        this.position.x + vx,
-        this.position.y,
-        this.position.z
-      );
+      const xOnlyPosition = new Vector3(this.position.x + vx, this.position.y, this.position.z);
       const xOnlyX = Math.round(xOnlyPosition.x);
       const xOnlyY = Math.round(xOnlyPosition.y);
 
       if (this.level.isWalkable(xOnlyX, xOnlyY)) {
         // Calculate distance traveled
         const distance = Math.sqrt(
-          Math.pow(xOnlyPosition.x - this.lastPosition.x, 2) +
-          Math.pow(xOnlyPosition.y - this.lastPosition.y, 2)
+          Math.pow(xOnlyPosition.x - this.lastPosition.x, 2) + Math.pow(xOnlyPosition.y - this.lastPosition.y, 2),
         );
         this.totalDistanceTraveled += distance;
 
@@ -193,19 +203,14 @@ export class Player extends RenderObject {
         this.lastPosition.z = this.position.z;
       } else {
         // Try moving only on Y axis
-        const yOnlyPosition = new Vector3(
-          this.position.x,
-          this.position.y + vy,
-          this.position.z
-        );
+        const yOnlyPosition = new Vector3(this.position.x, this.position.y + vy, this.position.z);
         const yOnlyX = Math.round(yOnlyPosition.x);
         const yOnlyY = Math.round(yOnlyPosition.y);
 
         if (this.level.isWalkable(yOnlyX, yOnlyY)) {
           // Calculate distance traveled
           const distance = Math.sqrt(
-            Math.pow(yOnlyPosition.x - this.lastPosition.x, 2) +
-            Math.pow(yOnlyPosition.y - this.lastPosition.y, 2)
+            Math.pow(yOnlyPosition.x - this.lastPosition.x, 2) + Math.pow(yOnlyPosition.y - this.lastPosition.y, 2),
           );
           this.totalDistanceTraveled += distance;
 
@@ -255,10 +260,12 @@ export class Player extends RenderObject {
     this.level = level;
   }
 
-  private keysDown: Set<string> = new Set();
+  private keysDown = new Set<string>();
 
   public onKeyDown(event: KeyboardEvent) {
-    if (this.keysDown.has(event.key.toLowerCase())) return;
+    if (this.keysDown.has(event.key.toLowerCase())) {
+      return;
+    }
     this.keysDown.add(event.key.toLowerCase());
   }
 
