@@ -41,9 +41,6 @@ export const gameSlice = createSlice({
     },
     setNearSprayCan: (state, action: PayloadAction<boolean>) => {
       state.nearSprayCan = action.payload;
-      if (!action.payload) {
-        state.activeSprayCanId = undefined;
-      }
     },
     resetSprayArea: (state) => {
       state.sprayCans = {};
@@ -54,7 +51,7 @@ export const gameSlice = createSlice({
         return acc;
       }, {});
     },
-    setActiveSprayCanId: (state, action: PayloadAction<number | undefined>) => {
+    setActiveSprayCanId: (state, action: PayloadAction<number>) => {
       state.activeSprayCanId = action.payload;
     },
     completeSprayCan: (state) => {

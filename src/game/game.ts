@@ -200,8 +200,9 @@ export class Game {
     }
 
     if (isNearSprayCan && nearestSprayCan && nearestSprayCan.id !== this.lastSprayCanId) {
+      console.log(`Player is near spray can with ID: ${nearestSprayCan.id}`);
       this.lastSprayCanId = nearestSprayCan.id;
-      store.dispatch(gameActions.setActiveSprayCanId(this.lastSprayCanId));
+      store.dispatch(gameActions.setActiveSprayCanId(nearestSprayCan.id));
     }
   }
 

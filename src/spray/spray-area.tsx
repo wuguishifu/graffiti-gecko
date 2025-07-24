@@ -1,9 +1,9 @@
 import { Lives } from '@/components/lives';
+import { store } from '@/state/store';
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { useGame } from '../state/game-context';
 import { gameActions } from '../state/game-slice';
 import { useAppDispatch, useAppSelector } from '../state/use-app-state';
-import { store } from '@/state/store';
 
 export type SprayAreaRef = {
   reset: () => void;
@@ -253,7 +253,6 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     throttledCalculateOverlap();
   };
 
-  const activeSprayCanId = useAppSelector((state) => state.game.activeSprayCanId);
   const dispatch = useAppDispatch();
   const [sprayComplete, setSprayComplete] = useState(false);
   const sprayCompleteTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -266,6 +265,8 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     }
 
     hasCompletedSprayCan.current = true;
+
+    const activeSprayCanId = store.getState().game.activeSprayCanId;
 
     if (gameInstance.current && activeSprayCanId != null) {
       gameInstance.current.completeSprayCan(activeSprayCanId);
