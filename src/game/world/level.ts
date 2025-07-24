@@ -8,7 +8,7 @@ import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
 import type { Player } from '../player/player';
 import { Tile, TileVariant } from '../tiles/tile';
-import { slime } from './generation/slime';
+import { Slime } from './generation/slime';
 
 type TileType = 'grass' | 'stone' | 'building';
 
@@ -65,7 +65,7 @@ export class Level {
     }
 
     // TODO: Allow roadBendOrder to be set from outside
-    slime(this.tiles, this.gl, 'random');
+    Slime.generate(this.tiles, this.gl, 'random');
     this.generateWall()
   }
 
