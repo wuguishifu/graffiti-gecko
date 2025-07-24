@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { gameActions } from '../state/game-slice';
 import { useAppDispatch } from '../state/use-app-state';
 import { SettingsMenu } from '../ui/settings-menu';
+import { Sounds } from '../game/sound/sound.ts';
 
 export function MainMenu() {
   const [showSettings, setShowSettings] = useState(false);
@@ -16,6 +17,15 @@ export function MainMenu() {
         setShowSettings(false);
       }
     };
+    const unlockAudio = () => {
+      if (Howler.ctx && Howler.ctx.state === 'suspended') {
+        Howler.ctx.resume();
+      }
+      window.removeEventListener('click', unlockAudio);
+    };
+    window.addEventListener('click', unlockAudio, { once: true });
+
+    
 
     window.addEventListener('keydown', handleKeyDown);
     return () => {
@@ -30,12 +40,26 @@ export function MainMenu() {
         src='/assets/screens/start.png'
       />
       <div className='text-center absolute top-[50%] left-[30%] flex flex-col gap-8'>
-        <Link to='/game' className='hover:scale-110 transition-transform' onClick={() => dispatch(gameActions.reset())}>
+        <Link to='/game' className='hover:scale-110 transition-transform' 
+        onMouseEnter={() => Sounds.hover.play()}
+        onClick={() => {
+          Sounds.click.play();
+          dispatch(gameActions.reset());}}>
           <img src='/assets/copy/start-run.svg' className='select-none pointer-events-none' />
         </Link>
-        <button className='hover:scale-110 transition-transform cursor-pointer' onClick={() => setShowSettings(true)}>
-          <img src='/assets/copy/settings.svg' className='select-none pointer-events-none' />
-        </button>
+      <button
+        onMouseEnter={() => Sounds.hover.play()}
+        onClick={() => {
+          Sounds.click.play();
+          setShowSettings(true);
+        }}
+        className="hover:scale-110 transition-transform cursor-pointer"
+      >
+        <img
+          src="/assets/copy/settings.svg"
+          className="select-none pointer-events-none"
+        />
+      </button>
       </div>
       <div className='absolute top-0 right-0 opacity-0 hover:opacity-100 transition-opacity duration-300'>
         <Link to="/dev" className={buttonVariants({ variant: 'default' })}>
