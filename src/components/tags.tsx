@@ -25,7 +25,6 @@ export function Tags() {
         <p className="!text-black text-4xl font-bold font-blank-river mt-2 z-10">
           {totalCompleted}/{totalSprayCans}
         </p>
-        <pre className="!text-black z-100">{JSON.stringify(sprayCans, null, 2)}</pre>
         <img src="/assets/copy/tags-done.svg" className="scale-75 z-10" />
       </div>
     </div>
