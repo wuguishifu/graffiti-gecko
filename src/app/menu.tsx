@@ -3,14 +3,13 @@ import { Link } from 'react-router';
 
 import { soundService } from '../game/sound/sound.ts';
 import { gameActions } from '../state/game-slice';
-import { useAppDispatch } from '../state/use-app-state';
+import { useAppDispatch, useAppSelector } from '../state/use-app-state';
 import { SettingsMenu } from '../ui/settings-menu';
 
 import { buttonVariants } from '@/components/ui/button';
 
 export function MainMenu() {
   const [showSettings, setShowSettings] = useState(false);
-
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -26,6 +25,18 @@ export function MainMenu() {
     };
   }, []);
 
+  const soundOn = useAppSelector((state) => state.session.soundOn);
+
+  useEffect(() => {
+    if (soundOn) {
+      soundService.playSound('mainMenu', 0.3, true);
+    }
+
+    return () => {
+      soundService.stopSound('mainMenu');
+    };
+  }, [soundOn]);
+
   return (
     <main className="h-full flex items-center justify-center">
       <img
@@ -40,6 +51,7 @@ export function MainMenu() {
           onClick={() => {
             soundService.playSound('click');
             dispatch(gameActions.reset());
+            soundService.stopSound('mainMenu');
           }}
         >
           <img src="/assets/copy/start-run.svg" className="select-none pointer-events-none" />

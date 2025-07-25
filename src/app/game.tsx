@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router';
 
 import { Game } from '../game/game';
+import { soundService } from '../game/sound/sound';
 import { SprayArea, type SprayAreaRef } from '../spray/spray-area';
 import { GameProvider } from '../state/game-context';
 import { GamePauser } from '../state/game-pauser';
@@ -35,6 +36,19 @@ export function GamePage() {
       }
     };
   }, []);
+
+  const soundOn = useAppSelector((state) => state.session.soundOn);
+
+  useEffect(() => {
+    const randSong = soundService.randomGameMusicKey();
+    if (soundOn) {
+      soundService.playSound(randSong, 0.3, true);
+    }
+
+    return () => {
+      soundService.stopSound(randSong);
+    };
+  }, [soundOn]);
 
   const onOpenSprayArea = useCallback(() => {
     sprayAreaRef.current?.reset();

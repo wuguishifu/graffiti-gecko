@@ -236,6 +236,9 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     } else {
       soundService.stopSound('spray');
     }
+    return () => {
+      soundService.stopSound('spray');
+    };
   }, [isPainting]);
 
   const paint = (e: React.MouseEvent | React.TouchEvent) => {
