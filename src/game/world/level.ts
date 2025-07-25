@@ -152,13 +152,15 @@ export class Level {
   private spawnSprayCans(accessibleWalls: { x: number; y: number }[]) {
     const randomizedAccessibleWalls = [...accessibleWalls].sort(() => Math.random() - 0.5); // Shuffle positions
 
-    const baseSprayCans = Math.floor(Math.random() * 2) + 3; // 3-4 base spray cans
-    const difficultyBonus = Math.min(this.difficultyLevel - 1, 5); // Cap at +5 for balance
+    // spray cans per level:
+    // 1-3: 2-3
+    // 4-6: 3-4
+    // 7-9: 4-5
+    // 10-12: 5-6
     const numSprayCans = this.devOptions.manySprayCans
       ? randomizedAccessibleWalls.length
-      : Math.min(baseSprayCans + difficultyBonus, randomizedAccessibleWalls.length);
-
-    this.sprayCans = Array.from({ length: Math.min(numSprayCans, randomizedAccessibleWalls.length) }, (_, i) => {
+      : Math.floor(Math.random() * 2) + 2 + Math.floor(Math.min(this.difficultyLevel, 3) / 3);
+    this.sprayCans = Array.from({ length: numSprayCans }, (_, i) => {
       const pos = randomizedAccessibleWalls[i];
       const sprayCan = new SprayCan(this.gl, i);
       sprayCan.position.x = pos.x;
