@@ -352,8 +352,9 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
       if (gameInstance.current && activeSprayCanId != null) {
         gameInstance.current.failSprayCan(activeSprayCanId);
       }
-
       hasCompletedSprayCan.current = true;
+
+      soundService.playSound('fail');
       setSprayFailed(true);
 
       if (sprayFailedTimeoutRef.current) {

@@ -10,6 +10,7 @@ const Sounds = {
   policeWalk: new Howl({ src: ['/assets/sounds/police_walk.mp3'] }),
   spray: new Howl({ src: ['/assets/sounds/spray.mp3'] }),
   success: new Howl({ src: ['/assets/sounds/success.mp3'] }),
+  fail: new Howl({ src: ['/assets/sounds/fail.mp3'] }),
   mainMenu: new Howl({ src: ['/assets/sounds/music/main_menu.mp3'] }),
   game1: new Howl({ src: ['/assets/sounds/music/game1.mp3'] }),
   game2: new Howl({ src: ['/assets/sounds/music/game2.mp3'] }),
