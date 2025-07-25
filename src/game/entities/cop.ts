@@ -254,7 +254,7 @@ export class Cop extends RenderObject {
     }
   }
 
-  private getDistanceToPlayer(): number {
+  public getDistanceToPlayer(): number {
     const dx = this.player.position.x - this.position.x;
     const dy = this.player.position.y - this.position.y;
     return Math.sqrt(dx * dx + dy * dy);

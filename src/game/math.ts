@@ -135,3 +135,5 @@ export class Vector3 {
     return Math.acos(Vector3.dot(v1, v2) / (Vector3.magnitude(v1) * Vector3.magnitude(v2)));
   }
 }
+
+export const lerp = (a: number, b: number, t: number) => a + (1 / t) * (b - a);

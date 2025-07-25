@@ -1,5 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 
+import { soundService } from '../game/sound/sound';
 import { useGame } from '../state/game-context';
 import { gameActions } from '../state/game-slice';
 import { useAppDispatch, useAppSelector } from '../state/use-app-state';
@@ -227,6 +228,16 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     setIsPainting(false);
   };
 
+  soundService.stopSound('policeWalk');
+
+  useEffect(() => {
+    if (isPainting) {
+      soundService.playSound('spray', 0.3, true);
+    } else {
+      soundService.stopSound('spray');
+    }
+  }, [isPainting]);
+
   const paint = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault(); // Prevent default to avoid conflicts
     if (!isPainting) {
@@ -291,7 +302,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     if (hasCompletedSprayCan.current) {
       return;
     }
-
+    soundService.playSound('success');
     hasCompletedSprayCan.current = true;
 
     const activeSprayCanId = store.getState().game.activeSprayCanId;

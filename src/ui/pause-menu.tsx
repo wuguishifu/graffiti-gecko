@@ -20,6 +20,8 @@ export function PauseMenu() {
 
   const totalDuration = useAppSelector((state) => state.dev.overrideTotalTime || 300);
 
+  soundService.stopSound('policeWalk');
+
   return (
     <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-black select-none">
       <img

@@ -1,11 +1,12 @@
 import { gameActions } from '../state/game-slice';
 import { store } from '../state/store';
+import { Cop } from './entities/cop';
 import { Camera } from './graphics/camera';
 import { resetSquareMesh } from './graphics/mesh';
 import { buildProgramInfo, initShaderProgram } from './graphics/shader-source';
 import { TextureManager } from './graphics/texture-manager';
 import type { ProgramInfo } from './graphics/types';
-import { Vector3 } from './math';
+import { lerp, Vector3 } from './math';
 import { Player } from './player/player';
 import fsSource from './shaders/fragment.glsl?raw';
 import vsSource from './shaders/vertex.glsl?raw';
@@ -221,6 +222,22 @@ export class Game {
     const cops = this.level.getCops();
     const captureRadius = 1.0; // Distance within which cops can capture player
 
+    const copDistanceResult = cops.reduce<{ cop: Cop; distance: number } | null>((closest, cop) => {
+      const distance = cop.getDistanceToPlayer();
+      if (!closest || distance < closest.distance) {
+        return { cop, distance };
+      }
+      return closest;
+    }, null);
+
+    if (copDistanceResult && copDistanceResult.distance < 5) {
+      const { distance } = copDistanceResult;
+      const footVol = lerp(0.1, 2, distance);
+      soundService.playSound('policeWalk', footVol, true);
+    } else {
+      soundService.stopSound('policeWalk');
+    }
+
     const nearbyCop = cops.find((cop) => {
       return cop.isNearPlayer(captureRadius);
     });
@@ -232,6 +249,8 @@ export class Game {
 
         if (this.player.getLives() === 0) {
           soundService.playSound('caught');
+          soundService.stopSound('policeWalk');
+          this.player.position.x = 1000;
           store.dispatch(gameActions.setGameOverFlag(true));
           store.dispatch(gameActions.setDistanceTraveled(this.player.getTotalDistanceTraveled()));
         }
