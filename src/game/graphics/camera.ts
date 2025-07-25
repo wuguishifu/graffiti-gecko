@@ -3,7 +3,7 @@ import { mat4 } from 'gl-matrix';
 import { Vector3 } from '../math';
 import { Player } from '../player/player';
 
-const DISTANCE = 20;
+const DISTANCE = 12;
 
 export class Camera {
   private player: Player;

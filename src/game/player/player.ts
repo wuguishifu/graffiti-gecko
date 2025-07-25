@@ -15,6 +15,8 @@ import { DevSliceState } from '@/state/dev-slice';
 const PLAYER_LIVES = 3;
 
 export class Player extends RenderObject {
+  private walkSpeed = 0.04;
+  private runSpeed = 0.08;
   private mesh: Mesh;
   private textureManager: TextureManager;
   private level: Level;
@@ -88,13 +90,13 @@ export class Player extends RenderObject {
 
     let vx = 0;
     let vy = 0;
-    let ax = 0.1;
+    let ax = this.walkSpeed;
     const isTryingToSprint = this.keysDown.has('shift');
     const canSprint = isTryingToSprint && this.stamina > 0 && this.staminaRegenDelayTimer === 0;
 
     // Sprinting logic
     if (canSprint) {
-      ax = 0.2;
+      ax = this.runSpeed;
       if (!this.devOptions.unlimitedStamina) {
         this.stamina -= this.staminaDepleteRate;
       }
@@ -103,7 +105,7 @@ export class Player extends RenderObject {
         this.staminaRegenDelayTimer = this.staminaRegenDelay;
       }
     } else {
-      ax = 0.1;
+      ax = this.walkSpeed;
       // Only start regen delay if we just hit 0 and are still trying to sprint
       if (this.stamina === 0 && isTryingToSprint && this.staminaRegenDelayTimer === 0) {
         this.staminaRegenDelayTimer = this.staminaRegenDelay;

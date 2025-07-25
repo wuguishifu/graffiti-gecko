@@ -2,7 +2,8 @@ import { gameActions } from '../state/game-slice';
 import { store } from '../state/store';
 import { Cop } from './entities/cop';
 import { Camera } from './graphics/camera';
-import { resetSquareMesh } from './graphics/mesh';
+import { resetSquareMesh, squareMesh } from './graphics/mesh';
+import { renderSimilarObjects } from './graphics/renderer';
 import { buildProgramInfo, initShaderProgram } from './graphics/shader-source';
 import { TextureManager } from './graphics/texture-manager';
 import type { ProgramInfo } from './graphics/types';
@@ -26,6 +27,7 @@ export class Game {
   private running = false;
   private static timerInterval: number | null = null;
   private static timerRunning = false;
+  private textureManager: TextureManager;
 
   public pause(stopTimer = true) {
     this.running = false;
@@ -147,6 +149,7 @@ export class Game {
     this.level.spawnEntities();
     this.camera = new Camera(this.canvas.clientWidth / this.canvas.clientHeight, this.player);
 
+    this.textureManager = TextureManager.getInstance(this.gl);
     this.running = true;
     this.setup().then(() => {
       this.startTimer();
@@ -155,13 +158,7 @@ export class Game {
   }
 
   public async setup() {
-    const textureManager = TextureManager.getInstance(this.gl);
-    await Promise.all([
-      textureManager.preloadAllTileTextures(),
-      textureManager.preloadEntityTexture('gecko'),
-      textureManager.preloadEntityTexture('spray-can'),
-      textureManager.preloadEntityTexture('cop'),
-    ]);
+    await Promise.all([this.textureManager.preloadAllTileTextures(), this.textureManager.preloadAllEntityTextures()]);
   }
 
   public run() {
@@ -186,6 +183,43 @@ export class Game {
   public render() {
     this.level.render(this.gl, this.programInfo, this.camera);
     this.player.render(this.gl, this.programInfo, this.camera);
+    this.renderIndicators();
+  }
+
+  private renderIndicators() {
+    const objectModels = this.level
+      .getSprayCans()
+      .filter((sprayCan) => {
+        if (sprayCan.isCompleted) {
+          return false;
+        }
+
+        const dx = sprayCan.position.x - this.player.position.x;
+        const dy = sprayCan.position.y - this.player.position.y;
+        return dx * dx + dy * dy > 12;
+      })
+      .map((sprayCan) => {
+        const direction = Vector3.subtract(sprayCan.position, this.player.position);
+        const angle = Vector3.angleFromXAxisXY(direction);
+
+        const position = Vector3.normalize(direction).scale(1).add(this.player.position);
+        const rotation = new Vector3(0, 0, angle);
+        const scale = new Vector3(1, 1, 1);
+        return { position, rotation, scale };
+      });
+
+    renderSimilarObjects({
+      gl: this.gl,
+      info: this.programInfo,
+      objects: objectModels.map((model) => ({
+        model,
+        alphaMultiplier: 1,
+      })),
+      mesh: squareMesh(this.gl),
+      texture: this.textureManager.getEntityTexture('arrow'),
+      useTexture: this.textureManager.isEntityTextureReady('arrow'),
+      camera: this.camera,
+    });
   }
 
   private lastSprayCanCheckValue = false;
@@ -246,6 +280,9 @@ export class Game {
       // Check if player takes damage
       if (this.player.takeDamage()) {
         console.log(`Player took damage! Lives remaining: ${this.player.getLives()}`);
+
+        // Kill the cop that caught the player
+        this.level.killCop(nearbyCop.getId());
 
         if (this.player.getLives() === 0) {
           soundService.playSound('caught');

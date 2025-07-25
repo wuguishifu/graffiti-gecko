@@ -134,6 +134,22 @@ export class Vector3 {
   static angle(v1: Vector3, v2: Vector3) {
     return Math.acos(Vector3.dot(v1, v2) / (Vector3.magnitude(v1) * Vector3.magnitude(v2)));
   }
+
+  static angleFromXAxisXY(v: Vector3) {
+    return Math.atan2(v.y, v.x);
+  }
+
+  static get e1() {
+    return new Vector3(1, 0, 0);
+  }
+
+  static get e2() {
+    return new Vector3(0, 1, 0);
+  }
+
+  static get e3() {
+    return new Vector3(0, 0, 1);
+  }
 }
 
 export const lerp = (a: number, b: number, t: number) => a + (1 / t) * (b - a);
