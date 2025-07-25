@@ -163,7 +163,7 @@ export class Game {
         const angle = Vector3.angleFromXAxisXY(direction);
 
         const position = Vector3.normalize(direction).scale(1).add(this.player.position);
-        const rotation = new Vector3(0, 0, angle);
+        const rotation = new Vector3(0, 0, angle + Math.PI);
         const scale = new Vector3(1, 1, 1);
         return { position, rotation, scale };
       });
@@ -275,6 +275,7 @@ export class Game {
   public failSprayCan(id: number) {
     const sprayCans = this.level.getSprayCans();
     const active = sprayCans.find((sprayCan) => sprayCan.id === id);
+    this.level.spawnExtraSprayCan();
     if (active) {
       active.isCompleted = true;
       active.state = 'failed';
