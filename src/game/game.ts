@@ -268,6 +268,16 @@ export class Game {
     const active = sprayCans.find((sprayCan) => sprayCan.id === id);
     if (active) {
       active.isCompleted = true;
+      active.state = 'completed';
+    }
+  }
+
+  public failSprayCan(id: number) {
+    const sprayCans = this.level.getSprayCans();
+    const active = sprayCans.find((sprayCan) => sprayCan.id === id);
+    if (active) {
+      active.isCompleted = true;
+      active.state = 'failed';
     }
   }
 

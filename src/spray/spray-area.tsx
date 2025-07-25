@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 
 import { soundService } from '../game/sound/sound';
 import { useGame } from '../state/game-context';
@@ -40,6 +40,9 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
   const [overlapPercentage, setOverlapPercentage] = useState(0);
   const throttledTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { gameInstance } = useGame();
+
+  const dispatch = useAppDispatch();
+  const dispatchRef = useRef(dispatch);
 
   const sprayColor = useAppSelector((state) => state.data.sprayColor);
 
@@ -194,7 +197,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     }, 100);
   };
 
-  const resetCanvas = () => {
+  const resetCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) {
       return;
@@ -213,7 +216,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
     // Reset completion flag
     hasCompletedSprayCan.current = false;
-  };
+  }, []);
 
   const startPainting = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault(); // Prevent default to avoid conflicts
@@ -295,12 +298,16 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     throttledCalculateOverlap();
   };
 
-  const dispatch = useAppDispatch();
   const [sprayComplete, setSprayComplete] = useState(false);
   const sprayCompleteTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasCompletedSprayCan = useRef(false);
 
   const onSprayComplete = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+
     // Prevent multiple completions for the same spray can
     if (hasCompletedSprayCan.current) {
       return;
@@ -329,6 +336,30 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
       sprayCompleteTimeoutRef.current = null;
     }, 2000);
   };
+
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  useEffect(() => {
+    timerRef.current = setTimeout(() => {
+      const activeSprayCanId = store.getState().game.activeSprayCanId;
+      if (gameInstance.current && activeSprayCanId != null) {
+        gameInstance.current.failSprayCan(activeSprayCanId);
+      }
+
+      hasCompletedSprayCan.current = true;
+
+      // TODO: potentially show message that the user failed
+      dispatchRef.current(gameActions.setSprayAreaVisible(false));
+      resetCanvas();
+      hasCompletedSprayCan.current = false;
+    }, 5_000);
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [gameInstance, resetCanvas]);
 
   // Cleanup on unmount
   useEffect(() => {
