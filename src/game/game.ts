@@ -281,6 +281,9 @@ export class Game {
       if (this.player.takeDamage()) {
         console.log(`Player took damage! Lives remaining: ${this.player.getLives()}`);
 
+        // Kill the cop that caught the player
+        this.level.killCop(nearbyCop.getId());
+
         if (this.player.getLives() === 0) {
           soundService.playSound('caught');
           soundService.stopSound('policeWalk');
