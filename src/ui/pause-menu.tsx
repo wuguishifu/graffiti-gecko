@@ -5,20 +5,14 @@ import { SettingsMenu } from './settings-menu';
 import { soundService } from '../game/sound/sound';
 import { gameActions } from '../state/game-slice';
 import { useAppDispatch, useAppSelector } from '../state/use-app-state';
-import { secondsToTimeString } from '../util/time-utils';
-
-import { Timer } from '@/components/timer';
 
 export function PauseMenu() {
   const [settingsVisible, setSettingsVisible] = useState(false);
 
   const currentLevel = useAppSelector((state) => state.game.currentLevel);
-  const timeLeft = useAppSelector((state) => state.game.timeLeft);
   const tagsCompleted = useAppSelector((state) => state.game.totalSprayCansCompleted);
 
   const dispatch = useAppDispatch();
-
-  const totalDuration = useAppSelector((state) => state.dev.overrideTotalTime || 300);
 
   soundService.stopSound('policeWalk');
 
@@ -32,17 +26,11 @@ export function PauseMenu() {
       <div className="flex flex-col items-center gap-8">
         <img src="/assets/copy/game-paused.svg" className="pointer-events-none" />
         <p className="text-6xl font-graffiti-youth !text-black">Level {currentLevel}</p>
-        <div className="flex flex-row items-center gap-32 w-[50rem] h-38">
+        <div className="flex flex-row items-center gap-32 w-[30rem] h-38">
           <Pill>
-            <p className="text-7xl font-graffiti-youth !text-black">{tagsCompleted}</p>
+            <p className="text-7xl font-graffiti-youth !text-black">{tagsCompleted} tags</p>
             <div className="absolute -left-20 -top-14">
               <img src="/assets/icons/can.png" className="size-48 pointer-events-none select-none" />
-            </div>
-          </Pill>
-          <Pill>
-            <p className="text-7xl font-graffiti-youth !text-black">{secondsToTimeString(timeLeft)}</p>
-            <div className="absolute -left-12">
-              <Timer remainingDurationSeconds={timeLeft} totalDurationSeconds={totalDuration} strokeWidth={3} />
             </div>
           </Pill>
         </div>

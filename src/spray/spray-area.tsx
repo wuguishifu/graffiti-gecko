@@ -1,11 +1,12 @@
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 
+import { Timer } from '../components/timer';
 import { soundService } from '../game/sound/sound';
 import { useGame } from '../state/game-context';
 import { gameActions } from '../state/game-slice';
 import { useAppDispatch, useAppSelector } from '../state/use-app-state';
+import { secondsToTimeString } from '../util/time-utils';
 
-import { Lives } from '@/components/lives';
 import { store } from '@/state/store';
 
 export type SprayAreaRef = {
@@ -40,6 +41,9 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
   const [overlapPercentage, setOverlapPercentage] = useState(0);
   const throttledTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { gameInstance } = useGame();
+
+  const dispatch = useAppDispatch();
+  const dispatchRef = useRef(dispatch);
 
   const sprayColor = useAppSelector((state) => state.data.sprayColor);
 
@@ -194,7 +198,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     }, 100);
   };
 
-  const resetCanvas = () => {
+  const resetCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) {
       return;
@@ -213,7 +217,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
     // Reset completion flag
     hasCompletedSprayCan.current = false;
-  };
+  }, []);
 
   const startPainting = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault(); // Prevent default to avoid conflicts
@@ -295,12 +299,16 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     throttledCalculateOverlap();
   };
 
-  const dispatch = useAppDispatch();
   const [sprayComplete, setSprayComplete] = useState(false);
   const sprayCompleteTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hasCompletedSprayCan = useRef(false);
 
   const onSprayComplete = () => {
+    if (countdownTimerRef.current) {
+      clearTimeout(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+
     // Prevent multiple completions for the same spray can
     if (hasCompletedSprayCan.current) {
       return;
@@ -329,6 +337,65 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
       sprayCompleteTimeoutRef.current = null;
     }, 2000);
   };
+
+  const [sprayFailed, setSprayFailed] = useState(false);
+  const sprayFailedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const totalTime = 10;
+  const [remainingTime, setRemainingTime] = useState(totalTime);
+
+  useEffect(() => {
+    setRemainingTime(totalTime); // Reset timer when spray area is shown
+    let interval: NodeJS.Timeout | null = null;
+    countdownTimerRef.current = setTimeout(() => {
+      const activeSprayCanId = store.getState().game.activeSprayCanId;
+      if (gameInstance.current && activeSprayCanId != null) {
+        gameInstance.current.failSprayCan(activeSprayCanId);
+      }
+
+      hasCompletedSprayCan.current = true;
+      setSprayFailed(true);
+
+      if (sprayFailedTimeoutRef.current) {
+        clearTimeout(sprayFailedTimeoutRef.current);
+      }
+
+      sprayCompleteTimeoutRef.current = setTimeout(() => {
+        dispatchRef.current(gameActions.setSprayAreaVisible(false));
+        dispatchRef.current(gameActions.failSprayCan());
+        resetCanvas();
+        setSprayFailed(false);
+        hasCompletedSprayCan.current = false;
+      }, 2000);
+    }, totalTime * 1000);
+
+    interval = setInterval(() => {
+      setRemainingTime((prev) => {
+        if (prev > 0) {
+          return prev - 1;
+        }
+        return 0;
+      });
+    }, 1000);
+
+    return () => {
+      if (countdownTimerRef.current) {
+        clearTimeout(countdownTimerRef.current);
+        countdownTimerRef.current = null;
+      }
+      if (sprayFailedTimeoutRef.current) {
+        clearTimeout(sprayFailedTimeoutRef.current);
+        sprayFailedTimeoutRef.current = null;
+      }
+      if (sprayCompleteTimeoutRef.current) {
+        clearTimeout(sprayCompleteTimeoutRef.current);
+        sprayCompleteTimeoutRef.current = null;
+      }
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [gameInstance, resetCanvas]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -379,8 +446,18 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
         <div className="absolute top-8 left-0 w-full flex justify-center">
           <img src="/assets/copy/tag-it.svg" />
         </div>
-        <div className="absolute -top-8 right-20">
-          <Lives />
+        <div className="absolute top-8 right-20">
+          <div className="bg-[#665F4D] border-3 border-white h-12 px-4 flex justify-end items-center rounded-xl relative w-36">
+            <div className="absolute -left-8">
+              <Timer
+                remainingDurationSeconds={remainingTime}
+                totalDurationSeconds={totalTime}
+                size={92}
+                strokeWidth={3}
+              />
+            </div>
+            <span className="text-3xl font-blank-river">{secondsToTimeString(remainingTime)}</span>
+          </div>
         </div>
       </div>
 
@@ -405,6 +482,17 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
             src="/assets/tags/spray-bg.webp"
           />
           <img src="/assets/copy/tag-complete.svg" className="w-1/4 scale-bounce" />
+        </div>
+      )}
+
+      {/* Spray failed splash */}
+      {sprayFailed && (
+        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center pointer-events-none select-none z-0">
+          <img
+            className="absolute h-3/4 select-none pointer-events-none scale-bounce -z-10 scale-75"
+            src="/assets/tags/spray-bg-red.webp"
+          />
+          <img src="/assets/copy/tag-failed.svg" className="w-1/4 scale-bounce" />
         </div>
       )}
     </div>

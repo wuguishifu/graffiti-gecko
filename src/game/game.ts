@@ -25,21 +25,15 @@ export class Game {
   private player: Player;
   private level: Level;
   private running = false;
-  private static timerInterval: number | null = null;
-  private static timerRunning = false;
   private textureManager: TextureManager;
 
-  public pause(stopTimer = true) {
+  public pause() {
     this.running = false;
-    if (stopTimer) {
-      this.stopTimer();
-    }
   }
 
   public resume() {
     if (!this.running) {
       this.running = true;
-      this.startTimer();
       this.run();
     }
   }
@@ -67,43 +61,10 @@ export class Game {
     this.player.onKeyUp(event);
   }
 
-  private startTimer() {
-    if (Game.timerRunning) {
-      return;
-    }
-    Game.timerRunning = true;
-    if (Game.timerInterval !== null) {
-      return;
-    }
-    Game.timerInterval = window.setInterval(() => {
-      if (!Game.timerRunning) {
-        return;
-      }
-      const state = store.getState();
-      const timeLeft = state.game.timeLeft;
-      if (timeLeft > 0) {
-        store.dispatch(gameActions.setTimeLeft(timeLeft - 1));
-        if (timeLeft - 1 === 0) {
-          store.dispatch(gameActions.setGameOverFlag(true));
-        }
-      }
-    }, 1000);
-  }
-
-  private stopTimer() {
-    if (Game.timerInterval) {
-      clearInterval(Game.timerInterval);
-      Game.timerInterval = null;
-      Game.timerRunning = false;
-    }
-  }
-
   constructor(
     canvas: HTMLCanvasElement,
     private devOptions: DevSliceState,
   ) {
-    store.dispatch(gameActions.setTimeLeft(devOptions.overrideTotalTime || 300));
-
     this.canvas = canvas;
     const gl = canvas.getContext('webgl', { antialias: false });
     if (!gl) {
@@ -152,7 +113,6 @@ export class Game {
     this.textureManager = TextureManager.getInstance(this.gl);
     this.running = true;
     this.setup().then(() => {
-      this.startTimer();
       this.run();
     });
   }
@@ -203,7 +163,7 @@ export class Game {
         const angle = Vector3.angleFromXAxisXY(direction);
 
         const position = Vector3.normalize(direction).scale(1).add(this.player.position);
-        const rotation = new Vector3(0, 0, angle);
+        const rotation = new Vector3(0, 0, angle + Math.PI);
         const scale = new Vector3(1, 1, 1);
         return { position, rotation, scale };
       });
@@ -308,6 +268,17 @@ export class Game {
     const active = sprayCans.find((sprayCan) => sprayCan.id === id);
     if (active) {
       active.isCompleted = true;
+      active.state = 'completed';
+    }
+  }
+
+  public failSprayCan(id: number) {
+    const sprayCans = this.level.getSprayCans();
+    const active = sprayCans.find((sprayCan) => sprayCan.id === id);
+    this.level.spawnExtraSprayCan();
+    if (active) {
+      active.isCompleted = true;
+      active.state = 'failed';
     }
   }
 
@@ -341,7 +312,6 @@ export class Game {
   public destroy() {
     // Stop the game loop
     this.running = false;
-    this.stopTimer();
 
     // Remove event listeners
     document.removeEventListener('keydown', this.boundKeyDown);

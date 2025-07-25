@@ -22,6 +22,8 @@ export class Level {
   private sprayCans: SprayCan[] = [];
   private cops: Cop[] = [];
   private player: Player | null = null;
+  private accessibleTiles: Set<Tile> = new Set<Tile>();
+  private accessibleWalls: { x: number; y: number }[] = [];
 
   constructor(
     private gl: WebGLRenderingContext,
@@ -42,12 +44,9 @@ export class Level {
       return;
     }
 
-    const accessibleTiles = new Set<Tile>();
-    const accessibleWalls: { x: number; y: number }[] = [];
-    this.DFS(this.player.position.x, this.player.position.y, accessibleTiles, accessibleWalls);
-
-    this.spawnSprayCans(accessibleWalls);
-    this.spawnCops(this.player, accessibleTiles);
+    this.DFS(this.player.position.x, this.player.position.y);
+    this.spawnSprayCans();
+    this.spawnCops(this.player);
   }
 
   public generate() {
@@ -149,8 +148,8 @@ export class Level {
     return this.tiles[y]?.[x] ?? null;
   }
 
-  private spawnSprayCans(accessibleWalls: { x: number; y: number }[]) {
-    const randomizedAccessibleWalls = [...accessibleWalls].sort(() => Math.random() - 0.5); // Shuffle positions
+  private spawnSprayCans() {
+    const randomizedAccessibleWalls = [...this.accessibleWalls].sort(() => Math.random() - 0.5); // Shuffle positions
 
     // spray cans per level:
     // 1-3: 2-3
@@ -176,17 +175,17 @@ export class Level {
     );
   }
 
-  private DFS(x: number, y: number, visited: Set<Tile>, edges: { x: number; y: number }[]) {
+  private DFS(x: number, y: number) {
     if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
       return;
     }
 
     const tile = this.tiles[y]?.[x];
-    if (!tile || !walkableTiles.includes(tile.variant) || visited.has(tile)) {
+    if (!tile || !walkableTiles.includes(tile.variant) || this.accessibleTiles.has(tile)) {
       return;
     }
 
-    visited.add(tile);
+    this.accessibleTiles.add(tile);
 
     // Check if this tile is a building-road edge
     if (tile.variant === 'stone') {
@@ -196,14 +195,14 @@ export class Level {
         // average position
         const avgX = (neighbor.position.x + x) / 2;
         const avgY = (neighbor.position.y + y) / 2;
-        edges.push({ x: avgX, y: avgY });
+        this.accessibleWalls.push({ x: avgX, y: avgY });
       }
     }
 
-    this.DFS(x + 1, y, visited, edges);
-    this.DFS(x - 1, y, visited, edges);
-    this.DFS(x, y + 1, visited, edges);
-    this.DFS(x, y - 1, visited, edges);
+    this.DFS(x + 1, y);
+    this.DFS(x - 1, y);
+    this.DFS(x, y + 1);
+    this.DFS(x, y - 1);
   }
 
   private getNeighborTiles(x: number, y: number): Tile[] {
@@ -231,11 +230,24 @@ export class Level {
     return this.sprayCans;
   }
 
-  private spawnCops(player: Player, accessibleTiles: Set<Tile>) {
+  public spawnExtraSprayCan() {
+    const newSprayCanPosition: { x: number; y: number } =
+      this.accessibleWalls[Math.floor(Math.random() * this.accessibleWalls.length)];
+
+    const extraSprayCan = new SprayCan(this.gl, this.sprayCans.length);
+    extraSprayCan.position.x = newSprayCanPosition.x;
+    extraSprayCan.position.y = newSprayCanPosition.y;
+    extraSprayCan.position.z = 0.1; // Slightly above ground
+    this.sprayCans.push(extraSprayCan);
+
+    store.dispatch(gameActions.addSprayCan(extraSprayCan.id));
+  }
+
+  private spawnCops(player: Player) {
     this.cops = [];
 
     const minDistanceFromPlayer = 8;
-    const validSpawnPoints: { x: number; y: number }[] = Array.from(accessibleTiles)
+    const validSpawnPoints: { x: number; y: number }[] = Array.from(this.accessibleTiles)
       .filter((tile) => {
         const dx = tile.position.x - player.position.x;
         const dy = tile.position.y - player.position.y;

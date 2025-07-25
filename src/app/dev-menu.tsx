@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
 
 import { Button, buttonVariants } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { devActions } from '@/state/dev-slice';
@@ -57,15 +56,6 @@ export function DevMenu() {
           <Switch
             checked={devState.onePercentFill}
             onCheckedChange={() => dispatch(devActions.toggleOnePercentFill())}
-          />
-        </Label>
-        <Label className="flex">
-          <h2 className="text-xl flex-1">Override Timer</h2>
-          <Input
-            className="flex-1"
-            type="number"
-            value={devState.overrideTotalTime}
-            onChange={(e) => dispatch(devActions.setTotalTime(Number(e.target.value)))}
           />
         </Label>
         <Button onClick={() => dispatch(devActions.reset())} className="cursor-pointer">
