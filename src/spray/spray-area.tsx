@@ -338,6 +338,8 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     }, 2000);
   };
 
+  const [sprayFailed, setSprayFailed] = useState(false);
+  const sprayFailedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
   const totalTime = 10;
   const [remainingTime, setRemainingTime] = useState(totalTime);
@@ -352,12 +354,19 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
       }
 
       hasCompletedSprayCan.current = true;
+      setSprayFailed(true);
 
-      // TODO: potentially show message that the user failed
-      dispatchRef.current(gameActions.setSprayAreaVisible(false));
-      dispatchRef.current(gameActions.failSprayCan());
-      resetCanvas();
-      hasCompletedSprayCan.current = false;
+      if (sprayFailedTimeoutRef.current) {
+        clearTimeout(sprayFailedTimeoutRef.current);
+      }
+
+      sprayCompleteTimeoutRef.current = setTimeout(() => {
+        dispatchRef.current(gameActions.setSprayAreaVisible(false));
+        dispatchRef.current(gameActions.failSprayCan());
+        resetCanvas();
+        setSprayFailed(false);
+        hasCompletedSprayCan.current = false;
+      }, 2000);
     }, totalTime * 1000);
 
     interval = setInterval(() => {
@@ -373,6 +382,14 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
       if (countdownTimerRef.current) {
         clearTimeout(countdownTimerRef.current);
         countdownTimerRef.current = null;
+      }
+      if (sprayFailedTimeoutRef.current) {
+        clearTimeout(sprayFailedTimeoutRef.current);
+        sprayFailedTimeoutRef.current = null;
+      }
+      if (sprayCompleteTimeoutRef.current) {
+        clearTimeout(sprayCompleteTimeoutRef.current);
+        sprayCompleteTimeoutRef.current = null;
       }
       if (interval) {
         clearInterval(interval);
@@ -465,6 +482,17 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
             src="/assets/tags/spray-bg.webp"
           />
           <img src="/assets/copy/tag-complete.svg" className="w-1/4 scale-bounce" />
+        </div>
+      )}
+
+      {/* Spray failed splash */}
+      {sprayFailed && (
+        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center pointer-events-none select-none z-0">
+          <img
+            className="absolute h-3/4 select-none pointer-events-none scale-bounce -z-10 scale-75"
+            src="/assets/tags/spray-bg-red.webp"
+          />
+          <img src="/assets/copy/tag-failed.svg" className="w-1/4 scale-bounce" />
         </div>
       )}
     </div>
