@@ -190,6 +190,10 @@ export class Game {
     const objectModels = this.level
       .getSprayCans()
       .filter((sprayCan) => {
+        if (sprayCan.isCompleted) {
+          return false;
+        }
+
         const dx = sprayCan.position.x - this.player.position.x;
         const dy = sprayCan.position.y - this.player.position.y;
         return dx * dx + dy * dy > 12;
