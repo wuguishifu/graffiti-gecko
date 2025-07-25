@@ -9,10 +9,11 @@ const colors = ['#FF00D0', '#78D441', '#71FFF3', '#FFF600', '#FF8000'];
 export function SettingsMenu({ onHide }: { onHide: () => void }) {
   const dispatch = useAppDispatch();
   const dispatchRef = useRef(dispatch);
-
   const changeColorFn = useCallback((color: string) => () => dispatchRef.current(dataActions.setSprayColor(color)), []);
 
   const selectedColor = useAppSelector((state) => state.data.sprayColor);
+  const musicVolume = useAppSelector((state) => state.data.musicVolume);
+  const soundVolume = useAppSelector((state) => state.data.soundVolume);
 
   return (
     <div className="absolute top-0 right-0 w-full h-full flex items-center justify-center bg-white/20 backdrop-blur-md z-50">
@@ -37,7 +38,43 @@ export function SettingsMenu({ onHide }: { onHide: () => void }) {
             ))}
           </div>
         </div>
-        <div className="mt-24 flex justify-end w-full">
+        <div className="mt-12 flex items-center gap-4 w-full">
+          <p className="text-6xl font-blank-river !text-black">Music</p>
+          <label
+            htmlFor="minmax-range"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          ></label>
+          <input
+            id="minmax-range"
+            type="range"
+            min="0"
+            max="1"
+            step="0.1"
+            value={musicVolume}
+            onChange={(e) => dispatch(dataActions.setMusicVolume(Number(e.target.value)))}
+            className="flex-1 h-6 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-black"
+          />
+        </div>
+
+        <div className="mt-12 flex items-center gap-4 w-full">
+          <p className="text-6xl font-blank-river !text-black">Sound</p>
+          <label
+            htmlFor="minmax-range"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          ></label>
+          <input
+            id="minmax-range"
+            type="range"
+            min="0"
+            max="1"
+            step="0.1"
+            value={soundVolume}
+            onChange={(e) => dispatch(dataActions.setSoundVolume(Number(e.target.value)))}
+            className="flex-1 h-6 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 accent-black"
+          />
+        </div>
+
+        <div className="mt-12 flex justify-end w-full">
           <button
             className="hover:scale-110 transition-transform cursor-pointer"
             onMouseEnter={() => soundService.playSound('hover')}

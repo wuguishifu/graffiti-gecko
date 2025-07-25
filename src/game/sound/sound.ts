@@ -3,18 +3,18 @@ import { Howl } from 'howler';
 import { store } from '@/state/store';
 
 const Sounds = {
-  click: new Howl({ src: ['/assets/sounds/button.mp3'], volume: 0.3 }),
-  hover: new Howl({ src: ['/assets/sounds/hover.mp3'], volume: 0.3 }),
-  hit: new Howl({ src: ['/assets/sounds/hit.mp3'], volume: 0.3 }),
-  caught: new Howl({ src: ['/assets/sounds/caught.wav'], volume: 0.3 }),
-  policeWalk: new Howl({ src: ['/assets/sounds/police_walk.mp3'], volume: 0.3, loop: true }),
-  spray: new Howl({ src: ['/assets/sounds/spray.mp3'], volume: 0.3, loop: true }),
-  success: new Howl({ src: ['/assets/sounds/success.mp3'], volume: 0.3 }),
-  mainMenu: new Howl({ src: ['/assets/sounds/music/main_menu.mp3'], volume: 0.3 }),
-  game1: new Howl({ src: ['/assets/sounds/music/game1.mp3'], volume: 0.3 }),
-  game2: new Howl({ src: ['/assets/sounds/music/game2.mp3'], volume: 0.3 }),
-  game3: new Howl({ src: ['/assets/sounds/music/game3.mp3'], volume: 0.3 }),
-  game4: new Howl({ src: ['/assets/sounds/music/game4.mp3'], volume: 0.3 }),
+  click: new Howl({ src: ['/assets/sounds/button.mp3'] }),
+  hover: new Howl({ src: ['/assets/sounds/hover.mp3'] }),
+  hit: new Howl({ src: ['/assets/sounds/hit.mp3'] }),
+  caught: new Howl({ src: ['/assets/sounds/caught.wav'] }),
+  policeWalk: new Howl({ src: ['/assets/sounds/police_walk.mp3'] }),
+  spray: new Howl({ src: ['/assets/sounds/spray.mp3'] }),
+  success: new Howl({ src: ['/assets/sounds/success.mp3'] }),
+  mainMenu: new Howl({ src: ['/assets/sounds/music/main_menu.mp3'] }),
+  game1: new Howl({ src: ['/assets/sounds/music/game1.mp3'] }),
+  game2: new Howl({ src: ['/assets/sounds/music/game2.mp3'] }),
+  game3: new Howl({ src: ['/assets/sounds/music/game3.mp3'] }),
+  game4: new Howl({ src: ['/assets/sounds/music/game4.mp3'] }),
 };
 
 const gameMusicKeys: (keyof typeof Sounds)[] = ['game1', 'game2', 'game3', 'game4'];
@@ -22,11 +22,16 @@ const gameMusicKeys: (keyof typeof Sounds)[] = ['game1', 'game2', 'game3', 'game
 class SoundService {
   private loopIds: Partial<Record<keyof typeof Sounds, number>> = {};
 
-  public playSound(key: keyof typeof Sounds, volume = 0.3, loop = false) {
+  public playSound(key: keyof typeof Sounds, volume = 1, loop = false) {
     if (!store.getState().session.soundOn) {
       return;
     }
     const howl = Sounds[key];
+    const soundPreference = ['mainMenu', 'game1', 'game2', 'game3', 'game4'].includes(key)
+      ? store.getState().data.musicVolume
+      : store.getState().data.soundVolume;
+
+    const finalVolume = volume * soundPreference;
 
     if (loop) {
       let id = this.loopIds[key];
@@ -35,12 +40,12 @@ class SoundService {
         this.loopIds[key] = id;
       }
       if (volume != null) {
-        howl.volume(volume, id);
+        howl.volume(finalVolume, id);
       }
     } else {
       const id = howl.play();
       if (volume != null) {
-        howl.volume(volume, id);
+        howl.volume(finalVolume, id);
       }
     }
   }
