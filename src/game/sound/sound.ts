@@ -20,7 +20,7 @@ const Sounds = {
 const gameMusicKeys: (keyof typeof Sounds)[] = ['game1', 'game2', 'game3', 'game4'];
 
 class SoundService {
-  private loopIds: Partial<Record<keyof typeof Sounds, number>> = {};
+  public loopIds: Partial<Record<keyof typeof Sounds, number>> = {};
 
   public playSound(key: keyof typeof Sounds, volume = 1, loop = false) {
     if (!store.getState().session.soundOn) {
@@ -48,6 +48,15 @@ class SoundService {
         howl.volume(finalVolume, id);
       }
     }
+  }
+
+  public changeVolume(key: keyof typeof Sounds, volume: number) {
+    const howl = Sounds[key];
+    const id = this.loopIds[key];
+    if (id == null) {
+      return;
+    }
+    howl.volume(volume, id);
   }
 
   public stopSound(key: keyof typeof Sounds) {
