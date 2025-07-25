@@ -8,18 +8,20 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Serve static files from the dist directory (Vite build output)
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// API routes can be added here
-app.get('/api/health', (req, res) => {
+app.get('/api/health', (_, res) => {
   res.json({ status: 'OK', message: 'Server is running' });
 });
 
-// Handle client-side routing by serving index.html for all non-API routes
+app.get('/api/leaderboard', (_, res) => {
+  return res.status(200).json({
+    hello: 'world',
+  });
+});
+
 app.get('*', (req, res) => {
-  // Skip API routes
-  if (req.path.startsWith('/api/')) {
+  if (req.path.startsWith('/api')) {
     return res.status(404).json({ error: 'API endpoint not found' });
   }
 
@@ -31,7 +33,6 @@ const server = app.listen(PORT, () => {
   console.log(`API health check: http://localhost:${PORT}/api/health`);
 });
 
-// Handle graceful shutdown
 process.on('SIGINT', () => {
   console.log('\nReceived SIGINT. Shutting down gracefully...');
   server.close(() => {

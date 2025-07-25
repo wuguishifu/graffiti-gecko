@@ -26,6 +26,13 @@ export function MainMenu() {
     };
   }, []);
 
+  useEffect(() => {
+    console.log('hi');
+    fetch('/api/health')
+      .then((response) => response.json())
+      .then(console.log);
+  }, []);
+
   return (
     <main className="h-full flex items-center justify-center">
       <img
