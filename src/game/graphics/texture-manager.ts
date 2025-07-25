@@ -1,7 +1,7 @@
 import { Texture } from './texture';
 import { TileVariant } from '../tiles/types';
 
-type EntityVariant = 'gecko' | 'spray-can' | 'cop';
+type EntityVariant = 'gecko' | 'spray-can' | 'cop' | 'arrow';
 
 const tileVariantToTextureMap: Record<TileVariant, string> = {
   grass: '/assets/tiles/grass.jpg',
@@ -15,6 +15,7 @@ const entityVariantToTextureMap: Record<EntityVariant, string> = {
   gecko: '/assets/gecko.png',
   'spray-can': '/assets/entities/spray-can.png',
   cop: '/assets/entities/cop.png',
+  arrow: '/assets/entities/arrow.png',
 };
 
 export class TextureManager {
@@ -43,6 +44,15 @@ export class TextureManager {
 
     await Promise.all(loadPromises);
     console.log('All tile textures preloaded successfully');
+  }
+
+  public async preloadAllEntityTextures(): Promise<void> {
+    const loadPromises = Object.entries(entityVariantToTextureMap).map(([variant, path]) =>
+      this.loadEntityTexture(variant as EntityVariant, path),
+    );
+
+    await Promise.all(loadPromises);
+    console.log('All entity textures preloaded successfully');
   }
 
   public async preloadEntityTexture(variant: EntityVariant): Promise<void> {
