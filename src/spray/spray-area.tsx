@@ -349,6 +349,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
 
       // TODO: potentially show message that the user failed
       dispatchRef.current(gameActions.setSprayAreaVisible(false));
+      dispatchRef.current(gameActions.failSprayCan());
       resetCanvas();
       hasCompletedSprayCan.current = false;
     }, 5_000);

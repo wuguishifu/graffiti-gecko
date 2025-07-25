@@ -239,6 +239,8 @@ export class Level {
     extraSprayCan.position.y = newSprayCanPosition.y;
     extraSprayCan.position.z = 0.1; // Slightly above ground
     this.sprayCans.push(extraSprayCan);
+
+    store.dispatch(gameActions.addSprayCan(extraSprayCan.id));
   }
 
   private spawnCops(player: Player) {

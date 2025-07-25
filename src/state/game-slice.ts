@@ -1,5 +1,7 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
+import { SprayCanState } from '../game/entities/spray-can';
+
 /*
   Redux slice for managing game state.
   Things in this slice will not be persisted across sessions.
@@ -8,7 +10,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 type GameSliceState = {
   sprayAreaVisible: boolean;
   nearSprayCan: boolean;
-  sprayCans: Record<number, boolean>;
+  sprayCans: Record<number, SprayCanState>;
   activeSprayCanId?: number;
   lives: number;
   gameOverFlag?: boolean;
@@ -44,20 +46,30 @@ export const gameSlice = createSlice({
       state.sprayCans = {};
     },
     setSprayCans: (state, action: PayloadAction<number[]>) => {
-      state.sprayCans = action.payload.reduce<Record<number, boolean>>((acc, canId) => {
-        acc[canId] = false;
+      state.sprayCans = action.payload.reduce<Record<number, SprayCanState>>((acc, canId) => {
+        acc[canId] = 'available';
         return acc;
       }, {});
+    },
+    addSprayCan: (state, action: PayloadAction<number>) => {
+      const canId = action.payload;
+      state.sprayCans[canId] = 'available';
     },
     setActiveSprayCanId: (state, action: PayloadAction<number>) => {
       state.activeSprayCanId = action.payload;
     },
     completeSprayCan: (state) => {
       if (state.activeSprayCanId !== undefined) {
-        state.sprayCans[state.activeSprayCanId] = true;
+        state.sprayCans[state.activeSprayCanId] = 'completed';
         console.log(`Completing spray can ${state.activeSprayCanId}, total now: ${state.totalSprayCansCompleted + 1}`);
       }
       state.totalSprayCansCompleted++;
+    },
+    failSprayCan: (state) => {
+      if (state.activeSprayCanId !== undefined) {
+        state.sprayCans[state.activeSprayCanId] = 'failed';
+        console.log(`Failing spray can ${state.activeSprayCanId}`);
+      }
     },
     setLives: (state, action: PayloadAction<number>) => {
       state.lives = action.payload;

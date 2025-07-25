@@ -6,7 +6,7 @@ import { EntityVariant, TextureManager } from '../graphics/texture-manager';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
 
-type SprayCanState = 'available' | 'completed' | 'failed';
+export type SprayCanState = 'available' | 'completed' | 'failed';
 
 export class SprayCan extends RenderObject {
   private mesh: Mesh;
