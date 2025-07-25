@@ -11,7 +11,7 @@ export function GamePauser() {
 
   useEffect(() => {
     if (sprayAreaVisible) {
-      gameInstance.current?.pause(false);
+      gameInstance.current?.pause();
       return;
     }
 

@@ -16,7 +16,6 @@ type GameSliceState = {
   totalSprayCansCompleted: number;
   currentLevel: number;
   pauseMenuVisible?: boolean;
-  timeLeft: number;
   energyPercent: number;
 };
 
@@ -28,7 +27,6 @@ const initialState: GameSliceState = {
   distanceTraveled: 0,
   totalSprayCansCompleted: 0,
   currentLevel: 1,
-  timeLeft: 60 * 5,
   energyPercent: 100,
 };
 
@@ -78,9 +76,6 @@ export const gameSlice = createSlice({
     },
     setPauseMenuVisible: (state, action: PayloadAction<boolean>) => {
       state.pauseMenuVisible = action.payload;
-    },
-    setTimeLeft: (state, action: PayloadAction<number>) => {
-      state.timeLeft = action.payload;
     },
     setEnergyPercent: (state, action: PayloadAction<number>) => {
       state.energyPercent = action.payload;

@@ -1,9 +1,8 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 export type DevSliceState = {
   disableCopAi: boolean;
   unlimitedStamina: boolean;
-  overrideTotalTime: number;
   godMode: boolean;
   manySprayCans: boolean;
   onePercentFill: boolean;
@@ -13,7 +12,6 @@ export type DevSliceState = {
 const initialState: DevSliceState = {
   disableCopAi: false,
   unlimitedStamina: false,
-  overrideTotalTime: 0,
   godMode: false,
   manySprayCans: false,
   onePercentFill: false,
@@ -26,9 +24,6 @@ export const devSlice = createSlice({
   reducers: {
     toggleCopAi: (state) => {
       state.disableCopAi = !state.disableCopAi;
-    },
-    setTotalTime: (state, action: PayloadAction<number | undefined>) => {
-      state.overrideTotalTime = action.payload ?? 0;
     },
     toggleUnlimitedStamina: (state) => {
       state.unlimitedStamina = !state.unlimitedStamina;

@@ -6,15 +6,19 @@ import { TextureManager } from '../graphics/texture-manager';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
 
+type SprayCanState = 'available' | 'completed' | 'failed';
+
 export class SprayCan extends RenderObject {
   private mesh: Mesh;
   private textureManager: TextureManager;
   public id: number;
   public isCompleted = false;
+  public state: SprayCanState;
 
   constructor(gl: WebGLRenderingContext, id: number) {
     super(new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
 
+    this.state = 'available';
     this.mesh = squareMesh(gl);
     this.id = id;
     this.textureManager = TextureManager.getInstance(gl);
