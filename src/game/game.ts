@@ -192,7 +192,7 @@ export class Game {
       .filter((sprayCan) => {
         const dx = sprayCan.position.x - this.player.position.x;
         const dy = sprayCan.position.y - this.player.position.y;
-        return dx * dx + dy * dy > 24;
+        return dx * dx + dy * dy > 12;
       })
       .map((sprayCan) => {
         const direction = Vector3.subtract(sprayCan.position, this.player.position);
