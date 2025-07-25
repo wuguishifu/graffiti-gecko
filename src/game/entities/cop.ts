@@ -22,8 +22,9 @@ export class Cop extends RenderObject {
   private textureManager: TextureManager;
   private level: Level;
   private player: Player;
-  private defaultSpeed = 0.03;
-  private speed = 0.03;
+  private defaultSpeed = 0.02;
+  private speed = 0.02;
+  private acceleration = 0.005;
   private chaseRadius = 100;
   private id: number;
   private path: { x: number; y: number }[] = [];
@@ -54,7 +55,7 @@ export class Cop extends RenderObject {
 
     // Scale speed based on difficulty level
     // Level 1: 0.05, Level 2: 0.06, Level 3: 0.07, etc. (capped at 0.12 for balance)
-    const speedIncrease = Math.min(difficultyLevel - 1, 7) * 0.01; // +0.01 per level, max +0.07
+    const speedIncrease = Math.min(difficultyLevel - 1, 7) * this.acceleration; // +0.01 per level, max +0.07
     this.speed = this.defaultSpeed + speedIncrease;
   }
 
