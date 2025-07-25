@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { Link } from 'react-router';
 
 import { SettingsMenu } from './settings-menu';
+import { soundService } from '../game/sound/sound';
 import { gameActions } from '../state/game-slice';
 import { useAppDispatch, useAppSelector } from '../state/use-app-state';
 import { secondsToTimeString } from '../util/time-utils';
@@ -44,19 +46,34 @@ export function PauseMenu() {
         </div>
         <button
           className="hover:scale-110 transition-transform cursor-pointer"
-          onClick={() => dispatch(gameActions.setPauseMenuVisible(false))}
+          onMouseEnter={() => soundService.playSound('hover')}
+          onClick={() => {
+            soundService.playSound('click');
+            dispatch(gameActions.setPauseMenuVisible(false));
+          }}
         >
           <img src="/assets/copy/resume.svg" />
         </button>
         <button
           className="hover:scale-110 transition-transform cursor-pointer"
-          onClick={() => setSettingsVisible(true)}
+          onMouseEnter={() => soundService.playSound('hover')}
+          onClick={() => {
+            setSettingsVisible(true);
+            soundService.playSound('click');
+          }}
         >
           <img src="/assets/copy/pause-menu-settings.svg" />
         </button>
-        <a href="/" className="hover:scale-110 transition-transform">
+        <Link
+          to="/"
+          className="hover:scale-110 transition-transform"
+          onMouseEnter={() => soundService.playSound('hover')}
+          onClick={() => {
+            soundService.playSound('click');
+          }}
+        >
           <img src="/assets/copy/exit-to-main-menu.svg" />
-        </a>
+        </Link>
       </div>
       {settingsVisible && <SettingsMenu onHide={() => setSettingsVisible(false)} />}
     </div>

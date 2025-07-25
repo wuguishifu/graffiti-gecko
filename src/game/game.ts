@@ -9,6 +9,7 @@ import { Vector3 } from './math';
 import { Player } from './player/player';
 import fsSource from './shaders/fragment.glsl?raw';
 import vsSource from './shaders/vertex.glsl?raw';
+import { soundService } from './sound/sound';
 import { Level } from './world/level';
 
 import { DevSliceState } from '@/state/dev-slice';
@@ -230,6 +231,7 @@ export class Game {
         console.log(`Player took damage! Lives remaining: ${this.player.getLives()}`);
 
         if (this.player.getLives() === 0) {
+          soundService.playSound('caught');
           store.dispatch(gameActions.setGameOverFlag(true));
           store.dispatch(gameActions.setDistanceTraveled(this.player.getTotalDistanceTraveled()));
         }

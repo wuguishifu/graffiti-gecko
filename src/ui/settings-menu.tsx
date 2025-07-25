@@ -1,5 +1,6 @@
 import { useCallback, useRef } from 'react';
 
+import { soundService } from '../game/sound/sound';
 import { dataActions } from '../state/data-slice';
 import { useAppDispatch, useAppSelector } from '../state/use-app-state';
 
@@ -37,7 +38,14 @@ export function SettingsMenu({ onHide }: { onHide: () => void }) {
           </div>
         </div>
         <div className="mt-24 flex justify-end w-full">
-          <button className="hover:scale-110 transition-transform cursor-pointer" onClick={onHide}>
+          <button
+            className="hover:scale-110 transition-transform cursor-pointer"
+            onMouseEnter={() => soundService.playSound('hover')}
+            onClick={() => {
+              soundService.playSound('click');
+              onHide();
+            }}
+          >
             <img src="/assets/copy/confirm.svg" />
           </button>
         </div>

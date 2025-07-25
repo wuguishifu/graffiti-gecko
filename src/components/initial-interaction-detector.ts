@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 
-import { gameActions } from '@/state/game-slice';
+import { sessionActions } from '../state/session-slice';
+
 import { useAppDispatch } from '@/state/use-app-state';
 
 export function InitialInteractionDetector() {
@@ -9,7 +10,7 @@ export function InitialInteractionDetector() {
 
   useEffect(() => {
     function handleUserInteraction() {
-      dispatchRef.current(gameActions.setSoundOn(true));
+      dispatchRef.current(sessionActions.setSoundOn(true));
       window.removeEventListener('click', handleUserInteraction);
     }
 

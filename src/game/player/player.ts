@@ -7,6 +7,7 @@ import { renderObject } from '../graphics/renderer';
 import { TextureManager } from '../graphics/texture-manager';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
+import { soundService } from '../sound/sound';
 import type { Level } from '../world/level';
 
 import { DevSliceState } from '@/state/dev-slice';
@@ -237,10 +238,13 @@ export class Player extends RenderObject {
       this.lives--;
     }
 
+    if (this.lives > 0) {
+      soundService.playSound('hit');
+    }
+
     this.isInvincible = true;
     this.invincibilityTimer = 0;
     this.flashTimer = 0;
-
     return true; // Damage was taken
   }
 

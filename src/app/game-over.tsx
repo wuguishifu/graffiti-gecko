@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
 
+import { soundService } from '../game/sound/sound';
 import { useAppSelector } from '../state/use-app-state';
 
 export function GameOver() {
@@ -36,10 +37,24 @@ export function GameOver() {
             <p className="text-5xl font-graffiti-youth !text-black">{totalSprayCansCompleted}</p>
           </div>
         </div>
-        <Link to="/game" className="hover:scale-110 transition-transform">
+        <Link
+          to="/game"
+          className="hover:scale-110 transition-transform"
+          onMouseEnter={() => soundService.playSound('hover')}
+          onClick={() => {
+            soundService.playSound('click');
+          }}
+        >
           <img src="/assets/copy/new-run.svg" />
         </Link>
-        <Link to="/" className="hover:scale-110 transition-transform">
+        <Link
+          to="/"
+          className="hover:scale-110 transition-transform"
+          onMouseEnter={() => soundService.playSound('hover')}
+          onClick={() => {
+            soundService.playSound('click');
+          }}
+        >
           <img src="/assets/copy/main-menu.svg" />
         </Link>
       </div>

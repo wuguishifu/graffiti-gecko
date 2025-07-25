@@ -18,7 +18,6 @@ type GameSliceState = {
   pauseMenuVisible?: boolean;
   timeLeft: number;
   energyPercent: number;
-  soundOn: boolean;
 };
 
 const initialState: GameSliceState = {
@@ -31,7 +30,6 @@ const initialState: GameSliceState = {
   currentLevel: 1,
   timeLeft: 60 * 5,
   energyPercent: 100,
-  soundOn: false,
 };
 
 export const gameSlice = createSlice({
@@ -86,9 +84,6 @@ export const gameSlice = createSlice({
     },
     setEnergyPercent: (state, action: PayloadAction<number>) => {
       state.energyPercent = action.payload;
-    },
-    setSoundOn: (state, action: PayloadAction<boolean>) => {
-      state.soundOn = action.payload;
     },
     reset: () => initialState,
   },

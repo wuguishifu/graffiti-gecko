@@ -7,9 +7,11 @@ import { dataSlice } from './data-slice';
 import { devSlice } from './dev-slice';
 import { gameSlice } from './game-slice';
 import { reduxLocalStorage } from './local-storage';
+import { sessionSlice } from './session-slice';
 
 const rootReducer = combineReducers({
   [gameSlice.name]: gameSlice.reducer,
+  [sessionSlice.name]: sessionSlice.reducer,
   [dataSlice.name]: dataSlice.reducer,
   [devSlice.name]: devSlice.reducer,
 });
