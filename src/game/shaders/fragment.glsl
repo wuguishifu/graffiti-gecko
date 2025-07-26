@@ -1,43 +1,21 @@
 precision mediump float;
 
-varying vec3 passNormal;
-varying vec3 passFragPos;
 varying vec2 passTextureCoord;
 
-uniform vec3 viewPos;
-uniform vec3 lightPos;
-uniform float lightLevel;
-uniform vec3 lightColor;
 uniform sampler2D uTexture;
 uniform bool useTexture;
-uniform float alphaMultiplier;
 
 void main(void) {
-    vec3 color;
-    float alpha = 1.0;
-    
-    if (useTexture) {
-        vec4 texColor = texture2D(uTexture, passTextureCoord);
-        color = texColor.rgb;
-        alpha = texColor.a;
-    } else {
-        color = vec3(0.5, 0.5, 0.5);
-    }
+  vec3 color;
+  float alpha = 1.0;
 
-    vec3 ambient = lightLevel * lightColor;
-    vec3 lightDir = normalize(lightPos - passFragPos);
-    float diff = max(dot(passNormal, lightDir), 0.0);
-    vec3 diffuse = diff * lightColor;
+  if (useTexture) {
+    vec4 texColor = texture2D(uTexture, passTextureCoord);
+    color = texColor.rgb;
+    alpha = texColor.a;
+  } else {
+    color = vec3(0.5, 0.5, 0.5);
+  }
 
-    float specularStrength = 1.0;
-    vec3 viewDir = normalize(viewPos - passFragPos);
-    vec3 reflectDir = reflect(-lightDir, passNormal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32.0);
-    vec3 specular = specularStrength * spec * lightColor;
-
-    vec3 colorResult = (ambient + diffuse + specular) * color;
-
-    alpha *= alphaMultiplier;
-
-    gl_FragColor = vec4(colorResult, alpha);
+  gl_FragColor = vec4(color, alpha);
 }

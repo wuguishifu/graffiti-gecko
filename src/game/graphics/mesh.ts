@@ -5,7 +5,6 @@ export class Mesh {
   indices: number[];
 
   pbo: WebGLBuffer;
-  nbo: WebGLBuffer;
   tbo: WebGLBuffer;
 
   ibo: WebGLBuffer;
@@ -16,7 +15,6 @@ export class Mesh {
     this.indices = indices;
 
     this.pbo = gl.createBuffer();
-    this.nbo = gl.createBuffer();
     this.tbo = gl.createBuffer();
     this.ibo = gl.createBuffer();
 
@@ -24,13 +22,6 @@ export class Mesh {
     gl.bufferData(
       gl.ARRAY_BUFFER,
       new Float32Array(this.vertices.flatMap((v) => Object.values(v.position))),
-      gl.STATIC_DRAW,
-    );
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, this.nbo);
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array(this.vertices.flatMap((v) => Object.values(v.normal))),
       gl.STATIC_DRAW,
     );
 
@@ -49,7 +40,6 @@ export class Mesh {
   mesh() {
     return {
       pbo: this.pbo,
-      nbo: this.nbo,
       tbo: this.tbo,
       ibo: this.ibo,
       vertexCount: this.vertexCount,
@@ -59,9 +49,6 @@ export class Mesh {
   destroy(gl: WebGLRenderingContext): void {
     if (this.pbo) {
       gl.deleteBuffer(this.pbo);
-    }
-    if (this.nbo) {
-      gl.deleteBuffer(this.nbo);
     }
     if (this.tbo) {
       gl.deleteBuffer(this.tbo);
@@ -74,21 +61,19 @@ export class Mesh {
 
 export class Vertex {
   position: Vector3;
-  normal: Vector3;
   textureCoord: [number, number];
 
-  constructor(position: Vector3, normal: Vector3, textureCoord: [number, number]) {
+  constructor(position: Vector3, textureCoord: [number, number]) {
     this.position = position;
-    this.normal = normal;
     this.textureCoord = textureCoord;
   }
 }
 
 const squareVertices = [
-  new Vertex(new Vector3(-0.5, -0.5, 0), new Vector3(0, 0, 1), [1, 0]),
-  new Vertex(new Vector3(0.5, -0.5, 0), new Vector3(0, 0, 1), [0, 0]),
-  new Vertex(new Vector3(0.5, 0.5, 0), new Vector3(0, 0, 1), [0, 1]),
-  new Vertex(new Vector3(-0.5, 0.5, 0), new Vector3(0, 0, 1), [1, 1]),
+  new Vertex(new Vector3(-0.5, -0.5, 0), [1, 0]),
+  new Vertex(new Vector3(0.5, -0.5, 0), [0, 0]),
+  new Vertex(new Vector3(0.5, 0.5, 0), [0, 1]),
+  new Vertex(new Vector3(-0.5, 0.5, 0), [1, 1]),
 ];
 
 const squareIndices = [0, 1, 2, 0, 2, 3];

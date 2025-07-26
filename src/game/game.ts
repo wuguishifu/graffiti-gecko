@@ -173,7 +173,6 @@ export class Game {
       info: this.programInfo,
       objects: objectModels.map((model) => ({
         model,
-        alphaMultiplier: 1,
       })),
       mesh: squareMesh(this.gl),
       texture: this.textureManager.getEntityTexture('arrow'),
