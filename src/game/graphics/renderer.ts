@@ -16,7 +16,6 @@ type ObjectData = {
   model: ObjectModel;
   texture?: Texture;
   useTexture?: boolean;
-  alphaMultiplier?: number;
 };
 
 type RenderProps = {
@@ -39,7 +38,6 @@ type RenderGroupProps = {
   };
   objects: {
     model: ObjectModel;
-    alphaMultiplier?: number;
   }[];
   mesh: Mesh;
   texture?: Texture;
@@ -47,12 +45,7 @@ type RenderGroupProps = {
   camera: Camera;
 };
 
-export function renderObject({
-  gl,
-  object: { mesh, model, texture, useTexture = false, alphaMultiplier = 1.0 },
-  camera,
-  info,
-}: RenderProps) {
+export function renderObject({ gl, object: { mesh, model, texture, useTexture = false }, camera, info }: RenderProps) {
   const modelMatrix = mat4.create();
   mat4.translate(modelMatrix, modelMatrix, model.position.toReadonlyVec3());
   mat4.rotateX(modelMatrix, modelMatrix, model.rotation.x);
@@ -65,11 +58,6 @@ export function renderObject({
   gl.bindBuffer(gl.ARRAY_BUFFER, mesh.pbo);
   gl.vertexAttribPointer(info.attributes.aPosition, 3, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(info.attributes.aPosition);
-  gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-  gl.bindBuffer(gl.ARRAY_BUFFER, mesh.nbo);
-  gl.vertexAttribPointer(info.attributes.aNormal, 3, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(info.attributes.aNormal);
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, mesh.tbo);
@@ -90,17 +78,11 @@ export function renderObject({
   gl.uniformMatrix4fv(info.uniforms.vModel, false, modelMatrix);
   gl.uniform3fv(info.uniforms.viewPos, camera.position.toArray());
 
-  gl.uniform3fv(info.uniforms.lightPos, [0, 5, 0]);
-  gl.uniform3fv(info.uniforms.lightColor, [1, 1, 1]);
-  gl.uniform1f(info.uniforms.lightLevel, 1.0);
-  gl.uniform1f(info.uniforms.alphaMultiplier, alphaMultiplier);
-
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.ibo);
   gl.drawElements(gl.TRIANGLES, mesh.vertexCount, gl.UNSIGNED_SHORT, 0);
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 
   gl.disableVertexAttribArray(info.attributes.aPosition);
-  gl.disableVertexAttribArray(info.attributes.aNormal);
   gl.disableVertexAttribArray(info.attributes.aTextureCoord);
 
   gl.useProgram(null);
@@ -114,19 +96,10 @@ export function renderSimilarObjects({ gl, info, objects, mesh, camera, texture,
   gl.enableVertexAttribArray(info.attributes.aPosition);
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
-  gl.bindBuffer(gl.ARRAY_BUFFER, mesh.nbo);
-  gl.vertexAttribPointer(info.attributes.aNormal, 3, gl.FLOAT, false, 0, 0);
-  gl.enableVertexAttribArray(info.attributes.aNormal);
-  gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
   gl.bindBuffer(gl.ARRAY_BUFFER, mesh.tbo);
   gl.vertexAttribPointer(info.attributes.aTextureCoord, 2, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(info.attributes.aTextureCoord);
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
-
-  gl.uniform3fv(info.uniforms.lightPos, [0, 5, 0]);
-  gl.uniform3fv(info.uniforms.lightColor, [1, 1, 1]);
-  gl.uniform1f(info.uniforms.lightLevel, 1.0);
 
   if (texture && useTexture) {
     texture.bind(0);
@@ -140,7 +113,7 @@ export function renderSimilarObjects({ gl, info, objects, mesh, camera, texture,
   gl.uniformMatrix4fv(info.uniforms.vProjection, false, camera.projectionMatrix());
   gl.uniform3fv(info.uniforms.viewPos, camera.position.toArray());
 
-  for (const { model, alphaMultiplier = 1.0 } of objects) {
+  for (const { model } of objects) {
     const modelMatrix = mat4.create();
     mat4.translate(modelMatrix, modelMatrix, model.position.toReadonlyVec3());
     mat4.rotateX(modelMatrix, modelMatrix, model.rotation.x);
@@ -148,7 +121,6 @@ export function renderSimilarObjects({ gl, info, objects, mesh, camera, texture,
     mat4.rotateZ(modelMatrix, modelMatrix, model.rotation.z);
     mat4.scale(modelMatrix, modelMatrix, model.scale.toReadonlyVec3());
     gl.uniformMatrix4fv(info.uniforms.vModel, false, modelMatrix);
-    gl.uniform1f(info.uniforms.alphaMultiplier, alphaMultiplier);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.ibo);
     gl.drawElements(gl.TRIANGLES, mesh.vertexCount, gl.UNSIGNED_SHORT, 0);
@@ -156,7 +128,6 @@ export function renderSimilarObjects({ gl, info, objects, mesh, camera, texture,
   }
 
   gl.disableVertexAttribArray(info.attributes.aPosition);
-  gl.disableVertexAttribArray(info.attributes.aNormal);
   gl.disableVertexAttribArray(info.attributes.aTextureCoord);
 
   gl.useProgram(null);
