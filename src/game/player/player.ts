@@ -37,6 +37,11 @@ export class Player extends RenderObject {
   private lastEnergyPercent = 100;
   private energyUpdateThrottle = 6; // only update Redux every 6 frames
   private energyUpdateFrame = 0;
+  private isDodging = false;
+  private dodgeCooldownMs = 7000;
+  private dodgeRotationInterval: NodeJS.Timeout | null = null;
+  private isOnDodgeCooldown = false;
+  private dodgeDurationMs = 3000;
 
   constructor(
     gl: WebGLRenderingContext,
@@ -44,9 +49,7 @@ export class Player extends RenderObject {
     private devOptions: Partial<DevSliceState>,
   ) {
     super(level.getRandomStoneTile() ?? new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 1, 1));
-
     this.devOptions = devOptions;
-
     this.gl = gl;
     this.mesh = squareMesh(gl);
     this.textureManager = TextureManager.getInstance(gl);
@@ -176,7 +179,9 @@ export class Player extends RenderObject {
       this.position.x = newPosition.x;
       this.position.y = newPosition.y;
       this.position.z = newPosition.z;
-      this.rotation.z = -Math.atan2(vx, vy);
+      if (!this.isDodging) {
+        this.rotation.z = -Math.atan2(vx, vy);
+      }
 
       // Update last position
       this.lastPosition.x = this.position.x;
@@ -198,8 +203,9 @@ export class Player extends RenderObject {
         this.position.x = xOnlyPosition.x;
         this.position.y = xOnlyPosition.y;
         this.position.z = xOnlyPosition.z;
-        this.rotation.z = -Math.atan2(vx, 0);
-
+        if (!this.isDodging) {
+          this.rotation.z = -Math.atan2(vx, 0);
+        }
         // Update last position
         this.lastPosition.x = this.position.x;
         this.lastPosition.y = this.position.y;
@@ -220,8 +226,9 @@ export class Player extends RenderObject {
           this.position.x = yOnlyPosition.x;
           this.position.y = yOnlyPosition.y;
           this.position.z = yOnlyPosition.z;
-          this.rotation.z = -Math.atan2(0, vy);
-
+          if (!this.isDodging) {
+            this.rotation.z = -Math.atan2(0, vy);
+          }
           // Update last position
           this.lastPosition.x = this.position.x;
           this.lastPosition.y = this.position.y;
@@ -229,6 +236,41 @@ export class Player extends RenderObject {
         }
       }
     }
+  }
+  public dodge() {
+    if (this.isDodging || this.isOnDodgeCooldown) {
+      return;
+    }
+
+    this.isDodging = true;
+    this.isInvincible = true;
+    this.isOnDodgeCooldown = true;
+
+    // Optional: continuous rotation effect
+    const rotationSpeed = 0.2;
+    const interval = setInterval(() => {
+      this.rotation.z += rotationSpeed;
+    }, 16); // ~60 FPS
+
+    // End dodge duration
+    setTimeout(() => {
+      clearInterval(interval);
+      this.isDodging = false;
+      this.isInvincible = false;
+    }, this.dodgeDurationMs);
+
+    // End total cooldown after full cooldown period
+    setTimeout(() => {
+      this.isOnDodgeCooldown = false;
+    }, this.dodgeCooldownMs);
+  }
+
+  public getDodging(): boolean {
+    return this.isDodging;
+  }
+
+  public isInDodgeCooldown(): boolean {
+    return this.isOnDodgeCooldown;
   }
 
   public takeDamage(): boolean {

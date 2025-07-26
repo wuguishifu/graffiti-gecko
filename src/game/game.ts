@@ -22,7 +22,7 @@ export class Game {
   private camera: Camera;
   private shaderProgram: WebGLProgram;
   private programInfo: ProgramInfo;
-  private player: Player;
+  public player: Player;
   private level: Level;
   private running = false;
   private textureManager: TextureManager;
