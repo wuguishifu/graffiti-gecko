@@ -40,6 +40,7 @@ export class Player extends RenderObject {
   private isDodging = false;
   private dodgeCooldownMs = 7000;
   private dodgeRotationInterval: NodeJS.Timeout | null = null;
+  private dodgeTimeout: NodeJS.Timeout | null = null;
   private isOnDodgeCooldown = false;
   private dodgeDurationMs = 3000;
 
@@ -61,7 +62,7 @@ export class Player extends RenderObject {
 
   public render(gl: WebGLRenderingContext, programInfo: ProgramInfo, camera: Camera) {
     // Flash effect during invincibility
-    if (this.isInvincible) {
+    if (this.isInvincible || this.isDodging) {
       this.flashTimer++;
       if (this.flashTimer % this.flashInterval < this.flashInterval / 2) {
         return; // Skip rendering every other flash interval
@@ -85,7 +86,7 @@ export class Player extends RenderObject {
     // Update invincibility timer
     if (this.isInvincible) {
       this.invincibilityTimer++;
-      if (this.invincibilityTimer >= this.invincibilityDuration) {
+      if (this.invincibilityTimer >= this.invincibilityDuration && !this.isDodging) {
         this.isInvincible = false;
         this.invincibilityTimer = 0;
       }
@@ -246,20 +247,18 @@ export class Player extends RenderObject {
     this.isInvincible = true;
     this.isOnDodgeCooldown = true;
 
-    // Optional: continuous rotation effect
     const rotationSpeed = 0.2;
-    const interval = setInterval(() => {
+    this.dodgeRotationInterval = setInterval(() => {
       this.rotation.z += rotationSpeed;
-    }, 16); // ~60 FPS
+    }, 16);
 
-    // End dodge duration
-    setTimeout(() => {
-      clearInterval(interval);
+    this.dodgeTimeout = setTimeout(() => {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      clearInterval(this.dodgeRotationInterval!);
       this.isDodging = false;
-      this.isInvincible = false;
+      // this.isInvincible = false;
     }, this.dodgeDurationMs);
 
-    // End total cooldown after full cooldown period
     setTimeout(() => {
       this.isOnDodgeCooldown = false;
     }, this.dodgeCooldownMs);
