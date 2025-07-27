@@ -67,10 +67,20 @@ export function GamePage() {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === ' ' && store.getState().game.nearSprayCan && !store.getState().game.sprayAreaVisible) {
-        event.preventDefault();
-        sprayAreaRef.current?.reset();
-        onOpenSprayArea();
+      event.preventDefault();
+
+      if (event.key === ' ') {
+        if (store.getState().game.sprayAreaVisible) {
+          return;
+        }
+
+        if (store.getState().game.nearSprayCan) {
+          sprayAreaRef.current?.reset();
+          onOpenSprayArea();
+          return;
+        }
+
+        gameInstance.current?.player?.dodge();
       }
     };
 
