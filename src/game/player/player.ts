@@ -8,6 +8,8 @@ import { TextureManager } from '../graphics/texture-manager';
 import type { ProgramInfo } from '../graphics/types';
 import { Vector3 } from '../math';
 import { soundService } from '../sound/sound';
+import { PausableInterval } from '../util/pauseable-interval';
+import { PausableTimeout } from '../util/pauseable-timeout';
 import type { Level } from '../world/level';
 
 import { DevSliceState } from '@/state/dev-slice';
@@ -39,8 +41,8 @@ export class Player extends RenderObject {
   private energyUpdateFrame = 0;
   private isDodging = false;
   public isOnDodgeCooldown = false;
-  private dodgeTimeout: NodeJS.Timeout | null = null;
-  private dodgeTimerInterval: ReturnType<typeof setInterval> | null = null;
+  private dodgeTimeout: PausableTimeout | null = null;
+  private dodgeTimerInterval: PausableInterval | null = null;
   public static dodgeDurationMs = 3000;
   public static dodgeCooldownMs = 7000;
 
@@ -58,6 +60,16 @@ export class Player extends RenderObject {
     this.lastPosition = new Vector3(0, 0, 0);
 
     store.dispatch(gameActions.setLives(PLAYER_LIVES));
+  }
+
+  public pause() {
+    this.dodgeTimeout?.pause();
+    this.dodgeTimerInterval?.pause();
+  }
+
+  public resume() {
+    this.dodgeTimeout?.resume();
+    this.dodgeTimerInterval?.resume();
   }
 
   public render(gl: WebGLRenderingContext, programInfo: ProgramInfo, camera: Camera) {
@@ -271,14 +283,16 @@ export class Player extends RenderObject {
     );
 
     if (this.dodgeTimeout) {
-      clearTimeout(this.dodgeTimeout);
+      this.dodgeTimeout.clear();
+      this.dodgeTimeout = null;
     }
 
     if (this.dodgeTimerInterval) {
-      clearInterval(this.dodgeTimerInterval);
+      this.dodgeTimerInterval.clear();
+      this.dodgeTimerInterval = null;
     }
 
-    this.dodgeTimerInterval = setInterval(() => {
+    this.dodgeTimerInterval = new PausableInterval(() => {
       const remainingTime = store.getState().game.dodgeState.cooldownRemainingMs;
       if (remainingTime > 0) {
         store.dispatch(
@@ -289,7 +303,7 @@ export class Player extends RenderObject {
       }
     }, 1000);
 
-    this.dodgeTimeout = setTimeout(() => {
+    this.dodgeTimeout = new PausableTimeout(() => {
       this.isDodging = false;
       this.dodgeTimeout = null;
       store.dispatch(
@@ -313,7 +327,7 @@ export class Player extends RenderObject {
         );
 
         if (this.dodgeTimerInterval) {
-          clearInterval(this.dodgeTimerInterval);
+          this.dodgeTimerInterval.clear();
         }
       }, Player.dodgeCooldownMs);
     }, Player.dodgeDurationMs);
