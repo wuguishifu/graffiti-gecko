@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback } from 'react';
 
 import { Timer } from '../components/timer';
+import { Player } from '../game/player/player';
 import { useGame } from '../state/game-context';
 import { useAppSelector } from '../state/use-app-state';
 
@@ -12,50 +13,23 @@ type HudProps = {
   onOpenSprayArea: () => void;
 };
 
+const dodgeTotalDurationSeconds = (Player.dodgeCooldownMs + Player.dodgeDurationMs) / 1000;
+
 export function Hud({ onOpenSprayArea }: HudProps) {
   const nearSprayCan = useAppSelector((state) => state.game.nearSprayCan);
   const devMode = useAppSelector((state) => state.dev.isDirty);
   const { gameInstance } = useGame();
 
-  const dodgeCooldownSeconds = 3;
-  const [cooldownRemaining, setCooldownRemaining] = useState(0);
-  const cooldownIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const canDodge = useAppSelector((state) => state.game.dodgeState.canDodge);
+  const dodgeTimeRemaining = useAppSelector((state) => state.game.dodgeState.cooldownRemainingMs);
 
-  const player = gameInstance.current?.player;
-  const [canDodge, setCanDodge] = useState(true);
-
-  const handleDodge = () => {
+  const handleDodge = useCallback(() => {
     const player = gameInstance.current?.player;
-    if (!player || player.getDodging()) {
+    if (!player?.canDodge) {
       return;
     }
 
     player.dodge(); // uses internal cooldown
-    setCooldownRemaining(dodgeCooldownSeconds);
-
-    cooldownIntervalRef.current = setInterval(() => {
-      setCooldownRemaining((prev) => {
-        if (prev <= 1) {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          clearInterval(cooldownIntervalRef.current!);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const player = gameInstance.current?.player;
-      if (!player) {
-        return;
-      }
-
-      setCanDodge(!player.isInDodgeCooldown());
-    }, 100); // check 10x per second
-
-    return () => clearInterval(interval);
   }, [gameInstance]);
 
   return (
@@ -88,8 +62,8 @@ export function Hud({ onOpenSprayArea }: HudProps) {
 
           {!canDodge && (
             <Timer
-              remainingDurationSeconds={cooldownRemaining}
-              totalDurationSeconds={dodgeCooldownSeconds}
+              remainingDurationSeconds={dodgeTimeRemaining / 1000}
+              totalDurationSeconds={dodgeTotalDurationSeconds}
               size={40}
               strokeWidth={5}
             />

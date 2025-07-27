@@ -38,11 +38,11 @@ export class Player extends RenderObject {
   private energyUpdateThrottle = 6; // only update Redux every 6 frames
   private energyUpdateFrame = 0;
   private isDodging = false;
-  private dodgeCooldownMs = 7000;
-  private dodgeRotationInterval: NodeJS.Timeout | null = null;
+  public isOnDodgeCooldown = false;
   private dodgeTimeout: NodeJS.Timeout | null = null;
-  private isOnDodgeCooldown = false;
-  private dodgeDurationMs = 3000;
+  private dodgeTimerInterval: ReturnType<typeof setInterval> | null = null;
+  public static dodgeDurationMs = 3000;
+  public static dodgeCooldownMs = 7000;
 
   constructor(
     gl: WebGLRenderingContext,
@@ -62,7 +62,7 @@ export class Player extends RenderObject {
 
   public render(gl: WebGLRenderingContext, programInfo: ProgramInfo, camera: Camera) {
     // Flash effect during invincibility
-    if (this.isInvincible || this.isDodging) {
+    if (this.isInvincible) {
       this.flashTimer++;
       if (this.flashTimer % this.flashInterval < this.flashInterval / 2) {
         return; // Skip rendering every other flash interval
@@ -77,6 +77,7 @@ export class Player extends RenderObject {
         model: this.model,
         texture: this.textureManager.getEntityTexture('gecko'),
         useTexture: this.textureManager.isEntityTextureReady('gecko'),
+        alphaMultiplier: this.isDodging ? 0.5 : 1,
       },
       camera,
     });
@@ -90,6 +91,11 @@ export class Player extends RenderObject {
         this.isInvincible = false;
         this.invincibilityTimer = 0;
       }
+    }
+
+    // Dodge rotation
+    if (this.isDodging) {
+      this.rotation.z += 0.1;
     }
 
     let vx = 0;
@@ -238,42 +244,83 @@ export class Player extends RenderObject {
       }
     }
   }
+
+  public get canDodge(): boolean {
+    return !this.isDodging && !this.isOnDodgeCooldown;
+  }
+
+  public get shouldTakeDamage(): boolean {
+    return !this.isInvincible && !this.isDodging;
+  }
+
   public dodge() {
-    if (this.isDodging || this.isOnDodgeCooldown) {
+    if (!this.canDodge) {
       return;
     }
 
     this.isDodging = true;
-    this.isInvincible = true;
     this.isOnDodgeCooldown = true;
 
-    const rotationSpeed = 0.2;
-    this.dodgeRotationInterval = setInterval(() => {
-      this.rotation.z += rotationSpeed;
-    }, 16);
+    store.dispatch(
+      gameActions.updateDodgeState({
+        canDodge: false,
+        isDodging: true,
+        isOnCooldown: true,
+        cooldownRemainingMs: Player.dodgeCooldownMs + Player.dodgeDurationMs,
+      }),
+    );
+
+    if (this.dodgeTimeout) {
+      clearTimeout(this.dodgeTimeout);
+    }
+
+    if (this.dodgeTimerInterval) {
+      clearInterval(this.dodgeTimerInterval);
+    }
+
+    this.dodgeTimerInterval = setInterval(() => {
+      const remainingTime = store.getState().game.dodgeState.cooldownRemainingMs;
+      if (remainingTime > 0) {
+        store.dispatch(
+          gameActions.updateDodgeState({
+            cooldownRemainingMs: remainingTime - 1000,
+          }),
+        );
+      }
+    }, 1000);
 
     this.dodgeTimeout = setTimeout(() => {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      clearInterval(this.dodgeRotationInterval!);
       this.isDodging = false;
-      // this.isInvincible = false;
-    }, this.dodgeDurationMs);
+      this.dodgeTimeout = null;
+      store.dispatch(
+        gameActions.updateDodgeState({
+          isDodging: false,
+          isOnCooldown: true,
+          cooldownRemainingMs: Player.dodgeCooldownMs,
+        }),
+      );
 
-    setTimeout(() => {
-      this.isOnDodgeCooldown = false;
-    }, this.dodgeCooldownMs);
-  }
+      setTimeout(() => {
+        this.isOnDodgeCooldown = false;
 
-  public getDodging(): boolean {
-    return this.isDodging;
-  }
+        store.dispatch(
+          gameActions.updateDodgeState({
+            isDodging: false,
+            isOnCooldown: true,
+            cooldownRemainingMs: Player.dodgeCooldownMs,
+            canDodge: true,
+          }),
+        );
 
-  public isInDodgeCooldown(): boolean {
-    return this.isOnDodgeCooldown;
+        if (this.dodgeTimerInterval) {
+          clearInterval(this.dodgeTimerInterval);
+        }
+      }, Player.dodgeCooldownMs);
+    }, Player.dodgeDurationMs);
   }
 
   public takeDamage(): boolean {
-    if (this.isInvincible) {
+    if (!this.shouldTakeDamage) {
       return false; // No damage taken during invincibility
     }
 
@@ -293,10 +340,6 @@ export class Player extends RenderObject {
 
   public getLives(): number {
     return this.lives;
-  }
-
-  public isInvulnerable(): boolean {
-    return this.isInvincible;
   }
 
   public getTotalDistanceTraveled(): number {

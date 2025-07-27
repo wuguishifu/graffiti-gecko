@@ -16,6 +16,7 @@ type ObjectData = {
   model: ObjectModel;
   texture?: Texture;
   useTexture?: boolean;
+  alphaMultiplier?: number;
 };
 
 type RenderProps = {
@@ -38,6 +39,7 @@ type RenderGroupProps = {
   };
   objects: {
     model: ObjectModel;
+    alphaMultiplier?: number;
   }[];
   mesh: Mesh;
   texture?: Texture;
@@ -45,7 +47,12 @@ type RenderGroupProps = {
   camera: Camera;
 };
 
-export function renderObject({ gl, object: { mesh, model, texture, useTexture = false }, camera, info }: RenderProps) {
+export function renderObject({
+  gl,
+  object: { mesh, model, texture, useTexture = false, alphaMultiplier = 1 },
+  camera,
+  info,
+}: RenderProps) {
   const modelMatrix = mat4.create();
   mat4.translate(modelMatrix, modelMatrix, model.position.toReadonlyVec3());
   mat4.rotateX(modelMatrix, modelMatrix, model.rotation.x);
@@ -72,6 +79,8 @@ export function renderObject({ gl, object: { mesh, model, texture, useTexture = 
   } else {
     gl.uniform1i(info.uniforms.useTexture, 0);
   }
+
+  gl.uniform1f(info.uniforms.uAlphaMultiplier, alphaMultiplier);
 
   gl.uniformMatrix4fv(info.uniforms.vView, false, camera.viewMatrix());
   gl.uniformMatrix4fv(info.uniforms.vProjection, false, camera.projectionMatrix());
@@ -113,7 +122,7 @@ export function renderSimilarObjects({ gl, info, objects, mesh, camera, texture,
   gl.uniformMatrix4fv(info.uniforms.vProjection, false, camera.projectionMatrix());
   gl.uniform3fv(info.uniforms.viewPos, camera.position.toArray());
 
-  for (const { model } of objects) {
+  for (const { model, alphaMultiplier = 1 } of objects) {
     const modelMatrix = mat4.create();
     mat4.translate(modelMatrix, modelMatrix, model.position.toReadonlyVec3());
     mat4.rotateX(modelMatrix, modelMatrix, model.rotation.x);
@@ -121,6 +130,7 @@ export function renderSimilarObjects({ gl, info, objects, mesh, camera, texture,
     mat4.rotateZ(modelMatrix, modelMatrix, model.rotation.z);
     mat4.scale(modelMatrix, modelMatrix, model.scale.toReadonlyVec3());
     gl.uniformMatrix4fv(info.uniforms.vModel, false, modelMatrix);
+    gl.uniform1f(info.uniforms.uAlphaMultiplier, alphaMultiplier);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.ibo);
     gl.drawElements(gl.TRIANGLES, mesh.vertexCount, gl.UNSIGNED_SHORT, 0);

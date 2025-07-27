@@ -4,6 +4,7 @@ varying vec2 passTextureCoord;
 
 uniform sampler2D uTexture;
 uniform bool useTexture;
+uniform float uAlphaMultiplier;
 
 void main(void) {
   vec3 color;
@@ -17,5 +18,5 @@ void main(void) {
     color = vec3(0.5, 0.5, 0.5);
   }
 
-  gl_FragColor = vec4(color, alpha);
+  gl_FragColor = vec4(color, alpha * uAlphaMultiplier);
 }
