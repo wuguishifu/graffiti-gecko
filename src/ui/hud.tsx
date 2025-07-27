@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 
 import { Timer } from '../components/timer';
 import { Player } from '../game/player/player';
+import { cn } from '../lib/utils';
 import { useGame } from '../state/game-context';
 import { useAppSelector } from '../state/use-app-state';
 
@@ -24,12 +25,7 @@ export function Hud({ onOpenSprayArea }: HudProps) {
   const dodgeTimeRemaining = useAppSelector((state) => state.game.dodgeState.cooldownRemainingMs);
 
   const handleDodge = useCallback(() => {
-    const player = gameInstance.current?.player;
-    if (!player?.canDodge) {
-      return;
-    }
-
-    player.dodge(); // uses internal cooldown
+    gameInstance.current?.player?.dodge();
   }, [gameInstance]);
 
   return (
@@ -51,9 +47,10 @@ export function Hud({ onOpenSprayArea }: HudProps) {
         )}
         <div className="absolute bottom-0 left-0 flex items-center gap-2">
           <button
-            className={`cursor-pointer hover:scale-110 transition-transform ${
-              canDodge ? '' : 'opacity-50 pointer-events-none'
-            }`}
+            className={cn(
+              'cursor-pointer hover:scale-110 transition-transform ',
+              canDodge ? '' : 'opacity-50 pointer-events-none',
+            )}
             onClick={handleDodge}
             tabIndex={-1}
           >

@@ -288,10 +288,6 @@ export class Level {
     });
   }
 
-  public killCop(id: number) {
-    this.cops = this.cops.filter((cop) => cop.getId() !== id);
-  }
-
   public getCops(): Cop[] {
     return this.cops;
   }
