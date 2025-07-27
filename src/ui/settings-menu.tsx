@@ -108,7 +108,7 @@ export function SettingsMenu({ onHide }: { onHide: () => void }) {
             </div>
           </div>
           <div className="w-52 bg-[#FFF600] aspect-square border-3 border-black rounded-xl flex flex-col items-center py-2 justify-evenly">
-            <img src="/assets/copy/start-tag.svg" />
+            <img src="/assets/copy/tag-slash-dodge.svg" />
             <img src="/assets/icons/mouse-click.png" className="h-15" />
             <div className="flex justify-center w-full">
               <div className="bg-white border-3 border-black rounded-lg flex items-center justify-center h-15 w-3/4">
