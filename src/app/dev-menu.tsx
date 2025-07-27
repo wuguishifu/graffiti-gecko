@@ -41,13 +41,6 @@ export function DevMenu() {
           <Switch checked={devState.godMode} onCheckedChange={() => dispatch(devActions.toggleGodMode())} />
         </Label>
         <Label className="cursor-pointer">
-          <h2 className="text-xl">Unlimited Stamina</h2>
-          <Switch
-            checked={devState.unlimitedStamina}
-            onCheckedChange={() => dispatch(devActions.toggleUnlimitedStamina())}
-          />
-        </Label>
-        <Label className="cursor-pointer">
           <h2 className="text-xl">Many Spray Cans</h2>
           <Switch checked={devState.manySprayCans} onCheckedChange={() => dispatch(devActions.toggleManySprayCans())} />
         </Label>

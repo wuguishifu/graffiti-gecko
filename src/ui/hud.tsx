@@ -6,7 +6,6 @@ import { cn } from '../lib/utils';
 import { useGame } from '../state/game-context';
 import { useAppSelector } from '../state/use-app-state';
 
-import { Energy } from '@/components/energy';
 import { Lives } from '@/components/lives';
 import { Tags } from '@/components/tags';
 
@@ -33,7 +32,6 @@ export function Hud({ onOpenSprayArea }: HudProps) {
       <div className="relative w-full h-full">
         <div className="flex flex-row items-center justify-between select-none pointer-events-none">
           <Tags />
-          <Energy />
           <Lives />
         </div>
         {nearSprayCan && (

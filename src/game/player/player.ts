@@ -18,7 +18,6 @@ const PLAYER_LIVES = 3;
 
 export class Player extends RenderObject {
   private walkSpeed = 0.04;
-  private runSpeed = 0.08;
   private mesh: Mesh;
   private textureManager: TextureManager;
   private level: Level;
@@ -31,14 +30,6 @@ export class Player extends RenderObject {
   private flashInterval = 10; // Flash every 10 frames
   private totalDistanceTraveled = 0;
   private lastPosition: Vector3;
-  private stamina = 100; // 0-100 percent
-  private staminaDepleteRate = 0.7; // percent per frame while sprinting
-  private staminaRegenRate = 0.3; // percent per frame while recovering
-  private staminaRegenDelay = 60; // frames to wait after hitting 0 (1s at 60fps)
-  private staminaRegenDelayTimer = 0;
-  private lastEnergyPercent = 100;
-  private energyUpdateThrottle = 6; // only update Redux every 6 frames
-  private energyUpdateFrame = 0;
   private isDodging = false;
   public isOnDodgeCooldown = false;
   private dodgeTimeout: PausableTimeout | null = null;
@@ -112,57 +103,7 @@ export class Player extends RenderObject {
 
     let vx = 0;
     let vy = 0;
-    let ax = this.walkSpeed;
-    const isTryingToSprint = this.keysDown.has('shift');
-    const canSprint = isTryingToSprint && this.stamina > 0 && this.staminaRegenDelayTimer === 0;
-
-    // Sprinting logic
-    if (canSprint) {
-      ax = this.runSpeed;
-      if (!this.devOptions.unlimitedStamina) {
-        this.stamina -= this.staminaDepleteRate;
-      }
-      if (this.stamina <= 0) {
-        this.stamina = 0;
-        this.staminaRegenDelayTimer = this.staminaRegenDelay;
-      }
-    } else {
-      ax = this.walkSpeed;
-      // Only start regen delay if we just hit 0 and are still trying to sprint
-      if (this.stamina === 0 && isTryingToSprint && this.staminaRegenDelayTimer === 0) {
-        this.staminaRegenDelayTimer = this.staminaRegenDelay;
-      }
-    }
-
-    // Regen delay countdown
-    if (this.staminaRegenDelayTimer > 0) {
-      this.staminaRegenDelayTimer--;
-    } else if (!canSprint && this.stamina < 100) {
-      // Only regen if not sprinting and delay is over
-      this.stamina += this.staminaRegenRate;
-      if (this.stamina > 100) {
-        this.stamina = 100;
-      }
-    }
-
-    // Clamp stamina
-    if (this.stamina < 0) {
-      this.stamina = 0;
-    }
-    if (this.stamina > 100) {
-      this.stamina = 100;
-    }
-
-    // Throttle Redux updates for energyPercent
-    this.energyUpdateFrame = (this.energyUpdateFrame + 1) % this.energyUpdateThrottle;
-    const roundedEnergy = Math.round(this.stamina);
-    if (
-      (roundedEnergy !== this.lastEnergyPercent && this.energyUpdateFrame === 0) ||
-      (this.lastEnergyPercent !== roundedEnergy && (roundedEnergy === 0 || roundedEnergy === 100))
-    ) {
-      store.dispatch(gameActions.setEnergyPercent(roundedEnergy));
-      this.lastEnergyPercent = roundedEnergy;
-    }
+    const ax = this.walkSpeed;
 
     if (this.keysDown.has('w')) {
       vy += ax;

@@ -2,7 +2,6 @@ import { createSlice } from '@reduxjs/toolkit';
 
 export type DevSliceState = {
   disableCopAi: boolean;
-  unlimitedStamina: boolean;
   godMode: boolean;
   manySprayCans: boolean;
   onePercentFill: boolean;
@@ -11,7 +10,6 @@ export type DevSliceState = {
 
 const initialState: DevSliceState = {
   disableCopAi: false,
-  unlimitedStamina: false,
   godMode: false,
   manySprayCans: false,
   onePercentFill: false,
@@ -24,9 +22,6 @@ export const devSlice = createSlice({
   reducers: {
     toggleCopAi: (state) => {
       state.disableCopAi = !state.disableCopAi;
-    },
-    toggleUnlimitedStamina: (state) => {
-      state.unlimitedStamina = !state.unlimitedStamina;
     },
     toggleGodMode: (state) => {
       state.godMode = !state.godMode;

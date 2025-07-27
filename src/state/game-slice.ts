@@ -18,7 +18,6 @@ type GameSliceState = {
   totalSprayCansCompleted: number;
   currentLevel: number;
   pauseMenuVisible?: boolean;
-  energyPercent: number;
   dodgeState: {
     canDodge: boolean;
     isDodging: boolean;
@@ -35,7 +34,6 @@ const initialState: GameSliceState = {
   distanceTraveled: 0,
   totalSprayCansCompleted: 0,
   currentLevel: 1,
-  energyPercent: 100,
   dodgeState: {
     canDodge: true,
     isDodging: false,
@@ -100,9 +98,6 @@ export const gameSlice = createSlice({
     },
     setPauseMenuVisible: (state, action: PayloadAction<boolean>) => {
       state.pauseMenuVisible = action.payload;
-    },
-    setEnergyPercent: (state, action: PayloadAction<number>) => {
-      state.energyPercent = action.payload;
     },
     updateDodgeState: (state, action: PayloadAction<Partial<GameSliceState['dodgeState']>>) => {
       state.dodgeState = {
