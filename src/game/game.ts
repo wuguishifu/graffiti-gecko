@@ -29,12 +29,14 @@ export class Game {
 
   public pause() {
     this.running = false;
+    this.player.pause();
   }
 
   public resume() {
     if (!this.running) {
       this.running = true;
       this.run();
+      this.player.resume();
     }
   }
 

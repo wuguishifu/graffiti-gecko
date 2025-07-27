@@ -2,12 +2,14 @@ import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router';
 
 import { soundService } from '../game/sound/sound';
-import { useAppSelector } from '../state/use-app-state';
+import { gameActions } from '../state/game-slice';
+import { useAppDispatch, useAppSelector } from '../state/use-app-state';
 
 export function GameOver() {
   const totalSprayCansCompleted = useAppSelector((state) => state.game.totalSprayCansCompleted);
   const currentLevel = useAppSelector((state) => state.game.currentLevel);
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -42,6 +44,7 @@ export function GameOver() {
           className="hover:scale-110 transition-transform"
           onMouseEnter={() => soundService.playSound('hover')}
           onClick={() => {
+            dispatch(gameActions.reset());
             soundService.playSound('click');
           }}
         >

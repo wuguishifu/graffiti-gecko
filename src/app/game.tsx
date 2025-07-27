@@ -24,8 +24,6 @@ export function GamePage() {
 
   useEffect(() => {
     if (canvasRef.current) {
-      // Reset game state for new session
-      dispatchRef.current(gameActions.reset());
       gameInstance.current = new Game(canvasRef.current, store.getState().dev);
     }
 
