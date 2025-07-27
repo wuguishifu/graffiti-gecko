@@ -235,7 +235,7 @@ export class Player extends RenderObject {
 
     this.dodgeTimerInterval = new PausableInterval(() => {
       const remainingTime = store.getState().game.dodgeState.cooldownRemainingMs;
-      if (remainingTime > 0) {
+      if (remainingTime >= 0) {
         store.dispatch(
           gameActions.updateDodgeState({
             cooldownRemainingMs: remainingTime - 1000,

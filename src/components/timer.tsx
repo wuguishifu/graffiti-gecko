@@ -35,7 +35,11 @@ export function Timer({
   return (
     <svg width={size} height={size}>
       <circle cx={center} cy={center} r={radius} fill="white" stroke="black" strokeWidth={strokeWidth} />
-      {percentElapsed > 0 && <path d={wedgePath} fill="black" />}
+      {percentElapsed >= 1 ? (
+        <circle cx={center} cy={center} r={wedgeRadius} fill="black" />
+      ) : (
+        percentElapsed > 0 && <path d={wedgePath} fill="black" />
+      )}
       <circle
         cx={center}
         cy={center}

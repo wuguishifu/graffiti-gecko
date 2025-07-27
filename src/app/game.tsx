@@ -65,9 +65,8 @@ export function GamePage() {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      event.preventDefault();
-
       if (event.key === ' ') {
+        event.preventDefault();
         if (store.getState().game.sprayAreaVisible) {
           return;
         }
