@@ -40,7 +40,7 @@ export function Hud({ onOpenSprayArea }: HudProps) {
             onClick={onOpenSprayArea}
             tabIndex={-1}
           >
-            <img src="/assets/icons/can.png" className="size-64 pointer-events-none select-none" tabIndex={-1} />
+            <img src="./assets/icons/can.png" className="size-64 pointer-events-none select-none" tabIndex={-1} />
           </button>
         )}
         <div className="absolute bottom-0 left-0 flex items-center gap-2">
@@ -52,7 +52,7 @@ export function Hud({ onOpenSprayArea }: HudProps) {
             onClick={handleDodge}
             tabIndex={-1}
           >
-            <img src="/assets/icons/dodge.png" className="size-64 pointer-events-none select-none" tabIndex={-1} />
+            <img src="./assets/icons/dodge.png" className="size-64 pointer-events-none select-none" tabIndex={-1} />
           </button>
 
           {!canDodge && (

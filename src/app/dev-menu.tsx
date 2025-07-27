@@ -29,7 +29,7 @@ export function DevMenu() {
     <main className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
       <img
         className="absolute top-0 left-0 w-full h-full object-cover select-none pointer-events-none"
-        src="/assets/backgrounds/brick.webp"
+        src="./assets/backgrounds/brick.webp"
       />
       <div className="flex flex-col items-center gap-8 z-10">
         <Label className="cursor-pointer">

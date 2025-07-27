@@ -3,19 +3,19 @@ import { Howl } from 'howler';
 import { store } from '@/state/store';
 
 const Sounds = {
-  click: new Howl({ src: ['/assets/sounds/button.mp3'] }),
-  hover: new Howl({ src: ['/assets/sounds/hover.mp3'] }),
-  hit: new Howl({ src: ['/assets/sounds/hit.mp3'] }),
-  caught: new Howl({ src: ['/assets/sounds/caught.wav'] }),
-  policeWalk: new Howl({ src: ['/assets/sounds/police_walk.mp3'], loop: true }),
-  spray: new Howl({ src: ['/assets/sounds/spray.mp3'], loop: true }),
-  success: new Howl({ src: ['/assets/sounds/success.mp3'] }),
-  fail: new Howl({ src: ['/assets/sounds/fail.mp3'] }),
-  mainMenu: new Howl({ src: ['/assets/sounds/music/main_menu.mp3'], loop: true }),
-  game1: new Howl({ src: ['/assets/sounds/music/game1.mp3'], loop: true }),
-  game2: new Howl({ src: ['/assets/sounds/music/game2.mp3'], loop: true }),
-  game3: new Howl({ src: ['/assets/sounds/music/game3.mp3'], loop: true }),
-  game4: new Howl({ src: ['/assets/sounds/music/game4.mp3'], loop: true }),
+  click: new Howl({ src: ['./assets/sounds/button.mp3'] }),
+  hover: new Howl({ src: ['./assets/sounds/hover.mp3'] }),
+  hit: new Howl({ src: ['./assets/sounds/hit.mp3'] }),
+  caught: new Howl({ src: ['./assets/sounds/caught.wav'] }),
+  policeWalk: new Howl({ src: ['./assets/sounds/police_walk.mp3'], loop: true }),
+  spray: new Howl({ src: ['./assets/sounds/spray.mp3'], loop: true }),
+  success: new Howl({ src: ['./assets/sounds/success.mp3'] }),
+  fail: new Howl({ src: ['./assets/sounds/fail.mp3'] }),
+  mainMenu: new Howl({ src: ['./assets/sounds/music/main_menu.mp3'], loop: true }),
+  game1: new Howl({ src: ['./assets/sounds/music/game1.mp3'], loop: true }),
+  game2: new Howl({ src: ['./assets/sounds/music/game2.mp3'], loop: true }),
+  game3: new Howl({ src: ['./assets/sounds/music/game3.mp3'], loop: true }),
+  game4: new Howl({ src: ['./assets/sounds/music/game4.mp3'], loop: true }),
 };
 
 const gameMusicKeys: (keyof typeof Sounds)[] = ['game1', 'game2', 'game3', 'game4'];

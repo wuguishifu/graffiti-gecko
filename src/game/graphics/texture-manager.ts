@@ -4,20 +4,20 @@ import { TileVariant } from '../tiles/types';
 export type EntityVariant = 'gecko' | 'spray-can' | 'cop' | 'arrow' | 'spray-can-failed' | 'spray-can-completed';
 
 const tileVariantToTextureMap: Record<TileVariant, string> = {
-  grass: '/assets/tiles/grass.jpg',
-  stone: '/assets/tiles/stone.jpg',
-  building: '/assets/tiles/building.jpg',
-  sand: '/assets/tiles/sand.jpg',
-  vent: '/assets/tiles/vent.jpg',
+  grass: './assets/tiles/grass.jpg',
+  stone: './assets/tiles/stone.jpg',
+  building: './assets/tiles/building.jpg',
+  sand: './assets/tiles/sand.jpg',
+  vent: './assets/tiles/vent.jpg',
 };
 
 const entityVariantToTextureMap: Record<EntityVariant, string> = {
-  gecko: '/assets/gecko.png',
-  'spray-can': '/assets/entities/spray-can.png',
-  cop: '/assets/entities/cop.png',
-  arrow: '/assets/entities/arrow.png',
-  'spray-can-failed': '/assets/entities/spray-can-failed.png',
-  'spray-can-completed': '/assets/entities/spray-can-completed.png',
+  gecko: './assets/gecko.png',
+  'spray-can': './assets/entities/spray-can.png',
+  cop: './assets/entities/cop.png',
+  arrow: './assets/entities/arrow.png',
+  'spray-can-failed': './assets/entities/spray-can-failed.png',
+  'spray-can-completed': './assets/entities/spray-can-completed.png',
 };
 
 export class TextureManager {

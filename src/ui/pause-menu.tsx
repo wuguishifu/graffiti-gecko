@@ -20,17 +20,17 @@ export function PauseMenu() {
     <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-50 bg-black select-none">
       <img
         className="absolute top-0 left-0 w-full h-full object-cover -z-20 pointer-events-none"
-        src="/assets/backgrounds/wall.webp"
+        src="./assets/backgrounds/wall.webp"
       />
-      <img className="absolute h-[90%] select-none pointer-events-none -z-10" src="/assets/tags/spray-bg.webp" />
+      <img className="absolute h-[90%] select-none pointer-events-none -z-10" src="./assets/tags/spray-bg.webp" />
       <div className="flex flex-col items-center gap-8">
-        <img src="/assets/copy/game-paused.svg" className="pointer-events-none" />
+        <img src="./assets/copy/game-paused.svg" className="pointer-events-none" />
         <p className="text-6xl font-graffiti-youth !text-black">Level {currentLevel}</p>
         <div className="flex flex-row items-center gap-32 w-[30rem] h-38">
           <Pill>
             <p className="text-7xl font-graffiti-youth !text-black">{tagsCompleted} tags</p>
             <div className="absolute -left-20 -top-14">
-              <img src="/assets/icons/can.png" className="size-48 pointer-events-none select-none" />
+              <img src="./assets/icons/can.png" className="size-48 pointer-events-none select-none" />
             </div>
           </Pill>
         </div>
@@ -42,7 +42,7 @@ export function PauseMenu() {
             dispatch(gameActions.setPauseMenuVisible(false));
           }}
         >
-          <img src="/assets/copy/resume.svg" />
+          <img src="./assets/copy/resume.svg" />
         </button>
         <button
           className="hover:scale-110 transition-transform cursor-pointer"
@@ -52,7 +52,7 @@ export function PauseMenu() {
             soundService.playSound('click');
           }}
         >
-          <img src="/assets/copy/pause-menu-settings.svg" />
+          <img src="./assets/copy/pause-menu-settings.svg" />
         </button>
         <Link
           to="/"
@@ -62,7 +62,7 @@ export function PauseMenu() {
             soundService.playSound('click');
           }}
         >
-          <img src="/assets/copy/exit-to-main-menu.svg" />
+          <img src="./assets/copy/exit-to-main-menu.svg" />
         </Link>
       </div>
       {settingsVisible && <SettingsMenu onHide={() => setSettingsVisible(false)} />}

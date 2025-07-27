@@ -27,10 +27,10 @@ export function SettingsMenu({ onHide }: { onHide: () => void }) {
           filter: 'drop-shadow(15px 15px 4px rgba(0, 0, 0, 0.60))',
         }}
       >
-        <img src="/assets/copy/settings-title.svg" className="select-none pointer-events-none" />
+        <img src="./assets/copy/settings-title.svg" className="select-none pointer-events-none" />
         <div className="mt-12 flex items-center gap-4 w-full">
           <div className="w-44">
-            <img src="/assets/copy/music.svg" className="select-none pointer-events-none" />
+            <img src="./assets/copy/music.svg" className="select-none pointer-events-none" />
           </div>
           <label
             htmlFor="minmax-range"
@@ -50,7 +50,7 @@ export function SettingsMenu({ onHide }: { onHide: () => void }) {
 
         <div className="mt-12 flex items-center gap-4 w-full">
           <div className="w-44">
-            <img src="/assets/copy/sounds.svg" className="select-none pointer-events-none" />
+            <img src="./assets/copy/sounds.svg" className="select-none pointer-events-none" />
           </div>
           <label
             htmlFor="minmax-range"
@@ -69,7 +69,7 @@ export function SettingsMenu({ onHide }: { onHide: () => void }) {
         </div>
 
         <div className="mt-12 flex items-center gap-4 justify-between w-full">
-          <img src="/assets/copy/spray-color.svg" className="select-none pointer-events-none" />
+          <img src="./assets/copy/spray-color.svg" className="select-none pointer-events-none" />
           <div className="flex items-center gap-2">
             {colors.map((color) => (
               <button
@@ -84,9 +84,9 @@ export function SettingsMenu({ onHide }: { onHide: () => void }) {
         </div>
 
         <div className="mt-12 flex items-start gap-4 w-full select-none pointer-events-none">
-          <img src="/assets/copy/gameplay.svg" />
+          <img src="./assets/copy/gameplay.svg" />
           <div className="w-52 bg-[#FFF600] aspect-square border-3 border-black rounded-xl flex flex-col items-center py-2 px-2 justify-evenly">
-            <img src="/assets/copy/move.svg" />
+            <img src="./assets/copy/move.svg" />
             <div className="flex w-full justify-evenly">
               {/* don't judge me this is just so it lines up quick and dirty */}
               <div className="bg-transparent border-3 border-transparent rounded-lg aspect-square size-15"></div>
@@ -108,8 +108,8 @@ export function SettingsMenu({ onHide }: { onHide: () => void }) {
             </div>
           </div>
           <div className="w-52 bg-[#FFF600] aspect-square border-3 border-black rounded-xl flex flex-col items-center py-2 justify-evenly">
-            <img src="/assets/copy/tag-slash-dodge.svg" />
-            <img src="/assets/icons/mouse-click.png" className="h-15" />
+            <img src="./assets/copy/tag-slash-dodge.svg" />
+            <img src="./assets/icons/mouse-click.png" className="h-15" />
             <div className="flex justify-center w-full">
               <div className="bg-white border-3 border-black rounded-lg flex items-center justify-center h-15 w-3/4">
                 <span className="font-blank-river !text-black text-4xl">Space</span>
@@ -127,7 +127,7 @@ export function SettingsMenu({ onHide }: { onHide: () => void }) {
               onHide();
             }}
           >
-            <img src="/assets/copy/confirm.svg" />
+            <img src="./assets/copy/confirm.svg" />
           </button>
         </div>
       </div>

@@ -9,9 +9,9 @@ export function Lives() {
         <div className="flex items-center gap-2">
           {Array.from({ length: 3 }, (_, index) =>
             lives > index ? (
-              <img key={index} src="/assets/icons/heart-full.png" className="size-8" />
+              <img key={index} src="./assets/icons/heart-full.png" className="size-8" />
             ) : (
-              <img key={index} src="/assets/icons/heart-empty.png" className="size-8" />
+              <img key={index} src="./assets/icons/heart-empty.png" className="size-8" />
             ),
           )}
         </div>

@@ -14,17 +14,17 @@ export type SprayAreaRef = {
 };
 
 const tagImages = [
-  '/assets/tags/b.png',
-  '/assets/tags/crown.png',
-  '/assets/tags/f.png',
-  '/assets/tags/heart.png',
-  '/assets/tags/s.png',
-  '/assets/tags/scribble.png',
-  '/assets/tags/sparkle.png',
-  '/assets/tags/star1.png',
-  '/assets/tags/star2.png',
-  '/assets/tags/y.png',
-  '/assets/tags/z.png',
+  './assets/tags/b.png',
+  './assets/tags/crown.png',
+  './assets/tags/f.png',
+  './assets/tags/heart.png',
+  './assets/tags/s.png',
+  './assets/tags/scribble.png',
+  './assets/tags/sparkle.png',
+  './assets/tags/star1.png',
+  './assets/tags/star2.png',
+  './assets/tags/y.png',
+  './assets/tags/z.png',
 ] as const;
 
 const selectRandomTagImage = () => {
@@ -416,7 +416,7 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
     <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-1000 bg-black">
       <img
         className="absolute top-0 left-0 w-full h-full select-none pointer-events-none"
-        src="/assets/backgrounds/brick.webp"
+        src="./assets/backgrounds/brick.webp"
       />
 
       {/* Hidden canvas for tag processing */}
@@ -443,9 +443,9 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
             style={{ left: `${10 + 90 * 0.8 - 5.1}%`, transform: 'skewX(-54.583deg)' }}
           />
         </div>
-        <img src="/assets/copy/fill-to-complete.svg" className="absolute top-18 left-32" />
+        <img src="./assets/copy/fill-to-complete.svg" className="absolute top-18 left-32" />
         <div className="absolute top-8 left-0 w-full flex justify-center">
-          <img src="/assets/copy/tag-it.svg" />
+          <img src="./assets/copy/tag-it.svg" />
         </div>
         <div className="absolute top-8 right-20">
           <div className="bg-[#665F4D] border-3 border-white h-12 px-4 flex justify-end items-center rounded-xl relative w-36">
@@ -480,9 +480,9 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
         <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center pointer-events-none select-none z-0">
           <img
             className="absolute h-3/4 select-none pointer-events-none scale-bounce -z-10"
-            src="/assets/tags/spray-bg.webp"
+            src="./assets/tags/spray-bg.webp"
           />
-          <img src="/assets/copy/tag-complete.svg" className="w-1/4 scale-bounce" />
+          <img src="./assets/copy/tag-complete.svg" className="w-1/4 scale-bounce" />
         </div>
       )}
 
@@ -491,9 +491,9 @@ export const SprayArea = forwardRef<SprayAreaRef>((_, ref) => {
         <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center pointer-events-none select-none z-0">
           <img
             className="absolute h-3/4 select-none pointer-events-none scale-bounce -z-10 scale-75"
-            src="/assets/tags/spray-bg-red.webp"
+            src="./assets/tags/spray-bg-red.webp"
           />
-          <img src="/assets/copy/tag-failed.svg" className="w-1/4 scale-bounce" />
+          <img src="./assets/copy/tag-failed.svg" className="w-1/4 scale-bounce" />
         </div>
       )}
     </div>
