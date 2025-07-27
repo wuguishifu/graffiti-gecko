@@ -48,7 +48,7 @@ export function Hud({ onOpenSprayArea }: HudProps) {
         <div className="absolute bottom-0 left-0 flex items-center gap-2">
           <button
             className={cn(
-              'cursor-pointer hover:scale-110 transition-transform ',
+              'cursor-pointer scale-75 hover:scale-[85%] transition-transform ',
               canDodge ? '' : 'opacity-50 pointer-events-none',
             )}
             onClick={handleDodge}
